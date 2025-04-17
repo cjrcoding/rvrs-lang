@@ -1,0 +1,13 @@
+flow grant_access(user: Identity) {
+  source trust = check_trust(user)
+
+  branch trust == truth {
+    delta state = "allowed"
+    mouth "Access granted."
+  } else {
+    mouth "Access denied."
+    delta state = "denied"
+  }
+
+  echo state
+}
