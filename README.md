@@ -1,2 +1,2 @@
 # rvrs-lang
-A ritual-inspired language that compiles to Aiken for writing expressive smart contracts on Cardano.
+A minimal, ceremonial language that flows into Aiken — smart contracts written in your voice.
