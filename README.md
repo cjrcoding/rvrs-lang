@@ -1,5 +1,7 @@
 # rvrs-lang
 
+![RVRS Banner](https://raw.githubusercontent.com/YOUR_USERNAME/rvrs-lang/main/assets/rvrs-logo-clean.jpg)
+
 # rvrs-lang
 
 🌊 **Rivers (RVRS)**  
