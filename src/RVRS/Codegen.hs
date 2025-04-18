@@ -6,7 +6,7 @@ import RVRS.AST
 generateAiken :: Flow -> String
 generateAiken (Flow name args body) =
   unlines $
-    ["fn " ++ name ++ "(" ++ unwords args ++ ") -> String {"] ++
+    ["fn " ++ name ++ "(" ++ commaSep (map renderArg args) ++ ") -> String {"] ++
     map ("  " ++) (concatMap genStmt body) ++
     ["}"]
 
@@ -15,10 +15,10 @@ genStmt :: Statement -> [String]
 genStmt stmt = case stmt of
   Source var expr -> ["let " ++ var ++ " = " ++ genExpr expr]
   Delta var expr  -> ["let " ++ var ++ " = " ++ genExpr expr]
-  Mouth expr      -> ["trace " ++ show (genExpr expr)]  -- Wrapped in `show` to add quotes
+  Mouth expr      -> ["trace " ++ show (genExpr expr)]
   Echo expr       -> ["return " ++ genExpr expr]
   Branch cond tBranch fBranch ->
-    [ "if " ++ genExpr cond ++ " {" ] ++
+    ["if " ++ genExpr cond ++ " {"] ++
     indent (concatMap genStmt tBranch) ++
     ["} else {"] ++
     indent (concatMap genStmt fBranch) ++
@@ -28,15 +28,21 @@ genStmt stmt = case stmt of
 genExpr :: Expr -> String
 genExpr expr = case expr of
   Var x         -> x
-  StrLit s      -> show s          -- Adds quotes
+  StrLit s      -> show s
   BoolLit True  -> "true"
   BoolLit False -> "false"
   Equals a b    -> genExpr a ++ " == " ++ genExpr b
   Call f args   -> f ++ "(" ++ commaSep (map genExpr args) ++ ")"
 
+-- | Render a function argument
+renderArg :: Argument -> String
+renderArg (Argument name typ) = name ++ ": " ++ typ
+
 -- | Helpers
 commaSep :: [String] -> String
-commaSep = foldr1 (\a b -> a ++ ", " ++ b)
+commaSep []     = ""
+commaSep [x]    = x
+commaSep (x:xs) = x ++ ", " ++ commaSep xs
 
 indent :: [String] -> [String]
 indent = map ("  " ++)

@@ -1,4 +1,1 @@
-flow test() {
-  mouth "hello"
-  echo "world"
-}
+flow test()

@@ -1,3 +1,5 @@
+-- src/RVRS/Parser.hs
+
 module RVRS.Parser where
 
 import RVRS.AST
@@ -8,19 +10,24 @@ import Data.Void
 import Data.Text (Text)
 
 -- | Parser type
+-- 'Void' means we don't care about custom error types for now
+-- 'String' is our input type (source code lines)
 type Parser = Parsec Void String
 
 -- | Entry point for parsing a full flow
 parseRVRS :: String -> Either (ParseErrorBundle String Void) Flow
 parseRVRS input = parse flowParser "RVRS" input
 
--- | Basic flow parser — placeholder, to be expanded
+-- | Step 1: Parse just 'flow' and the function name
 flowParser :: Parser Flow
 flowParser = do
-  -- We'll eventually parse: flow name(args) { body }
-  fail "flowParser not implemented yet"
+  _ <- symbol "flow"
+  name <- identifier
+  _ <- symbol "("
+  _ <- symbol ")"
+  return $ Flow name [] []
 
--- | Utilities for future parsing
+-- | Utilities for parsing
 sc :: Parser ()
 sc = L.space space1 lineCmnt blockCmnt
   where
