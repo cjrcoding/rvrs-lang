@@ -1,7 +1,7 @@
 # rvrs-lang
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/CarlosJRivera/rvrs-lang/main/assets/rvrs-logo-clean.jpg" alt="RVRS Logo" width="600"/>
+  <img src="https://raw.githubusercontent.com/cjrcoding/rvrs-lang/main/assets/rvrs-logo-clean.jpg" alt="RVRS Logo" width="600"/>
 </p>
 
 # rvrs-lang
