@@ -1,0 +1,4 @@
+flow test() {
+  mouth "hello"
+  echo "world"
+}
