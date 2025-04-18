@@ -4,7 +4,7 @@
   <img src="https://raw.githubusercontent.com/cjrcoding/rvrs-lang/main/assets/rvrs-logo-clean.jpg" alt="RVRS Logo" width="600"/>
 </p>
 
-# rvrs-lang
+# RVRS
 
 🌊 **Rivers (RVRS)**  
 *"Not all contracts are code. Some are rivers."*
