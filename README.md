@@ -1,6 +1,8 @@
 # rvrs-lang
 
-![RVRS Banner](https://raw.githubusercontent.com/YOUR_USERNAME/rvrs-lang/main/assets/rvrs-logo-clean.jpg)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/CarlosJRivera/rvrs-lang/main/assets/rvrs-logo-clean.jpg" alt="RVRS Logo" width="600"/>
+</p>
 
 # rvrs-lang
 
