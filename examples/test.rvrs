@@ -1,1 +1,1 @@
-flow test()
+flow bless(user: Identity, flag: Bool)
