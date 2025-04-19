@@ -11,8 +11,7 @@
 
 It treats each contract as a ritual: structured, intentional, and flowing with meaning.
 
-RVRS compiles to [Aiken](https://aiken-lang.org), and is built for clarity, rhythm, and reflection.  
-It is still forming. Still flowing.
+RVRS compiles to [Aiken](https://aiken-lang.org), It is still forming. Still flowing.
 
 ---
 
