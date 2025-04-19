@@ -82,5 +82,6 @@ A defined color palette
 
 A calm visual tone
 
-👤 Created by Carlos Javier Rivera
+👤 Created by Carlos Javier Rivera.
+
 Actor, writer, builder.
