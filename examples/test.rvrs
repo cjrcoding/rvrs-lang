@@ -1,1 +1,3 @@
-flow bless(user: Identity, flag: Bool)
+flow bless(user: Identity) {
+  mouth "welcome"
+}

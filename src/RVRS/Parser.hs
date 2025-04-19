@@ -44,7 +44,8 @@ flowParser = do
   _ <- symbol "flow"
   name <- identifier
   args <- argListParser
-  return $ Flow name args []
+  body <- between (symbol "{") (symbol "}") (many (lexeme statementParser))
+  return $ Flow name args body
 
 -- | Whitespace + comment skipping
 -- Keeps things clean — supports -- and {- -} style comments
@@ -68,3 +69,9 @@ identifier = lexeme ((:) <$> letterChar <*> many alphaNumChar)
 -- | Parses string like "hello"
 stringLiteral :: Parser String
 stringLiteral = char '"' *> manyTill L.charLiteral (char '"')
+
+statementParser :: Parser Statement
+statementParser = do
+  _ <- symbol "mouth"
+  str <- stringLiteral
+  return $ Mouth (StrLit str)
