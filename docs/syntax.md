@@ -1,33 +1,59 @@
-# RVRS Syntax: Core Constructs
+# 📜 RVRS Syntax Reference
 
-This document outlines the **core syntax** of RVRS — the Ritual Language for writing expressive smart contracts that compile to Aiken.
+> "Not all contracts are code. Some are rivers."
 
-These keywords form the foundation of RVRS, enabling readable, ceremonial logic.
+This document defines the evolving syntax of RVRS — a ceremonial language for writing smart contracts on Cardano.
 
-## ✨ Core Keywords
+---
 
-| Keyword | Purpose | Equivalent (Aiken) | Description |
-|---------|---------|--------------------|-------------|
-| `flow` | Declare a function or validator | `fn`, `validator` | The main block of logic, a ritual of action |
-| `source` | Bind input or define a value | `let` | Establish origin of variables or parameters |
-| `branch` | Conditional logic | `if / else` | Split logic based on condition, diverge the current |
-| `delta` | Declare or update a variable | `let` (reassignment) | Marks change or transition |
-| `mouth` | Emit a message or trace | `trace` | Ritual output — let the contract speak |
-| `echo` | Return a value from the flow | `return` or final expr | The final whisper — output of the function |
+## 🌿 Core Keywords (Minimum Viable Ritual)
+These are essential for writing any valid RVRS `flow`:
 
-## 📘 Sample Flow
+| Keyword   | Meaning                        | Aiken Equivalent |
+|-----------|---------------------------------|------------------|
+| `flow`    | Function definition / ritual    | `fn`             |
+| `source`  | Bind a value                    | `let`            |
+| `delta`   | Reassign / update a value       | `let`            |
+| `branch`  | Conditional block               | `if` / `else`    |
+| `mouth`   | Output / log a value            | `trace`          |
+| `echo`    | Return a value from the flow    | `return`         |
 
-```rvrs
-flow grant_access(user: Identity) {
-  source trust = check_trust(user)
+---
 
-  branch trust == truth {
-    delta state = "allowed"
-    mouth "Access granted."
-  } else {
-    mouth "Access denied."
-    delta state = "denied"
-  }
+## ✨ Symbolic Keywords (Poetic & Expressive)
+These enhance meaning and provide expressive ritual structure:
 
-  echo state
-}
+| Keyword     | Meaning                                | Aiken Mapping / Role |
+|-------------|-----------------------------------------|----------------------|
+| `veil`      | Hide, guard, or reveal a truth          | `Maybe`, `match`     |
+| `invoke`    | Call another flow                       | function call        |
+| `tide`      | Iterate over a list or sequence         | loop / stream        |
+| `stream`    | Represents a flowing list               | list structure       |
+| `bless`     | Symbolic permission or action trigger   | user-defined         |
+| `chant`     | Symbolic evaluation / transformation    | expression wrapper   |
+| `glyph`     | Declare a symbolic or reusable type     | `type`               |
+| `ritual`    | Define reusable flow/module             | module / type        |
+
+---
+
+## 🪨 Structural & Meta Keywords (Constants & Control)
+These control flow outside the core runtime — like constants, errors, or structure.
+
+| Keyword     | Meaning                              | Aiken Equivalent  |
+|-------------|---------------------------------------|-------------------|
+| `pillar`    | Immutable constant                    | `const`           |
+| `mark`      | Annotate or tag a declaration         | (not yet mapped)  |
+| `drift`     | Exit or fail early                    | `fail`            |
+| `mouthpiece`| Conditional trace/output              | `trace_if`        |
+| `echo_if`   | Conditional return                    | n/a               |
+
+---
+
+## 🔮 Notes & Style
+- All keywords are lowercase, symbolic, and evocative.
+- RVRS prioritizes flow, readability, and poetic clarity over minimalism.
+- New keywords are only added if they bring expressive or functional clarity.
+
+---
+
+### Last Updated: April 17, 2025
