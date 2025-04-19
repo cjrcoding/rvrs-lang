@@ -49,10 +49,25 @@ These control flow outside the core runtime — like constants, errors, or struc
 
 ---
 
-## 🔮 Notes & Style
-- All keywords are lowercase, symbolic, and evocative.
-- RVRS prioritizes flow, readability, and poetic clarity over minimalism.
-- New keywords are only added if they bring expressive or functional clarity.
+## 🧪 Future Visual Language Ideas (Design Notes)
+RVRS may later support a well-defined aesthetic to enhance readability and expression:
+
+- 🎨 **Color Palette:**
+  - Each keyword group (Core, Symbolic, Structural) could have a dedicated hue
+  - E.g. `flow` = river blue, `branch` = moss green, `echo` = silver or mirror tones
+
+- 🧱 **Visual Themes:**
+  - Flows are structured like poems or spells — their formatting should reflect ritual spacing
+  - Syntax highlighting or editor themes should reflect calm, natural elements (stone, ink, water)
+
+- 📘 **Glyphs/Icons (Documentation only):**
+  - Minimal, symbolic glyphs (not emojis) may be used in docs or READMEs to visually anchor concepts
+  - Should be used sparingly to avoid overwhelming the core tone
+
+- ⚙️ **Terminal Style (Optional):**
+  - CLI might later support ANSI-colored output for statement types or errors, inspired by natural tones
+
+These visuals are not required for compiling or authoring — but they serve to deepen the emotional resonance of the language.
 
 ---
 
