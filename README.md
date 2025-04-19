@@ -83,7 +83,5 @@ A defined color palette
 
 A calm visual tone
 
-Sparing use of symbolic glyphs (in documentation only)
-
 👤 Created by Carlos Javier Rivera
 Actor, writer, builder.
