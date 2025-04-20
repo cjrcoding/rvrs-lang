@@ -8,6 +8,8 @@ import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 import Data.Void
 import Data.Text (Text)
+import Control.Monad (void)
+import Data.Char (isAlphaNum)
 
 -- | Parser type
 -- Reminder: 'Void' is for no custom errors, 'String' is what I'm parsing
@@ -62,18 +64,19 @@ symbol :: String -> Parser String
 symbol = L.symbol sc
 
 identifier :: Parser String
--- Letters followed by optional alphanum string (e.g. grant_access, user1)
-identifier = lexeme ((:) <$> letterChar <*> many alphaNumChar)
+identifier = lexeme $ (:) <$> letterChar <*> many (alphaNumChar <|> char '_')
 
 -- | Parses string like "hello"
 stringLiteral :: Parser String
 stringLiteral = char '"' *> manyTill L.charLiteral (char '"')
 
 -- | Statement parser dispatch
-statementParser :: Parser Statement
+
 statementParser =
       try mouthParser
   <|> try echoParser
+  <|> try sourceParser
+  <|> try deltaParser
 
 -- | mouth "hello"
 mouthParser :: Parser Statement
@@ -88,3 +91,35 @@ echoParser = do
   _ <- symbol "echo"
   str <- stringLiteral
   return $ Echo (StrLit str)
+
+sourceParser :: Parser Statement
+sourceParser = do
+  _ <- symbol "source"
+  var <- identifier
+  _ <- symbol "="
+  expr <- exprParser
+  return $ Source var expr
+
+deltaParser :: Parser Statement
+deltaParser = do
+  _ <- symbol "delta"
+  var <- identifier
+  _ <- symbol "="
+  expr <- exprParser
+  return $ Delta var expr
+
+exprParser :: Parser Expr
+exprParser =
+      try (BoolLit True <$ symbol "true")
+  <|> try (BoolLit False <$ symbol "false")
+  <|> try (StrLit <$> stringLiteral)
+  <|> try callParser
+  <|> Var <$> identifier
+
+
+callParser :: Parser Expr
+callParser = do
+  func <- identifier
+  args <- between (symbol "(") (symbol ")") (exprParser `sepBy` symbol ",")
+  return $ Call func args
+
