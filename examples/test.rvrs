@@ -1,3 +1,4 @@
 flow bless(user: Identity) {
   mouth "welcome"
+  echo "blessed"
 }

@@ -37,8 +37,7 @@ argListParser =
   between (symbol "(") (symbol ")") (argumentParser `sepBy` symbol ",")
 
 -- | The core — parses a full flow declaration header
--- For now: flow name(args), body is empty
--- Next step: add `{}` block parsing
+-- Now supports flow body with statement parsing
 flowParser :: Parser Flow
 flowParser = do
   _ <- symbol "flow"
@@ -70,8 +69,22 @@ identifier = lexeme ((:) <$> letterChar <*> many alphaNumChar)
 stringLiteral :: Parser String
 stringLiteral = char '"' *> manyTill L.charLiteral (char '"')
 
+-- | Statement parser dispatch
 statementParser :: Parser Statement
-statementParser = do
+statementParser =
+      try mouthParser
+  <|> try echoParser
+
+-- | mouth "hello"
+mouthParser :: Parser Statement
+mouthParser = do
   _ <- symbol "mouth"
   str <- stringLiteral
   return $ Mouth (StrLit str)
+
+-- | echo "goodbye"
+echoParser :: Parser Statement
+echoParser = do
+  _ <- symbol "echo"
+  str <- stringLiteral
+  return $ Echo (StrLit str)
