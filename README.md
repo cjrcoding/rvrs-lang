@@ -1,4 +1,4 @@
-# RVRS
+
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/cjrcoding/rvrs-lang/main/assets/rvrs-logo-clean.jpg" alt="RVRS Logo" width="600"/>
