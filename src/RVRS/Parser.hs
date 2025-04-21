@@ -77,6 +77,7 @@ statementParser =
   <|> try echoParser
   <|> try sourceParser
   <|> try deltaParser
+  <|> try branchParser
 
 -- | mouth "hello"
 mouthParser :: Parser Statement
@@ -122,4 +123,14 @@ callParser = do
   func <- identifier
   args <- between (symbol "(") (symbol ")") (exprParser `sepBy` symbol ",")
   return $ Call func args
+
+branchParser :: Parser Statement
+branchParser = do
+  _ <- symbol "branch"
+  cond <- exprParser
+  ifBlock <- between (symbol "{") (symbol "}") (many (lexeme statementParser))
+  _ <- symbol "else"
+  elseBlock <- between (symbol "{") (symbol "}") (many (lexeme statementParser))
+  return $ Branch cond ifBlock elseBlock
+
 
