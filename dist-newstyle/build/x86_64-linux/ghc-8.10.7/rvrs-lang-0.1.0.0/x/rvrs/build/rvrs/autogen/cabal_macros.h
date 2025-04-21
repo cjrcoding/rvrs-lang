@@ -30,6 +30,16 @@
   (major1) == 9 && (major2) <  2 || \
   (major1) == 9 && (major2) == 2 && (minor) <= 1)
 #endif /* MIN_VERSION_megaparsec */
+/* package parser-combinators-1.3.0 */
+#ifndef VERSION_parser_combinators
+#define VERSION_parser_combinators "1.3.0"
+#endif /* VERSION_parser_combinators */
+#ifndef MIN_VERSION_parser_combinators
+#define MIN_VERSION_parser_combinators(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  3 || \
+  (major1) == 1 && (major2) == 3 && (minor) <= 0)
+#endif /* MIN_VERSION_parser_combinators */
 /* package prettyprinter-1.7.1 */
 #ifndef VERSION_prettyprinter
 #define VERSION_prettyprinter "1.7.1"

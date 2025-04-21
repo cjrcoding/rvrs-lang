@@ -1,11 +1,5 @@
-flow bless(user: Identity) {
-  source trust = check_trust(user)
-
-  branch trust {
-    mouth "welcome"
-    echo "blessed"
-  } else {
-    mouth "denied"
-    echo "void"
-  }
+flow compare(user: Identity) {
+  source check = user == "admin"
+  mouth "checking identity"
+  echo "done"
 }

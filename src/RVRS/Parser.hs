@@ -5,6 +5,7 @@ module RVRS.Parser where
 import RVRS.AST
 import Text.Megaparsec
 import Text.Megaparsec.Char
+import Control.Monad.Combinators.Expr
 import qualified Text.Megaparsec.Char.Lexer as L
 import Data.Void
 import Data.Text (Text)
@@ -109,15 +110,25 @@ deltaParser = do
   expr <- exprParser
   return $ Delta var expr
 
+-- | Expression parser with support for function calls, string/bool literals, and equality
 exprParser :: Parser Expr
-exprParser =
+exprParser = makeExprParser term operatorTable
+
+-- | Term is a single literal, variable, or function call
+term :: Parser Expr
+term =
       try (BoolLit True <$ symbol "true")
   <|> try (BoolLit False <$ symbol "false")
   <|> try (StrLit <$> stringLiteral)
   <|> try callParser
   <|> Var <$> identifier
 
-
+-- | Operator precedence table (can be expanded later)
+operatorTable :: [[Operator Parser Expr]]
+operatorTable =
+  [ [ InfixL (Equals <$ symbol "==") ]
+  ]
+  
 callParser :: Parser Expr
 callParser = do
   func <- identifier

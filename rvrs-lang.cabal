@@ -15,4 +15,6 @@ executable rvrs
     , text
     , megaparsec
     , prettyprinter
+    , parser-combinators
+
   default-language:    Haskell2010
