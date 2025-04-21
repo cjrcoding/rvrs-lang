@@ -1,5 +1,5 @@
-flow compare(user: Identity) {
-  source check = user == "admin"
-  mouth "checking identity"
-  echo "done"
+flow test() {
+  delta flag = truth
+  delta check = void
+  echo "booleans set"
 }

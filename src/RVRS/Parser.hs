@@ -1,3 +1,4 @@
+
 -- src/RVRS/Parser.hs
 
 module RVRS.Parser where
@@ -5,12 +6,12 @@ module RVRS.Parser where
 import RVRS.AST
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Control.Monad.Combinators.Expr
 import qualified Text.Megaparsec.Char.Lexer as L
 import Data.Void
 import Data.Text (Text)
 import Control.Monad (void)
 import Data.Char (isAlphaNum)
+import Control.Monad.Combinators.Expr
 
 -- | Parser type
 -- Reminder: 'Void' is for no custom errors, 'String' is what I'm parsing
@@ -72,7 +73,6 @@ stringLiteral :: Parser String
 stringLiteral = char '"' *> manyTill L.charLiteral (char '"')
 
 -- | Statement parser dispatch
-
 statementParser =
       try mouthParser
   <|> try echoParser
@@ -110,38 +110,34 @@ deltaParser = do
   expr <- exprParser
   return $ Delta var expr
 
--- | Expression parser with support for function calls, string/bool literals, and equality
+branchParser :: Parser Statement
+branchParser = do
+  _ <- symbol "branch"
+  cond <- between (symbol "(") (symbol ")") exprParser
+  trueBranch <- between (symbol "{") (symbol "}") (many (lexeme statementParser))
+  _ <- symbol "else"
+  falseBranch <- between (symbol "{") (symbol "}") (many (lexeme statementParser))
+  return $ Branch cond trueBranch falseBranch
+
+-- | Expressions with support for precedence and aliases
 exprParser :: Parser Expr
 exprParser = makeExprParser term operatorTable
 
--- | Term is a single literal, variable, or function call
 term :: Parser Expr
 term =
-      try (BoolLit True <$ symbol "true")
-  <|> try (BoolLit False <$ symbol "false")
+      try (BoolLit True <$ (symbol "truth" <|> symbol "true"))
+  <|> try (BoolLit False <$ (symbol "void" <|> symbol "false"))
   <|> try (StrLit <$> stringLiteral)
   <|> try callParser
   <|> Var <$> identifier
 
--- | Operator precedence table (can be expanded later)
 operatorTable :: [[Operator Parser Expr]]
 operatorTable =
   [ [ InfixL (Equals <$ symbol "==") ]
   ]
-  
+
 callParser :: Parser Expr
 callParser = do
   func <- identifier
   args <- between (symbol "(") (symbol ")") (exprParser `sepBy` symbol ",")
   return $ Call func args
-
-branchParser :: Parser Statement
-branchParser = do
-  _ <- symbol "branch"
-  cond <- exprParser
-  ifBlock <- between (symbol "{") (symbol "}") (many (lexeme statementParser))
-  _ <- symbol "else"
-  elseBlock <- between (symbol "{") (symbol "}") (many (lexeme statementParser))
-  return $ Branch cond ifBlock elseBlock
-
-
