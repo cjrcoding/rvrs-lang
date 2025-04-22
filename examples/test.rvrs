@@ -1,5 +1,5 @@
 flow test() {
+  pillar ROLE = "admin"
   delta flag = truth
-  delta check = void
-  echo "booleans set"
+  echo "constants held"
 }

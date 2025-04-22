@@ -22,6 +22,8 @@ data Statement
   | Branch Expr [Statement] [Statement]-- branch cond { ... } else { ... }
   | Mouth Expr                          -- mouth "..."
   | Echo Expr                           -- echo x
+  | Pillar String Expr  -- pillar NAME = ...
+
   deriving (Show, Eq)
 
 -- | Expression types used in RVRS

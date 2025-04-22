@@ -13,20 +13,14 @@ import Control.Monad (void)
 import Data.Char (isAlphaNum)
 import Control.Monad.Combinators.Expr
 
--- | Parser type
--- Reminder: 'Void' is for no custom errors, 'String' is what I'm parsing
--- This is the base type all my parsers build on
--- Eventually I could swap 'String' for 'Text', but this works for now
+
 type Parser = Parsec Void String
 
--- | Entry point — this is what runs when I call parseRVRS on file input
--- If I get a Left, it's a parse error; Right gives me a Flow object
+
 parseRVRS :: String -> Either (ParseErrorBundle String Void) Flow
 parseRVRS input = parse flowParser "RVRS" input
 
--- | Single argument like: user: Identity
--- Grabs name, skips the colon, grabs type
--- Feeds into my Flow's flowArgs as Argument name type
+
 argumentParser :: Parser Argument
 argumentParser = do
   name <- identifier
@@ -34,14 +28,12 @@ argumentParser = do
   typ <- identifier
   return $ Argument name typ
 
--- | Parses (arg1: Type, arg2: Type)
--- Between ( and ), splits by commas, uses argumentParser above
+
 argListParser :: Parser [Argument]
 argListParser =
   between (symbol "(") (symbol ")") (argumentParser `sepBy` symbol ",")
 
--- | The core — parses a full flow declaration header
--- Now supports flow body with statement parsing
+
 flowParser :: Parser Flow
 flowParser = do
   _ <- symbol "flow"
@@ -50,15 +42,14 @@ flowParser = do
   body <- between (symbol "{") (symbol "}") (many (lexeme statementParser))
   return $ Flow name args body
 
--- | Whitespace + comment skipping
--- Keeps things clean — supports -- and {- -} style comments
+
 sc :: Parser ()
 sc = L.space space1 lineCmnt blockCmnt
   where
     lineCmnt  = L.skipLineComment "--"
     blockCmnt = L.skipBlockComment "{-" "-}"
 
--- | Utility wrappers
+
 lexeme :: Parser a -> Parser a
 lexeme = L.lexeme sc
 
@@ -68,26 +59,27 @@ symbol = L.symbol sc
 identifier :: Parser String
 identifier = lexeme $ (:) <$> letterChar <*> many (alphaNumChar <|> char '_')
 
--- | Parses string like "hello"
+
 stringLiteral :: Parser String
 stringLiteral = char '"' *> manyTill L.charLiteral (char '"')
 
--- | Statement parser dispatch
+
 statementParser =
       try mouthParser
   <|> try echoParser
   <|> try sourceParser
   <|> try deltaParser
   <|> try branchParser
+  <|> try pillarParser
 
--- | mouth "hello"
+
 mouthParser :: Parser Statement
 mouthParser = do
   _ <- symbol "mouth"
   str <- stringLiteral
   return $ Mouth (StrLit str)
 
--- | echo "goodbye"
+
 echoParser :: Parser Statement
 echoParser = do
   _ <- symbol "echo"
@@ -119,7 +111,7 @@ branchParser = do
   falseBranch <- between (symbol "{") (symbol "}") (many (lexeme statementParser))
   return $ Branch cond trueBranch falseBranch
 
--- | Expressions with support for precedence and aliases
+
 exprParser :: Parser Expr
 exprParser = makeExprParser term operatorTable
 
@@ -141,3 +133,12 @@ callParser = do
   func <- identifier
   args <- between (symbol "(") (symbol ")") (exprParser `sepBy` symbol ",")
   return $ Call func args
+
+pillarParser :: Parser Statement
+pillarParser = do
+  _ <- symbol "pillar"
+  var <- identifier
+  _ <- symbol "="
+  expr <- exprParser
+  return $ Pillar var expr
+
