@@ -115,18 +115,29 @@ branchParser = do
 exprParser :: Parser Expr
 exprParser = makeExprParser term operatorTable
 
-term :: Parser Expr
+operatorTable :: [[Operator Parser Expr]]
+operatorTable =
+  [ [ InfixL (Mul <$ symbol "*")
+    , InfixL (Div <$ symbol "/")
+    ]
+  , [ InfixL (Add <$ symbol "+")
+    , InfixL (Sub <$ symbol "-")
+    ]
+  , [ InfixL (Equals <$ symbol "==") ]
+  ]
+
+binary :: String -> (Expr -> Expr -> Expr) -> Operator Parser Expr
+binary name f = InfixL (f <$ symbol name)
+
 term =
-      try (BoolLit True <$ (symbol "truth" <|> symbol "true"))
-  <|> try (BoolLit False <$ (symbol "void" <|> symbol "false"))
+      try (BoolLit True <$ symbol "truth")
+  <|> try (BoolLit False <$ symbol "void")
   <|> try (StrLit <$> stringLiteral)
+  <|> try (NumLit . read <$> lexeme (some digitChar))
   <|> try callParser
   <|> Var <$> identifier
 
-operatorTable :: [[Operator Parser Expr]]
-operatorTable =
-  [ [ InfixL (Equals <$ symbol "==") ]
-  ]
+
 
 callParser :: Parser Expr
 callParser = do

@@ -33,4 +33,10 @@ data Expr
   | BoolLit Bool                        -- true, false
   | Equals Expr Expr                    -- a == b
   | Call String [Expr]                  -- check_trust(user)
+  | Add Expr Expr
+  | Sub Expr Expr
+  | Mul Expr Expr
+  | Div Expr Expr
+  | NumLit Int
+
   deriving (Show, Eq)

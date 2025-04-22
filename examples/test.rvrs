@@ -1,5 +1,4 @@
-flow test() {
-  pillar ROLE = "admin"
-  delta flag = truth
-  echo "constants held"
+flow math() {
+  delta result = 2 + 3 * 4 == 14
+  echo "math works"
 }
