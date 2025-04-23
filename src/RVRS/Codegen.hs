@@ -1,4 +1,4 @@
-module RVRS.Codegen (generateAiken) where
+module RVRS.Codegen (generateAiken, prettyPrintFlow) where
 
 import RVRS.AST
 
@@ -46,3 +46,10 @@ commaSep (x:xs) = x ++ ", " ++ commaSep xs
 
 indent :: [String] -> [String]
 indent = map ("  " ++)
+
+-- | Pretty-print the Flow structure (used for debugging)
+prettyPrintFlow :: Flow -> String
+prettyPrintFlow (Flow name args body) =
+  "Flow\n  name: " ++ name ++
+  "\n  args: " ++ show args ++
+  "\n  body:\n    " ++ unlines (map show body)
