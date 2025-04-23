@@ -103,5 +103,5 @@ This is a language with soul.
 *Actor. Writer. Builder.*
 
 - [GitHub: @cjrcoding](https://github.com/cjrcoding)  
-- [IMDb: Carlos Javier Rivera](https://www.imdb.com/name/nm3024012/)
+- [IMDb: Carlos Javier Rivera](https://www.imdb.com/name/nm7121880/)
 
