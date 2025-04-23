@@ -60,6 +60,8 @@ flow full_test {
   }
   echo "done"
 }
+```
+```rvrs
 Output:
 
 mouth: start  
