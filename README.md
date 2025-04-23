@@ -8,7 +8,7 @@
 
 **“Not all contracts are code. Some are rivers.”**
 
-RVRS is an experimental smart contract language for Cardano — not command-based, but ceremonial.  
+RVRS is an experimental smart contract language for Cardano.
 It treats code as ritual. Every contract is a flow: deliberate, symbolic, and evolving.
 
 RVRS compiles to [Aiken](https://aiken-lang.org).  
