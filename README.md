@@ -72,17 +72,17 @@ echo: done
 🔮 What’s Flowing Next
 Coming soon to RVRS:
 
-echo returns as meaningful output from a flow
+`echo` returns as meaningful output from a flow
 
-Function-style flows with arguments and scoped return
+- Function-style flows with arguments and scoped return
 
-Nested branch logic
+- Nested branch logic
 
-Improved type safety and runtime checks
+- Improved type safety and runtime checks
 
-Support for multi-flow files and contracts
+- Support for multi-flow files and contracts
 
-Companion test flows and demo contracts
+- Companion test flows and demo contracts
 
 🎨 Design Philosophy
 RVRS is more than syntax. It’s a style of thinking.
