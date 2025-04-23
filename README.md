@@ -72,7 +72,7 @@ echo: done
 🔮 What’s Flowing Next
 Coming soon to RVRS:
 
-`echo` returns as meaningful output from a flow
+- `echo` returns as meaningful output from a flow
 
 - Function-style flows with arguments and scoped return
 
