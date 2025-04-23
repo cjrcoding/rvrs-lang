@@ -62,8 +62,21 @@ evalStmt :: Env -> Statement -> IO Env
 evalStmt env stmt = case stmt of
   Mouth (StrLit s) -> putStrLn ("mouth: " ++ s) >> return env
   Echo (StrLit s)  -> putStrLn ("echo: " ++ s) >> return env
-  Delta var expr   ->
+
+  Delta var expr ->
     case evalExpr env expr of
       Just val -> return $ M.insert var val env
       Nothing  -> putStrLn ("Could not evaluate: " ++ show expr) >> return env
-  _ -> return env  -- fallback for unsupported types
+
+  Branch cond thenStmts elseStmts ->
+    case evalExpr env cond of
+      Just (VBool True)  -> evalBody env thenStmts
+      Just (VBool False) -> evalBody env elseStmts
+      Just val -> do
+        putStrLn $ "Non-boolean condition in branch: " ++ show val
+        return env
+      Nothing -> do
+        putStrLn $ "Failed to evaluate branch condition: " ++ show cond
+        return env
+
+  _ -> return env

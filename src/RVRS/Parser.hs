@@ -63,14 +63,14 @@ identifier = lexeme $ (:) <$> letterChar <*> many (alphaNumChar <|> char '_')
 stringLiteral :: Parser String
 stringLiteral = char '"' *> manyTill L.charLiteral (char '"')
 
-
 statementParser =
-      try mouthParser
+      try branchParser
+  <|> try mouthParser
   <|> try echoParser
   <|> try sourceParser
   <|> try deltaParser
-  <|> try branchParser
   <|> try pillarParser
+
 
 
 mouthParser :: Parser Statement
