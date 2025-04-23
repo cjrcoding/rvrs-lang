@@ -4,84 +4,102 @@
   <img src="https://raw.githubusercontent.com/cjrcoding/rvrs-lang/main/assets/rvrs-logo-clean.jpg" alt="RVRS Logo" width="600"/>
 </p>
 
-🌊 **Rivers (RVRS)**  
-*“Not all contracts are code. Some are rivers.”*
+# 🌊 Rivers (RVRS)
 
-**RVRS** is an experimental language for writing smart contracts on Cardano — not as commands, but as ceremony.
+**“Not all contracts are code. Some are rivers.”**
 
-It treats each contract as a ritual: structured, intentional, and flowing with meaning.
+RVRS is an experimental smart contract language for Cardano — not command-based, but ceremonial.  
+It treats code as ritual. Every contract is a flow: deliberate, symbolic, and evolving.
 
-RVRS compiles to [Aiken](https://aiken-lang.org), It is still forming. Still flowing.
+RVRS compiles to [Aiken](https://aiken-lang.org).  
+It is still forming. Still flowing.
 
 ---
 
 ## ✨ The Core 6
 
-The **Core 6** shape every flow in RVRS:
+These elemental constructs shape every ritual:
 
-- `flow`: A ritual, a container of purpose  
-- `source`: The origin of data, the spring  
-- `delta`: A change, a transformation  
-- `branch`: A decision, a fork in the current  
-- `mouth`: A voice, a trace — the contract speaks  
-- `echo`: The final word, the return, the reflection  
+- `flow`: A container of purpose and invocation  
+- `source`: A declaration of origin, a variable spring  
+- `delta`: A transformation, a shift in state  
+- `branch`: A decision point — a fork in the current  
+- `mouth`: A voice — the moment the contract speaks  
+- `echo`: A return, the final reflection
 
-> These are the first stones in the riverbed.
-
----
-
-## 🛠️ What Exists So Far
-
-RVRS can now:
-
-- ✅ Parse full `flow` declarations with typed parameters  
-- ✅ Recognize and handle empty or populated `{}` blocks  
-- ✅ Interpret `mouth` as a trace/logging statement  
-- ✅ Represent arguments, flows, and statements with real AST types  
-- ✅ Compile and run from `.rvrs` files via CLI  
-- ✅ Pretty-print the flow structure for human eyes
+These are the riverbed. The rest flows from here.
 
 ---
 
-### 🧪 Example
+## ✅ Built So Far (April 2025)
 
-You can write this today:
+You can now write real, conditional, branching RVRS flows with computation and state.
+
+- ✅ Full parser for `flow`, `delta`, `branch`, `mouth`, `echo`, and expressions  
+- ✅ Arithmetic expression support: `+`, `-`, `*`, `/`  
+- ✅ Variable bindings and state mutation via `delta`  
+- ✅ Logical evaluation in `branch` blocks  
+- ✅ `mouth` logs the trace of the contract  
+- ✅ Pretty-printed AST output for debugging and clarity  
+- ✅ CLI interface for `.rvrs` execution and interpretation
+
+---
+
+## 🧪 Real Example (Now Possible)
 
 ```rvrs
-flow bless(user: Identity) {
-  mouth "welcome"
+flow full_test {
+  delta x = 5
+  delta check = (x == 5)
+  mouth "start"
+  branch check {
+    echo "matched"
+    delta x = 10
+  } else {
+    echo "did not match"
+  }
+  echo "done"
 }
+Output:
+
+mouth: start  
+echo: matched  
+echo: done
 ```
-…and it becomes an AST ready to render into Aiken.
 
-🌊 What’s Coming Next
-- echo: Return from a flow with intention
+🔮 What’s Flowing Next
+Coming soon to RVRS:
 
-- source / delta: Bind and transform values in ritual
+echo returns as meaningful output from a flow
 
-- branch: Flow logic through conditional currents
+Function-style flows with arguments and scoped return
 
-- Expression support: variables, function calls, and comparison
+Nested branch logic
 
-- Multi-flow files, test contracts, and on-chain rituals
+Improved type safety and runtime checks
 
-As the language deepens, so does its capacity for ceremony.
+Support for multi-flow files and contracts
+
+Companion test flows and demo contracts
 
 🎨 Design Philosophy
-RVRS is inspired by:
+RVRS is more than syntax. It’s a style of thinking.
 
 Ritual language and sacred geometry
 
-Simplicity with soul
+Readable, symbolic code with intent
 
-The belief that code can carry meaning, not just logic
+Calm aesthetic — designed for clarity and reflection
 
-It will evolve with:
+Inspired by nature, myth, and meaning
 
-A defined color palette
+This is a language with soul.
 
-A calm visual tone
+---
 
-👤 Created by Carlos Javier Rivera.
+## 👤 Created by Carlos Javier Rivera  
+*Actor. Writer. Builder.*
 
-Actor, writer, builder.
+- [GitHub: @cjrcoding](https://github.com/cjrcoding)  
+- [IMDb: Carlos Javier Rivera](https://www.imdb.com/name/nm3024012/)
+
