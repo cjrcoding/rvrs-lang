@@ -23,6 +23,8 @@ data Statement
   | Mouth Expr                          -- mouth "..."
   | Echo Expr                           -- echo x
   | Pillar String Expr  -- pillar NAME = ...
+  | Return Expr
+
 
   deriving (Show, Eq)
 

@@ -70,6 +70,7 @@ statementParser =
   <|> try sourceParser
   <|> try deltaParser
   <|> try pillarParser
+  <|> try returnParser
 
 
 
@@ -152,4 +153,10 @@ pillarParser = do
   _ <- symbol "="
   expr <- exprParser
   return $ Pillar var expr
+
+  returnParser :: Parser Statement
+returnParser = do
+  _ <- symbol "return"
+  expr <- exprParser
+  return $ Return expr
 

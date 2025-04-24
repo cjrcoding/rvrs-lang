@@ -45,28 +45,37 @@ evalExpr env (Mul e1 e2) = do
 
 evalExpr _ _ = Nothing
 
+data ExecResult
+  = Continue Env
+  | Returned Value
 
 evalFlow :: Flow -> IO ()
 evalFlow (Flow name args body) = do
   putStrLn $ "Evaluating flow: " ++ name
-  _ <- evalBody M.empty body
-  return ()
+  result <- evalBody M.empty body
+  case result of
+    Continue _     -> putStrLn "(Flow completed with no return)"
+    Returned value -> putStrLn $ "Returned: " ++ show value
 
-evalBody :: Env -> [Statement] -> IO Env
-evalBody env [] = return env
+
+evalBody :: Env -> [Statement] -> IO ExecResult
+evalBody env [] = return (Continue env)
 evalBody env (stmt:stmts) = do
-  env' <- evalStmt env stmt
-  evalBody env' stmts
+  result <- evalStmt env stmt
+  case result of
+    Continue newEnv -> evalBody newEnv stmts
+    Returned val    -> return (Returned val)
 
-evalStmt :: Env -> Statement -> IO Env
+
+evalStmt :: Env -> Statement -> IO ExecResult
 evalStmt env stmt = case stmt of
-  Mouth (StrLit s) -> putStrLn ("mouth: " ++ s) >> return env
-  Echo (StrLit s)  -> putStrLn ("echo: " ++ s) >> return env
+  Mouth (StrLit s) -> putStrLn ("mouth: " ++ s) >> return (Continue env)
+  Echo (StrLit s)  -> putStrLn ("echo: " ++ s) >> return (Continue env)
 
   Delta var expr ->
     case evalExpr env expr of
-      Just val -> return $ M.insert var val env
-      Nothing  -> putStrLn ("Could not evaluate: " ++ show expr) >> return env
+      Just val -> return (Continue (M.insert var val env))
+      Nothing  -> putStrLn ("Could not evaluate: " ++ show expr) >> return (Continue env)
 
   Branch cond thenStmts elseStmts ->
     case evalExpr env cond of
@@ -74,9 +83,16 @@ evalStmt env stmt = case stmt of
       Just (VBool False) -> evalBody env elseStmts
       Just val -> do
         putStrLn $ "Non-boolean condition in branch: " ++ show val
-        return env
+        return (Continue env)
       Nothing -> do
         putStrLn $ "Failed to evaluate branch condition: " ++ show cond
-        return env
+        return (Continue env)
 
-  _ -> return env
+  Return expr ->
+    case evalExpr env expr of
+      Just val -> return (Returned val)
+      Nothing  -> do
+        putStrLn ("Could not evaluate return value: " ++ show expr)
+        return (Returned VUnit)
+
+  _ -> return (Continue env)

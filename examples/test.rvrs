@@ -1,13 +1,6 @@
-flow full_test() {
-  pillar ROLE = "admin"
+flow early_exit() {
   delta x = 5
-  delta check = x == 5
-  mouth "start"
-  branch (check) {
-    echo "matched"
-    delta x = 10
-  } else {
-    echo "did not match"
-  }
-  echo "done"
+  mouth "before return"
+  return x
+  echo "this should not show"
 }
