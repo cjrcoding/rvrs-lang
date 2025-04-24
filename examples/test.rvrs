@@ -1,6 +1,19 @@
-flow early_exit() {
+flow full_test() {
+  pillar ROLE = "admin"
   delta x = 5
-  mouth "before return"
-  return x
+  delta check = (x == 5)
+  mouth "starting flow"
+
+  branch (check) {
+    echo "matched"
+    delta x = 10
+  } else {
+    echo "did not match"
+  }
+
+  delta truthFlag = truth
+  delta voidFlag = void
+  source y = (x + 1)
+  return y
   echo "this should not show"
 }

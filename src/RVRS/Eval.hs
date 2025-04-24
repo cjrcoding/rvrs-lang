@@ -77,6 +77,11 @@ evalStmt env stmt = case stmt of
       Just val -> return (Continue (M.insert var val env))
       Nothing  -> putStrLn ("Could not evaluate: " ++ show expr) >> return (Continue env)
 
+  Source var expr ->
+    case evalExpr env expr of
+      Just val -> return (Continue (M.insert var val env))
+      Nothing  -> putStrLn ("Could not evaluate: " ++ show expr) >> return (Continue env)
+
   Branch cond thenStmts elseStmts ->
     case evalExpr env cond of
       Just (VBool True)  -> evalBody env thenStmts

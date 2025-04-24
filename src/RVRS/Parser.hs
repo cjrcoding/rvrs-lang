@@ -39,7 +39,7 @@ flowParser = do
   _ <- symbol "flow"
   name <- identifier
   args <- argListParser
-  body <- between (symbol "{") (symbol "}") (many (lexeme statementParser))
+  body <- between (symbol "{") (symbol "}") (many statementParser)
   return $ Flow name args body
 
 
@@ -63,13 +63,14 @@ identifier = lexeme $ (:) <$> letterChar <*> many (alphaNumChar <|> char '_')
 stringLiteral :: Parser String
 stringLiteral = char '"' *> manyTill L.charLiteral (char '"')
 
-statementParser =
-      try branchParser
+statementParser :: Parser Statement
+statementParser = lexeme $
+      try pillarParser
   <|> try mouthParser
   <|> try echoParser
   <|> try sourceParser
   <|> try deltaParser
-  <|> try pillarParser
+  <|> try branchParser
   <|> try returnParser
 
 
@@ -137,6 +138,7 @@ term =
   <|> try (NumLit . read <$> lexeme (some digitChar))
   <|> try callParser
   <|> Var <$> identifier
+  <|> try (between (symbol "(") (symbol ")") exprParser)
 
 
 
@@ -154,7 +156,7 @@ pillarParser = do
   expr <- exprParser
   return $ Pillar var expr
 
-  returnParser :: Parser Statement
+returnParser :: Parser Statement
 returnParser = do
   _ <- symbol "return"
   expr <- exprParser
