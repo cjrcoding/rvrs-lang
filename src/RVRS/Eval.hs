@@ -43,6 +43,11 @@ evalExpr env (Mul e1 e2) = do
   VNum y <- evalExpr env e2
   return $ VNum (x * y)
 
+evalExpr env (Not e) = do
+  VBool b <- evalExpr env e
+  return $ VBool (not b)
+
+
 evalExpr _ _ = Nothing
 
 data ExecResult

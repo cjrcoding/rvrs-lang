@@ -26,6 +26,7 @@ data Statement
   | Return Expr
 
 
+
   deriving (Show, Eq)
 
 -- | Expression types used in RVRS
@@ -40,5 +41,6 @@ data Expr
   | Mul Expr Expr
   | Div Expr Expr
   | NumLit Int
+  | Not Expr     
 
   deriving (Show, Eq)

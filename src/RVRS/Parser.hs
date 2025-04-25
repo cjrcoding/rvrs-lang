@@ -136,9 +136,10 @@ term =
   <|> try (BoolLit False <$ symbol "void")
   <|> try (StrLit <$> stringLiteral)
   <|> try (NumLit . read <$> lexeme (some digitChar))
+  <|> try (Not <$> (symbol "not" *> term))             
   <|> try callParser
-  <|> Var <$> identifier
   <|> try (between (symbol "(") (symbol ")") exprParser)
+  <|> Var <$> identifier
 
 
 
