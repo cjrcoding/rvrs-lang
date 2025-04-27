@@ -25,8 +25,6 @@ data Statement
   | Pillar String Expr  -- pillar NAME = ...
   | Return Expr
 
-
-
   deriving (Show, Eq)
 
 -- | Expression types used in RVRS
@@ -42,5 +40,7 @@ data Expr
   | Div Expr Expr
   | NumLit Int
   | Not Expr     
+  | And Expr Expr   
+  | Or Expr Expr 
 
   deriving (Show, Eq)

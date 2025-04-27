@@ -47,6 +47,17 @@ evalExpr env (Not e) = do
   VBool b <- evalExpr env e
   return $ VBool (not b)
 
+evalExpr env (And e1 e2) = do
+  VBool b1 <- evalExpr env e1
+  VBool b2 <- evalExpr env e2
+  return $ VBool (b1 && b2)
+
+evalExpr env (Or e1 e2) = do
+  VBool b1 <- evalExpr env e1
+  VBool b2 <- evalExpr env e2
+  return $ VBool (b1 || b2)
+
+
 
 evalExpr _ _ = Nothing
 

@@ -1,5 +1,7 @@
-flow quick_test() {
-  delta a = void
-  delta b = not a
-  echo "done"
+flow quick_logic() {
+  delta a = truth
+  delta b = void
+  delta bothTrue = a and a
+  delta eitherTrue = a or b
+  echo "logic done"
 }

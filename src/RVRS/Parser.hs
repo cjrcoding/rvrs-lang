@@ -126,6 +126,9 @@ operatorTable =
     , InfixL (Sub <$ symbol "-")
     ]
   , [ InfixL (Equals <$ symbol "==") ]
+  , [ InfixL (And <$ symbol "and")
+    , InfixL (Or <$ symbol "or")
+    ]
   ]
 
 binary :: String -> (Expr -> Expr -> Expr) -> Operator Parser Expr
