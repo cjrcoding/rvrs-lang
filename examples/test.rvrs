@@ -1,13 +1,23 @@
-flow branch_test() {
-    delta a = 15
+flow full_showcase() {
+    echo "Starting Full Showcase"
 
-    branch a == 15 {
-        echo "Correct value!"
-        mouth "Declaring victory."
+    delta a = 5
+    delta b = 10
+    delta sum = a + b
+    delta product = a * b
+
+    echo "Computed sum:"
+    echo "15"  -- simulate for now since echo can't show variables yet
+    echo "Computed product:"
+    echo "50"  -- simulate for now
+
+    branch sum == 15 {
+        echo "Sum is correct!"
+        mouth "Branch success: Sum matched"
     } else {
-        echo "Incorrect value!"
-        mouth "Declaring failure."
+        echo "Sum is incorrect!"
+        mouth "Branch failure: Sum mismatch"
     }
 
-    echo "Branch test completed"
+    echo "Full Showcase Completed"
 }
