@@ -1,7 +1,5 @@
-flow quick_logic() {
-  delta a = truth
-  delta b = void
-  delta bothTrue = a and a
-  delta eitherTrue = a or b
-  echo "logic done"
+flow simple_flow() {
+  delta x = 1
+  delta y = (x + 2)
+  echo "finished normally"
 }

@@ -14,6 +14,8 @@ data Value
   | VUnit         -- used for now to represent 'no meaningful value'
   deriving (Show, Eq)
 
+
+
 -- | Evaluate an expression in an environment
 evalExpr :: Env -> Expr -> Maybe Value
 evalExpr env (Var name) =
@@ -65,13 +67,13 @@ data ExecResult
   = Continue Env
   | Returned Value
 
-evalFlow :: Flow -> IO ()
+evalFlow :: Flow -> IO (Maybe Value)
 evalFlow (Flow name args body) = do
   putStrLn $ "Evaluating flow: " ++ name
   result <- evalBody M.empty body
   case result of
-    Continue _     -> putStrLn "(Flow completed with no return)"
-    Returned value -> putStrLn $ "Returned: " ++ show value
+    Returned val -> return (Just val)
+    Continue _   -> return Nothing
 
 
 evalBody :: Env -> [Statement] -> IO ExecResult
@@ -87,17 +89,12 @@ evalStmt :: Env -> Statement -> IO ExecResult
 evalStmt env stmt = case stmt of
   Mouth (StrLit s) -> putStrLn ("mouth: " ++ s) >> return (Continue env)
   Echo (StrLit s)  -> putStrLn ("echo: " ++ s) >> return (Continue env)
-
+  
   Delta var expr ->
     case evalExpr env expr of
       Just val -> return (Continue (M.insert var val env))
       Nothing  -> putStrLn ("Could not evaluate: " ++ show expr) >> return (Continue env)
-
-  Source var expr ->
-    case evalExpr env expr of
-      Just val -> return (Continue (M.insert var val env))
-      Nothing  -> putStrLn ("Could not evaluate: " ++ show expr) >> return (Continue env)
-
+  
   Branch cond thenStmts elseStmts ->
     case evalExpr env cond of
       Just (VBool True)  -> evalBody env thenStmts
@@ -108,12 +105,15 @@ evalStmt env stmt = case stmt of
       Nothing -> do
         putStrLn $ "Failed to evaluate branch condition: " ++ show cond
         return (Continue env)
-
+  
   Return expr ->
     case evalExpr env expr of
       Just val -> return (Returned val)
-      Nothing  -> do
-        putStrLn ("Could not evaluate return value: " ++ show expr)
-        return (Returned VUnit)
-
+      Nothing  -> putStrLn ("Could not evaluate return value: " ++ show expr) >> return (Returned VUnit)
+  
   _ -> return (Continue env)
+
+
+
+
+

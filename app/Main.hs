@@ -1,7 +1,8 @@
+module Main where
+
 import RVRS.Parser (parseRVRS)
 import RVRS.Codegen (prettyPrintFlow)
 import RVRS.Eval (evalFlow)
-import RVRS.AST (Flow)
 import System.Environment (getArgs)
 import Text.Megaparsec (errorBundlePretty)
 
@@ -17,5 +18,8 @@ main = do
           putStrLn "Parsed Flow:\n"
           putStrLn (prettyPrintFlow ast)
           putStrLn "\nEvaluation Output:"
-          evalFlow ast
+          result <- evalFlow ast
+          case result of
+            Just val -> putStrLn ("Returned: " ++ show val)
+            Nothing  -> putStrLn "(Flow completed with no return)"
     _ -> putStrLn "Usage: rvrs <file>.rvrs"
