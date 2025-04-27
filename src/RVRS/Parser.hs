@@ -106,12 +106,16 @@ deltaParser = do
 
 branchParser :: Parser Statement
 branchParser = do
-  _ <- symbol "branch"
-  cond <- between (symbol "(") (symbol ")") exprParser
-  trueBranch <- between (symbol "{") (symbol "}") (many (lexeme statementParser))
-  _ <- symbol "else"
-  falseBranch <- between (symbol "{") (symbol "}") (many (lexeme statementParser))
-  return $ Branch cond trueBranch falseBranch
+  symbol "branch"
+  cond <- exprParser
+  thenBlock <- blockParser
+  elseBlock <- optionalElseParser
+  return $ Branch cond thenBlock elseBlock
+
+optionalElseParser :: Parser [Statement]
+optionalElseParser =
+      (symbol "else" *> blockParser)
+  <|> pure []  -- no else block provided
 
 
 exprParser :: Parser Expr
@@ -165,4 +169,12 @@ returnParser = do
   _ <- symbol "return"
   expr <- exprParser
   return $ Return expr
+
+blockParser :: Parser [Statement]
+blockParser = do
+  symbol "{"
+  stmts <- many statementParser
+  symbol "}"
+  return stmts
+
 

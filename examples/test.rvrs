@@ -1,5 +1,13 @@
-flow simple_flow() {
-  delta x = 1
-  delta y = (x + 2)
-  echo "finished normally"
+flow branch_test() {
+    delta a = 15
+
+    branch a == 15 {
+        echo "Correct value!"
+        mouth "Declaring victory."
+    } else {
+        echo "Incorrect value!"
+        mouth "Declaring failure."
+    }
+
+    echo "Branch test completed"
 }
