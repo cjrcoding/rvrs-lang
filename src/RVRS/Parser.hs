@@ -77,16 +77,18 @@ statementParser = lexeme $
 
 mouthParser :: Parser Statement
 mouthParser = do
-  _ <- symbol "mouth"
-  str <- stringLiteral
-  return $ Mouth (StrLit str)
+  symbol "mouth"
+  expr <- exprParser  
+  return $ Mouth expr
+
 
 
 echoParser :: Parser Statement
 echoParser = do
-  _ <- symbol "echo"
-  str <- stringLiteral
-  return $ Echo (StrLit str)
+  symbol "echo"
+  expr <- exprParser  
+  return $ Echo expr
+
 
 sourceParser :: Parser Statement
 sourceParser = do

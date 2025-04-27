@@ -1,0 +1,19 @@
+flow mood_chooser() {
+    -- Welcome the user
+    echo "Welcome to Mood Chooser."
+
+    -- Simulate input (hardcoded for now)
+    delta mood = 1
+
+    -- Branch based on mood
+    branch mood == 1 {
+        echo "You are feeling happy!"
+        mouth "Happiness flows through you."
+    } else {
+        echo "You are feeling mysterious..."
+        mouth "Mystery shrouds your path."
+    }
+
+    -- Final message
+    echo "Mood check completed."
+}

@@ -1,23 +1,4 @@
-flow full_showcase() {
-    echo "Starting Full Showcase"
-
-    delta a = 5
-    delta b = 10
-    delta sum = a + b
-    delta product = a * b
-
-    echo "Computed sum:"
-    echo "15"  -- simulate for now since echo can't show variables yet
-    echo "Computed product:"
-    echo "50"  -- simulate for now
-
-    branch sum == 15 {
-        echo "Sum is correct!"
-        mouth "Branch success: Sum matched"
-    } else {
-        echo "Sum is incorrect!"
-        mouth "Branch failure: Sum mismatch"
-    }
-
-    echo "Full Showcase Completed"
+flow test_mouth() {
+    delta mood = 7
+    mouth mood
 }

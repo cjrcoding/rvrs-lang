@@ -87,8 +87,20 @@ evalBody env (stmt:stmts) = do
 
 evalStmt :: Env -> Statement -> IO ExecResult
 evalStmt env stmt = case stmt of
-  Mouth (StrLit s) -> putStrLn ("mouth: " ++ s) >> return (Continue env)
-  Echo (StrLit s)  -> putStrLn ("echo: " ++ s) >> return (Continue env)
+  Echo expr -> 
+    case evalExpr env expr of
+      Just (VStr s) -> putStrLn ("echo: " ++ s) >> return (Continue env)
+      Just (VNum n) -> putStrLn ("echo: " ++ show n) >> return (Continue env)
+      Just (VBool b) -> putStrLn ("echo: " ++ show b) >> return (Continue env)
+      _ -> putStrLn "echo: [error: unsupported value]" >> return (Continue env)
+
+  Mouth expr ->
+    case evalExpr env expr of
+      Just (VStr s) -> putStrLn ("mouth: " ++ s) >> return (Continue env)
+      Just (VNum n) -> putStrLn ("mouth: " ++ show n) >> return (Continue env)
+      Just (VBool b) -> putStrLn ("mouth: " ++ show b) >> return (Continue env)
+      _ -> putStrLn "mouth: [error: unsupported value]" >> return (Continue env)
+
   
   Delta var expr ->
     case evalExpr env expr of
