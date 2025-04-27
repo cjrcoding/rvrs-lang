@@ -4,7 +4,12 @@ import RVRS.AST
 import qualified Data.Map as M
 
 -- | Our environment: variable bindings
-type Env = M.Map String Value
+data Binding
+  = Mutable Value
+  | Immutable Value
+  deriving (Show, Eq)
+
+type Env = M.Map String Binding
 
 -- | Values produced by evaluating expressions
 data Value
@@ -19,7 +24,10 @@ data Value
 -- | Evaluate an expression in an environment
 evalExpr :: Env -> Expr -> Maybe Value
 evalExpr env (Var name) =
-  M.lookup name env
+  case M.lookup name env of
+    Just (Mutable val) -> Just val
+    Just (Immutable val) -> Just val
+    Nothing -> Nothing
 
 evalExpr _ (NumLit n) = Just $ VNum n
 evalExpr _ (BoolLit b) = Just $ VBool b
@@ -104,8 +112,14 @@ evalStmt env stmt = case stmt of
   
   Delta var expr ->
     case evalExpr env expr of
-      Just val -> return (Continue (M.insert var val env))
-      Nothing  -> putStrLn ("Could not evaluate: " ++ show expr) >> return (Continue env)
+    Just val ->
+      case M.lookup var env of
+        Just (Immutable _) -> do
+          putStrLn ("Error: Cannot reassign immutable source '" ++ var ++ "'")
+          return (Continue env)
+        _ -> return (Continue (M.insert var (Mutable val) env))
+    Nothing -> putStrLn ("Could not evaluate: " ++ show expr) >> return (Continue env)
+
   
   Branch cond thenStmts elseStmts ->
     case evalExpr env cond of
@@ -122,9 +136,18 @@ evalStmt env stmt = case stmt of
     case evalExpr env expr of
       Just val -> return (Returned val)
       Nothing  -> putStrLn ("Could not evaluate return value: " ++ show expr) >> return (Returned VUnit)
+
+  Source var expr ->
+    case evalExpr env expr of
+      Just val -> return (Continue (insertSource var val env))
+      Nothing  -> putStrLn ("Could not evaluate: " ++ show expr) >> return (Continue env)
+
+
   
   _ -> return (Continue env)
 
+insertSource :: String -> Value -> Env -> Env
+insertSource var val env = M.insert var (Immutable val) env
 
 
 
