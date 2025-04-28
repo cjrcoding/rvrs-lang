@@ -10,12 +10,6 @@
   <img src="https://img.shields.io/badge/Version-v0.2.0--alpha-blueviolet?style=for-the-badge" alt="RVRS Version Badge"/>
 </p>
 
-<p align="center">
-  <a href="./dev-log.md">
-    <img src="https://img.shields.io/badge/Dev%20Log-View%20Here-blue?style=for-the-badge" alt="Dev Log Button"/>
-  </a>
-</p>
-
 **“Not all contracts are code. Some are rivers.”**
 
 RVRS is an experimental smart contract language for Cardano.
@@ -111,6 +105,12 @@ This is a language with soul.
 
 ## 👤 Created by Carlos Javier Rivera  
 *Actor. Writer. Builder.*
+
+<p align="center">
+  <a href="./dev-log.md">
+    <img src="https://img.shields.io/badge/Dev%20Log-View%20Here-blue?style=for-the-badge" alt="Dev Log Button"/>
+  </a>
+</p>
 
 - [GitHub: @cjrcoding](https://github.com/cjrcoding)  
 - [IMDb](https://www.imdb.com/name/nm7121880/)
