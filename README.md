@@ -6,7 +6,11 @@
 
 # 🌊 Rivers (RVRS)
 
-[View the RVRS Dev Log](./dev-log.md)
+<p align="center">
+  <a href="./dev-log.md">
+    <img src="https://img.shields.io/badge/Dev%20Log-View%20Here-blue?style=for-the-badge" alt="Dev Log Button"/>
+  </a>
+</p>
 
 **“Not all contracts are code. Some are rivers.”**
 
