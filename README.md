@@ -6,6 +6,8 @@
 
 # 🌊 Rivers (RVRS)
 
+[View the RVRS Dev Log](./dev-log.md)
+
 **“Not all contracts are code. Some are rivers.”**
 
 RVRS is an experimental smart contract language for Cardano.
