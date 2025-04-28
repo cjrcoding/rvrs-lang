@@ -7,6 +7,10 @@
 # 🌊 Rivers (RVRS)
 
 <p align="center">
+  <img src="https://img.shields.io/badge/Version-v0.2.0--alpha-blueviolet?style=for-the-badge" alt="RVRS Version Badge"/>
+</p>
+
+<p align="center">
   <a href="./dev-log.md">
     <img src="https://img.shields.io/badge/Dev%20Log-View%20Here-blue?style=for-the-badge" alt="Dev Log Button"/>
   </a>
