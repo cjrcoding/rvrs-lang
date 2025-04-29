@@ -6,10 +6,6 @@
 
 # 🌊 Rivers (RVRS)
 
-<p align="center">
-  <a href="./dev-log.md">
-    <img src="https://img.shields.io/badge/Dev%20Log-View%20Here-blue?style=for-the-badge" alt="Dev Log Button"/>
-  </a>
   <a href="#">
     <img src="https://img.shields.io/badge/Version-v0.3.0--alpha-blueviolet?style=for-the-badge" alt="RVRS Version Badge"/>
   </a>
@@ -117,8 +113,7 @@ This is a language with soul.
   <a href="./dev-log.md">
     <img src="https://img.shields.io/badge/Dev%20Log-View%20Here-blue?style=for-the-badge" alt="Dev Log Button"/>
   </a>
-</p>
-
+  
 - [GitHub: @cjrcoding](https://github.com/cjrcoding)  
 - [IMDb](https://www.imdb.com/name/nm7121880/)
 
