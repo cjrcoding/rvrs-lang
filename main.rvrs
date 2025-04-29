@@ -1,0 +1,18 @@
+flow main() {
+  delta x = 1
+  echo x            -- echo: 1
+
+  branch (x == 1) {
+    delta x = 2
+    echo x          -- echo: 2
+  }
+
+  echo x            -- echo: 1 again
+
+  branch (true) {
+    delta y = 42
+    echo y          -- echo: 42
+  }
+
+  echo y            -- error: undefined (should not exist outside branch)
+}

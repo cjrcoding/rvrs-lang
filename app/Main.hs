@@ -23,7 +23,10 @@ main = do
               putStrLn "Parsed Flow:\n"
               putStrLn (prettyPrintFlow mainFlow)
               putStrLn "\nEvaluation Output:"
-              result <- evalFlow flowEnv mainFlow
+              
+              -- 🔧 STARTING WITH A SCOPED ENVIRONMENT STACK
+              result <- evalFlow flowEnv mainFlow [M.empty]
+
               case result of
                 Just val -> putStrLn ("Returned: " ++ show val)
                 Nothing  -> putStrLn "(Flow completed with no return)"
