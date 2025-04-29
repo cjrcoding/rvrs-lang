@@ -1,54 +1,49 @@
-# RVRS Development Log
-
----
-## Devlog Restart — April 28, 2025
-
-**Context:**  
-During restructuring and Git cleanup on April 27-28,  
-previous dev logs were lost when an earlier version (v0.1.1) was accidentally pushed over the main repo.  
-Local recovery succeeded — RVRS features were preserved and recommitted.
-
-✅ Full restoration completed.  
-✅ Project structure cleaned under `rvrs-lang/`.  
-✅ Progress tracking now restarted.
+# RVRS Developer Log
 
 ---
 
-## Milestones Reconfirmed
+## 🧭 v0.3.0-alpha – Multi-Flow River Paths  
+**Date:** 2025-04-28  
+**Tag:** `v0.3.0-alpha`
 
-- ✅ Core 6 Rituals (flow, delta, source, branch, mouth, echo)
-- ✅ Source (immutable variable declaration)
-- ✅ Delta (mutable variable declaration)
-- ✅ Expression Expansion (math, logical operations)
-- ✅ Echo and Mouth outputs
-- ✅ Branching logic
-- ✅ Clean error handling for source reassignment
-- ✅ Full Showcase (`full_showcase.rvrs`) proving entire v0.2.0-alpha functionality
+### ✅ Summary:
+RVRS now supports multiple `flow` blocks per file, with a formal entrypoint flow (`main`).  
+Flows can call one another using `call <name>`, allowing modular logic structures.
 
----
-
-## Current Version
-
-- **v0.2.0-alpha** (ready for tagging)
+### 🔨 Core Changes:
+- Parser now accepts many flows from a single source file.
+- `evalFlow` updated to receive a flow environment (`Map String Flow`) for linking.
+- `Call` now exists as a **statement**, not an expression.
+- Added support for empty argument lists in `flow()` declarations.
+- `Main.hs` upgraded to build a flow map and run the `"main"` flow.
 
 ---
 
-## Next Steps
+## 🧭 v0.2.0 – Flow Foundations  
+**Date:** 2025-04-27  
+**Tag:** `v0.2.0`
 
-- 🔲 Git tag v0.2.0-alpha officially
-- 🔲 Update `README.md` to reflect full features
-- 🔲 Begin Phase 2 feature expansion:
-  - Flow arguments (`flow add(a, b)`)
-  - Error polish
-  - Importing rituals (optional)
+### ✅ Summary:
+Core control flow in RVRS is now implemented and stable.  
+The `mouth` keyword halts a flow immediately and optionally returns a value.
 
----
-
-## Reflections
-
-> "The river endures bends, rapids, even loss —  
->  but its current continues."
-
-**RVRS flows onward. 🌊**
+### 🔨 Core Changes:
+- `Mouth` returns and halts the flow using `Returned` type.
+- `evalBody` short-circuits on `Returned`.
+- `Echo`, `Mouth`, and `Return` all unified under a clean result model.
+- Added `formatVal` helper for consistent output.
 
 ---
+
+## 🧭 v0.1.0 – First Watershed  
+**Date:** 2025-04-25  
+**Tag:** `v0.1.0`
+
+### ✅ Summary:
+Initial prototype of the RVRS interpreter.  
+Supports basic expressions, flow blocks, echo statements, and evaluation.
+
+### 🔨 Core Features:
+- Parser and AST scaffolded with `Flow`, `Echo`, `Expr`, and simple arithmetic.
+- Basic environment for variable handling with `source` and `delta`.
+- First evaluator logic with runtime expression handling.
