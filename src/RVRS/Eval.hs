@@ -19,15 +19,20 @@ data Value
   | VUnit         -- used for now to represent 'no meaningful value'
   deriving (Show, Eq)
 
-
+-- | Format values for echo/mouth
+formatVal :: Value -> String
+formatVal (VStr s)  = s
+formatVal (VNum n)  = show n
+formatVal (VBool b) = show b
+formatVal VUnit     = "unit"
 
 -- | Evaluate an expression in an environment
 evalExpr :: Env -> Expr -> Maybe Value
 evalExpr env (Var name) =
   case M.lookup name env of
-    Just (Mutable val) -> Just val
+    Just (Mutable val)   -> Just val
     Just (Immutable val) -> Just val
-    Nothing -> Nothing
+    Nothing              -> Nothing
 
 evalExpr _ (NumLit n) = Just $ VNum n
 evalExpr _ (BoolLit b) = Just $ VBool b
@@ -67,10 +72,10 @@ evalExpr env (Or e1 e2) = do
   VBool b2 <- evalExpr env e2
   return $ VBool (b1 || b2)
 
-
-
+-- Catch-all
 evalExpr _ _ = Nothing
 
+-- | Execution result control flow
 data ExecResult
   = Continue Env
   | Returned Value
@@ -83,7 +88,6 @@ evalFlow (Flow name args body) = do
     Returned val -> return (Just val)
     Continue _   -> return Nothing
 
-
 evalBody :: Env -> [Statement] -> IO ExecResult
 evalBody env [] = return (Continue env)
 evalBody env (stmt:stmts) = do
@@ -92,35 +96,34 @@ evalBody env (stmt:stmts) = do
     Continue newEnv -> evalBody newEnv stmts
     Returned val    -> return (Returned val)
 
-
 evalStmt :: Env -> Statement -> IO ExecResult
 evalStmt env stmt = case stmt of
-  Echo expr -> 
+
+  Echo expr ->
     case evalExpr env expr of
-      Just (VStr s) -> putStrLn ("echo: " ++ s) >> return (Continue env)
-      Just (VNum n) -> putStrLn ("echo: " ++ show n) >> return (Continue env)
-      Just (VBool b) -> putStrLn ("echo: " ++ show b) >> return (Continue env)
-      _ -> putStrLn "echo: [error: unsupported value]" >> return (Continue env)
+      Just val -> putStrLn ("echo: " ++ formatVal val) >> return (Continue env)
+      Nothing  -> putStrLn "echo: [error: unsupported value]" >> return (Continue env)
 
   Mouth expr ->
     case evalExpr env expr of
-      Just (VStr s) -> putStrLn ("mouth: " ++ s) >> return (Continue env)
-      Just (VNum n) -> putStrLn ("mouth: " ++ show n) >> return (Continue env)
-      Just (VBool b) -> putStrLn ("mouth: " ++ show b) >> return (Continue env)
-      _ -> putStrLn "mouth: [error: unsupported value]" >> return (Continue env)
+      Just val -> putStrLn ("mouth: " ++ formatVal val) >> return (Returned val)
+      Nothing  -> putStrLn "mouth: [error: unsupported value]" >> return (Returned VUnit)
 
-  
   Delta var expr ->
     case evalExpr env expr of
-    Just val ->
-      case M.lookup var env of
-        Just (Immutable _) -> do
-          putStrLn ("Error: Cannot reassign immutable source '" ++ var ++ "'")
-          return (Continue env)
-        _ -> return (Continue (M.insert var (Mutable val) env))
-    Nothing -> putStrLn ("Could not evaluate: " ++ show expr) >> return (Continue env)
+      Just val ->
+        case M.lookup var env of
+          Just (Immutable _) -> do
+            putStrLn ("Error: Cannot reassign immutable source '" ++ var ++ "'")
+            return (Continue env)
+          _ -> return (Continue (M.insert var (Mutable val) env))
+      Nothing -> putStrLn ("Could not evaluate: " ++ show expr) >> return (Continue env)
 
-  
+  Source var expr ->
+    case evalExpr env expr of
+      Just val -> return (Continue (insertSource var val env))
+      Nothing  -> putStrLn ("Could not evaluate: " ++ show expr) >> return (Continue env)
+
   Branch cond thenStmts elseStmts ->
     case evalExpr env cond of
       Just (VBool True)  -> evalBody env thenStmts
@@ -131,24 +134,13 @@ evalStmt env stmt = case stmt of
       Nothing -> do
         putStrLn $ "Failed to evaluate branch condition: " ++ show cond
         return (Continue env)
-  
+
   Return expr ->
     case evalExpr env expr of
       Just val -> return (Returned val)
       Nothing  -> putStrLn ("Could not evaluate return value: " ++ show expr) >> return (Returned VUnit)
 
-  Source var expr ->
-    case evalExpr env expr of
-      Just val -> return (Continue (insertSource var val env))
-      Nothing  -> putStrLn ("Could not evaluate: " ++ show expr) >> return (Continue env)
-
-
-  
-  _ -> return (Continue env)
+  _ -> putStrLn "Unknown statement encountered." >> return (Continue env)
 
 insertSource :: String -> Value -> Env -> Env
 insertSource var val env = M.insert var (Immutable val) env
-
-
-
-
