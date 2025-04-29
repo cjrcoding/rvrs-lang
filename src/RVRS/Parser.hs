@@ -17,8 +17,8 @@ import Control.Monad.Combinators.Expr
 type Parser = Parsec Void String
 
 
-parseRVRS :: String -> Either (ParseErrorBundle String Void) Flow
-parseRVRS input = parse flowParser "RVRS" input
+parseRVRS :: String -> Either (ParseErrorBundle String Void) [Flow]
+parseRVRS input = parse (many flowParser) "RVRS" input
 
 
 argumentParser :: Parser Argument
@@ -72,6 +72,7 @@ statementParser = lexeme $
   <|> try deltaParser
   <|> try branchParser
   <|> try returnParser
+  <|> callStmt  
 
 
 
@@ -146,17 +147,17 @@ term =
   <|> try (StrLit <$> stringLiteral)
   <|> try (NumLit . read <$> lexeme (some digitChar))
   <|> try (Not <$> (symbol "not" *> term))             
-  <|> try callParser
+--  <|> try callParser
   <|> try (between (symbol "(") (symbol ")") exprParser)
   <|> Var <$> identifier
 
 
 
-callParser :: Parser Expr
-callParser = do
-  func <- identifier
-  args <- between (symbol "(") (symbol ")") (exprParser `sepBy` symbol ",")
-  return $ Call func args
+-- callParser :: Parser Expr
+-- callParser = do
+--  func <- identifier
+--  args <- between (symbol "(") (symbol ")") (exprParser `sepBy` symbol ",")
+--  return $ Call func args
 
 pillarParser :: Parser Statement
 pillarParser = do
@@ -178,5 +179,12 @@ blockParser = do
   stmts <- many statementParser
   symbol "}"
   return stmts
+
+callStmt :: Parser Statement
+callStmt = do
+  _ <- symbol "call"
+  name <- identifier
+  return $ Call name
+
 
 

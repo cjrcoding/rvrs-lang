@@ -1,5 +1,9 @@
-flow mouth_demo() {
-  echo "🌊 Start of flow"
-  mouth "🛑 Flow stops here"
-  echo "❌ This should not appear"
+flow greet() {
+  echo "👋 Hello from greet"
+}
+
+flow main() {
+  echo "🌊 Entering main"
+  call greet
+  echo "🌊 Exiting main"
 }

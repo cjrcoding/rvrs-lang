@@ -80,24 +80,24 @@ data ExecResult
   = Continue Env
   | Returned Value
 
-evalFlow :: Flow -> IO (Maybe Value)
-evalFlow (Flow name args body) = do
+evalFlow :: M.Map String Flow -> Flow -> IO (Maybe Value)
+evalFlow flowEnv (Flow name _ body) = do
   putStrLn $ "Evaluating flow: " ++ name
-  result <- evalBody M.empty body
+  result <- evalBody flowEnv M.empty body
   case result of
     Returned val -> return (Just val)
     Continue _   -> return Nothing
 
-evalBody :: Env -> [Statement] -> IO ExecResult
-evalBody env [] = return (Continue env)
-evalBody env (stmt:stmts) = do
-  result <- evalStmt env stmt
+evalBody :: M.Map String Flow -> Env -> [Statement] -> IO ExecResult
+evalBody flowEnv env [] = return (Continue env)
+evalBody flowEnv env (stmt:stmts) = do
+  result <- evalStmt flowEnv env stmt
   case result of
-    Continue newEnv -> evalBody newEnv stmts
+    Continue newEnv -> evalBody flowEnv newEnv stmts
     Returned val    -> return (Returned val)
 
-evalStmt :: Env -> Statement -> IO ExecResult
-evalStmt env stmt = case stmt of
+evalStmt :: M.Map String Flow -> Env -> Statement -> IO ExecResult
+evalStmt flowEnv env stmt = case stmt of
 
   Echo expr ->
     case evalExpr env expr of
@@ -126,8 +126,8 @@ evalStmt env stmt = case stmt of
 
   Branch cond thenStmts elseStmts ->
     case evalExpr env cond of
-      Just (VBool True)  -> evalBody env thenStmts
-      Just (VBool False) -> evalBody env elseStmts
+      Just (VBool True)  -> evalBody flowEnv env thenStmts
+      Just (VBool False) -> evalBody flowEnv env elseStmts
       Just val -> do
         putStrLn $ "Non-boolean condition in branch: " ++ show val
         return (Continue env)
@@ -139,6 +139,15 @@ evalStmt env stmt = case stmt of
     case evalExpr env expr of
       Just val -> return (Returned val)
       Nothing  -> putStrLn ("Could not evaluate return value: " ++ show expr) >> return (Returned VUnit)
+
+  Call name ->
+    case M.lookup name flowEnv of
+      Just targetFlow -> do
+        _ <- evalFlow flowEnv targetFlow
+        return (Continue env)
+      Nothing -> do
+        putStrLn $ "Error: flow '" ++ name ++ "' not found"
+        return (Continue env)
 
   _ -> putStrLn "Unknown statement encountered." >> return (Continue env)
 

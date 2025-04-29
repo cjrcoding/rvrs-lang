@@ -32,7 +32,7 @@ genExpr expr = case expr of
   BoolLit True  -> "true"
   BoolLit False -> "false"
   Equals a b    -> genExpr a ++ " == " ++ genExpr b
-  Call f args   -> f ++ "(" ++ commaSep (map genExpr args) ++ ")"
+  
 
 -- | Render a function argument
 renderArg :: Argument -> String

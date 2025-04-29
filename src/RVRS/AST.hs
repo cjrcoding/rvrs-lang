@@ -24,6 +24,8 @@ data Statement
   | Echo Expr                           -- echo x
   | Pillar String Expr  -- pillar NAME = ...
   | Return Expr
+  | Call String              -- e.g., call attack
+
 
   deriving (Show, Eq)
 
@@ -33,7 +35,6 @@ data Expr
   | StrLit String                       -- "hello"
   | BoolLit Bool                        -- true, false
   | Equals Expr Expr                    -- a == b
-  | Call String [Expr]                  -- check_trust(user)
   | Add Expr Expr
   | Sub Expr Expr
   | Mul Expr Expr
