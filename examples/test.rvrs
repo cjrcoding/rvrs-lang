@@ -1,4 +1,5 @@
-flow test_mouth() {
-    delta mood = 7
-    mouth mood
+flow mouth_demo() {
+  echo "🌊 Start of flow"
+  mouth "🛑 Flow stops here"
+  echo "❌ This should not appear"
 }
