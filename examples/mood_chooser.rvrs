@@ -24,3 +24,8 @@ flow mood_chooser() {
 
     echo "Mood check completed."
 }
+
+
+flow main() {
+  call mood_chooser
+}

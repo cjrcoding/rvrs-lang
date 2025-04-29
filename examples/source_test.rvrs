@@ -12,3 +12,8 @@ flow source_test() {
     echo "After illegal reassignment attempt:"
     echo pi
 }
+
+flow main() {
+  call source_test
+}
+

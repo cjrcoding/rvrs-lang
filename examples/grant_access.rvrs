@@ -3,3 +3,7 @@ flow check_flags() {
   source b = void
   echo "done"
 }
+
+flow main() {
+  call check_flags
+}
