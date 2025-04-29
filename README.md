@@ -7,13 +7,14 @@
 # 🌊 Rivers (RVRS)
 
 <p align="center">
-  <a href="./dev-log.md" style="margin-right: 0.5rem;">
-    <img src="https://img.shields.io/badge/Dev%20Log-View%20Here-blue?style=for-the-badge" alt="Dev Log"/>
+  <a href="./dev-log.md">
+    <img src="https://img.shields.io/badge/Dev%20Log-View%20Here-blue?style=for-the-badge" alt="Dev Log Button"/>
   </a>
   <a href="#">
-    <img src="https://img.shields.io/badge/Version-v0.3.1-blueviolet?style=for-the-badge" alt="RVRS Version"/>
+    <img src="https://img.shields.io/badge/Version-v0.3.0--alpha-blueviolet?style=for-the-badge" alt="RVRS Version Badge"/>
   </a>
 </p>
+
 
 
 **“Not all contracts are code. Some are rivers.”**
