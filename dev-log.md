@@ -1,5 +1,28 @@
 # RVRS Developer Log
 
+
+📓 Dev Log Entry
+🧭 v0.3.1-alpha – Scoped Branches & Variable Shadowing
+Date: 2025-04-30
+Tag: v0.3.1-alpha
+
+✅ Summary:
+RVRS now supports lexical scoping inside branches, including proper variable shadowing.
+
+🔍 Scope Achievements:
+Variables defined inside branch blocks are scoped locally
+
+Variables declared outside remain unaffected after branch exit
+
+Shadowing (re-declaring the same variable name) behaves correctly
+
+Confirmed with multiple passing tests
+
+🔬 Verified Tests:
+scope_test.rvrs: confirms isolation of variables in branches
+
+shadowing_test.rvrs: confirms that inner x does not overwrite outer x
+
 ---
 
 📘 Dev Log Update
@@ -40,29 +63,6 @@ Flows can call one another using `call <name>`, allowing modular logic structure
 - `Call` now exists as a **statement**, not an expression.
 - Added support for empty argument lists in `flow()` declarations.
 - `Main.hs` upgraded to build a flow map and run the `"main"` flow.
----
-
-📓 Dev Log Entry
-🧭 v0.3.1-alpha – Scoped Branches & Variable Shadowing
-Date: 2025-04-30
-Tag: v0.3.1-alpha
-
-✅ Summary:
-RVRS now supports lexical scoping inside branches, including proper variable shadowing.
-
-🔍 Scope Achievements:
-Variables defined inside branch blocks are scoped locally
-
-Variables declared outside remain unaffected after branch exit
-
-Shadowing (re-declaring the same variable name) behaves correctly
-
-Confirmed with multiple passing tests
-
-🔬 Verified Tests:
-scope_test.rvrs: confirms isolation of variables in branches
-
-shadowing_test.rvrs: confirms that inner x does not overwrite outer x
 
 ---
 
