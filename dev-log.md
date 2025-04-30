@@ -2,6 +2,7 @@
 
 ## 🧭 v0.3.1-alpha – Scoped Branches & Variable Shadowing
 **Date:** 2025-04-30
+
 **Tag:** `v0.3.1-alpha`
 
 ✅ Summary:
