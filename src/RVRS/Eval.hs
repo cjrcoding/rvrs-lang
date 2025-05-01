@@ -171,11 +171,13 @@ evalStmt flowEnv env stmt = case stmt of
 
   Call name ->
     case M.lookup name flowEnv of
-      Just targetFlow -> do
-        _ <- evalFlow flowEnv targetFlow (pushScope env)
-        return (Continue env)
-      Nothing -> do
-        putStrLn $ "Error: flow '" ++ name ++ "' not found"
-        return (Continue env)
+    Just targetFlow -> do
+      result <- evalFlow flowEnv targetFlow (pushScope env)
+      case result of
+        Just val -> return (Returned val)  -- 🚨 short-circuit flow
+        Nothing  -> return (Continue env)
+    Nothing -> do
+      putStrLn $ "Error: flow '" ++ name ++ "' not found"
+      return (Continue env)
 
   _ -> putStrLn "Unknown statement encountered." >> return (Continue env)

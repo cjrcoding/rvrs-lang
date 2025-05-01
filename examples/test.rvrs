@@ -1,9 +1,10 @@
-flow greet() {
-  echo "👋 Hello from greet"
+flow early_exit() {
+  echo 1
+  return 42
+  echo 2    -- should NOT print
 }
 
 flow main() {
-  echo "🌊 Entering main"
-  call greet
-  echo "🌊 Exiting main"
+  call early_exit
+  echo 3     -- should NOT run if return is passed back to main
 }
