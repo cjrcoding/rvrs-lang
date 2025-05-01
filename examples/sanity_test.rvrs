@@ -1,0 +1,9 @@
+flow main() {
+  source a = 2.0
+  source b = 3.0
+  delta c = a + b * 2.0
+  echo a
+  echo b
+  echo c
+  return c
+}

@@ -39,9 +39,11 @@ data Expr
   | Sub Expr Expr
   | Mul Expr Expr
   | Div Expr Expr
-  | NumLit Int
+  | NumLit Double
   | Not Expr     
   | And Expr Expr   
   | Or Expr Expr 
+  | CallExpr String         
+
 
   deriving (Show, Eq)

@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -fno-warn-overlapping-patterns #-}
+
 module RVRS.Eval where
 
 import RVRS.AST
@@ -5,7 +7,7 @@ import qualified Data.Map as M
 
 -- | Values produced by evaluating expressions
 data Value
-  = VNum Int
+  = VNum Double
   | VBool Bool
   | VStr String
   | VUnit         -- used for now to represent 'no meaningful value'
@@ -50,52 +52,70 @@ formatVal (VBool b) = show b
 formatVal VUnit     = "unit"
 
 -- | Evaluate an expression in an environment
-evalExpr :: Env -> Expr -> Maybe Value
-evalExpr env (Var name) =
+evalExpr :: M.Map String Flow -> Env -> Expr -> IO (Maybe Value)
+evalExpr flowEnv env (Var name) =
   case lookupVar name env of
-    Just (Mutable v)   -> Just v
-    Just (Immutable v) -> Just v
-    Nothing            -> Nothing
+    Just (Mutable v)   -> return (Just v)
+    Just (Immutable v) -> return (Just v)
+    Nothing            -> return Nothing
 
-evalExpr _ (NumLit n) = Just $ VNum n
-evalExpr _ (BoolLit b) = Just $ VBool b
-evalExpr _ (StrLit s) = Just $ VStr s
+evalExpr _ _ (NumLit n) = return $ Just $ VNum n
+evalExpr _ _ (BoolLit b) = return $ Just $ VBool b
+evalExpr _ _ (StrLit s) = return $ Just $ VStr s
 
-evalExpr env (Equals e1 e2) = do
-  v1 <- evalExpr env e1
-  v2 <- evalExpr env e2
-  return $ VBool (v1 == v2)
+evalExpr flowEnv env (Equals e1 e2) = do
+  v1 <- evalExpr flowEnv env e1
+  v2 <- evalExpr flowEnv env e2
+  return $ VBool <$> ((==) <$> v1 <*> v2)
 
-evalExpr env (Add e1 e2) = do
-  VNum x <- evalExpr env e1
-  VNum y <- evalExpr env e2
-  return $ VNum (x + y)
+evalExpr flowEnv env (Add e1 e2) = do
+  Just (VNum x) <- evalExpr flowEnv env e1
+  Just (VNum y) <- evalExpr flowEnv env e2
+  return $ Just $ VNum (x + y)
 
-evalExpr env (Sub e1 e2) = do
-  VNum x <- evalExpr env e1
-  VNum y <- evalExpr env e2
-  return $ VNum (x - y)
+evalExpr flowEnv env (Sub e1 e2) = do
+  Just (VNum x) <- evalExpr flowEnv env e1
+  Just (VNum y) <- evalExpr flowEnv env e2
+  return $ Just $ VNum (x - y)
 
-evalExpr env (Mul e1 e2) = do
-  VNum x <- evalExpr env e1
-  VNum y <- evalExpr env e2
-  return $ VNum (x * y)
+evalExpr flowEnv env (Mul e1 e2) = do
+  Just (VNum x) <- evalExpr flowEnv env e1
+  Just (VNum y) <- evalExpr flowEnv env e2
+  return $ Just $ VNum (x * y)
 
-evalExpr env (Not e) = do
-  VBool b <- evalExpr env e
-  return $ VBool (not b)
+evalExpr flowEnv env (Div e1 e2) = do
+  Just (VNum x) <- evalExpr flowEnv env e1
+  Just (VNum y) <- evalExpr flowEnv env e2
+  if y == 0
+    then do
+      putStrLn "Error: division by zero"
+      return Nothing
+    else return $ Just $ VNum (x / y)
 
-evalExpr env (And e1 e2) = do
-  VBool b1 <- evalExpr env e1
-  VBool b2 <- evalExpr env e2
-  return $ VBool (b1 && b2)
+evalExpr flowEnv env (Not e) = do
+  Just (VBool b) <- evalExpr flowEnv env e
+  return $ Just $ VBool (not b)
 
-evalExpr env (Or e1 e2) = do
-  VBool b1 <- evalExpr env e1
-  VBool b2 <- evalExpr env e2
-  return $ VBool (b1 || b2)
+evalExpr flowEnv env (And e1 e2) = do
+  Just (VBool b1) <- evalExpr flowEnv env e1
+  Just (VBool b2) <- evalExpr flowEnv env e2
+  return $ Just $ VBool (b1 && b2)
 
-evalExpr _ _ = Nothing
+evalExpr flowEnv env (Or e1 e2) = do
+  Just (VBool b1) <- evalExpr flowEnv env e1
+  Just (VBool b2) <- evalExpr flowEnv env e2
+  return $ Just $ VBool (b1 || b2)
+
+
+evalExpr flowEnv env (CallExpr name) =
+  case M.lookup name flowEnv of
+    Just flow -> evalFlow flowEnv flow (pushScope env)
+    Nothing -> do
+      putStrLn $ "Error: flow '" ++ name ++ "' not found"
+      return Nothing
+
+evalExpr _ _ expr = error $ "Unhandled expression: " ++ show expr
+
 
 -- | Execution result control flow
 data ExecResult
@@ -121,39 +141,44 @@ evalBody flowEnv env (stmt:stmts) = do
 evalStmt :: M.Map String Flow -> Env -> Statement -> IO ExecResult
 evalStmt flowEnv env stmt = case stmt of
 
-  Echo expr ->
-    case evalExpr env expr of
+  Echo expr -> do
+    result <- evalExpr flowEnv env expr
+    case result of
       Just val -> putStrLn ("echo: " ++ formatVal val) >> return (Continue env)
       Nothing  -> putStrLn "echo: [error: unsupported value]" >> return (Continue env)
 
-  Mouth expr ->
-    case evalExpr env expr of
+  Mouth expr -> do
+    result <- evalExpr flowEnv env expr
+    case result of
       Just val -> putStrLn ("mouth: " ++ formatVal val) >> return (Returned val)
       Nothing  -> putStrLn "mouth: [error: unsupported value]" >> return (Returned VUnit)
 
-  Delta var expr ->
-    case evalExpr env expr of
+  Delta var expr -> do
+    result <- evalExpr flowEnv env expr
+    case result of
       Just val ->
         case insertVar var (Mutable val) env of
           Left err     -> putStrLn ("Error: " ++ err) >> return (Continue env)
           Right newEnv -> return (Continue newEnv)
       Nothing -> putStrLn ("Could not evaluate: " ++ show expr) >> return (Continue env)
 
-  Source var expr ->
-    case evalExpr env expr of
+  Source var expr -> do
+    result <- evalExpr flowEnv env expr
+    case result of
       Just val -> return (Continue (insertSource var val env))
       Nothing  -> putStrLn ("Could not evaluate: " ++ show expr) >> return (Continue env)
 
-  Branch cond thenStmts elseStmts ->
-    case evalExpr env cond of
+  Branch cond thenStmts elseStmts -> do
+    result <- evalExpr flowEnv env cond
+    case result of
       Just (VBool True) -> do
-        result <- evalBody flowEnv (pushScope env) thenStmts
-        case result of
+        res <- evalBody flowEnv (pushScope env) thenStmts
+        case res of
           Continue _ -> return (Continue env)  -- discard inner scope
           Returned v -> return (Returned v)
       Just (VBool False) -> do
-        result <- evalBody flowEnv (pushScope env) elseStmts
-        case result of
+        res <- evalBody flowEnv (pushScope env) elseStmts
+        case res of
           Continue _ -> return (Continue env)
           Returned v -> return (Returned v)
       Just val -> do
@@ -163,21 +188,21 @@ evalStmt flowEnv env stmt = case stmt of
         putStrLn $ "Failed to evaluate branch condition: " ++ show cond
         return (Continue env)
 
-
-  Return expr ->
-    case evalExpr env expr of
+  Return expr -> do
+    result <- evalExpr flowEnv env expr
+    case result of
       Just val -> return (Returned val)
       Nothing  -> putStrLn ("Could not evaluate return value: " ++ show expr) >> return (Returned VUnit)
 
   Call name ->
     case M.lookup name flowEnv of
-    Just targetFlow -> do
-      result <- evalFlow flowEnv targetFlow (pushScope env)
-      case result of
-        Just val -> return (Returned val)  -- 🚨 short-circuit flow
-        Nothing  -> return (Continue env)
-    Nothing -> do
-      putStrLn $ "Error: flow '" ++ name ++ "' not found"
-      return (Continue env)
+      Just targetFlow -> do
+        result <- evalFlow flowEnv targetFlow (pushScope env)
+        case result of
+          Just val -> return (Returned val)
+          Nothing  -> return (Continue env)
+      Nothing -> do
+        putStrLn $ "Error: flow '" ++ name ++ "' not found"
+        return (Continue env)
 
   _ -> putStrLn "Unknown statement encountered." >> return (Continue env)

@@ -10,6 +10,7 @@ import Text.Megaparsec (errorBundlePretty)
 
 main :: IO ()
 main = do
+  putStrLn "🟢 Running REAL Main.hs (from src/app/Main.hs)"
   args <- getArgs
   case args of
     [filename] -> do
