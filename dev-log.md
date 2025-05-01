@@ -1,5 +1,37 @@
 # RVRS Developer Log
+---
 
+## 🧭 v0.3.5-alpha — Stable Parser + Full Flow Execution
+
+**Date:** 2025-05-01  
+**Tag:** `v0.3.5-alpha`
+
+✅ **Today’s Achievements:**
+- Isolated and fixed critical `delta` parsing bug (`unexpected 'd'`)
+- Implemented `NumLit Double` + `parseNumber` to support both `1` and `1.0`
+- Verified parser is wired into `Main.hs` with debug trace
+- Validated all core features with `full_test.rvrs`:
+  - Flow definitions
+  - `source` and `delta`
+  - `echo`, `mouth`, `return`
+  - Nested flow calls via `call` and `CallExpr`
+  - Scoped environments + shadowing
+  - Branch logic (`branch ... else ...`)
+  - Arithmetic expressions (+ - * /)
+- Cleaned `.cabal` and archived legacy `MiniParser`
+
+🔖 Tagged: `v0.3.5-alpha` — first stable public-ready snapshot.
+
+---
+
+**Next Steps (Planned for v0.3.6+):**
+- 🧠 Add support for flow **arguments** (e.g., `flow greet(name: Text)`)
+- 🔁 Implement **loops or recursion** (starting with manual tail call)
+- 🧪 Add **unit test file runner** (like `rvrs test/`)
+- 🧰 Begin prepping **codegen or Aiken output**
+- 🏗 Optional: add **type checking / validation**
+
+---
 ## 🧭 v0.3.1-alpha – Scoped Branches & Variable Shadowing
 **Date:** 2025-04-30
 
