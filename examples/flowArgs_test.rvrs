@@ -1,0 +1,16 @@
+flow greet(name) {
+  echo name
+}
+
+flow add(x, y, z) {
+  delta total = x + y + z
+  echo total
+}
+
+flow noArgs {
+  echo "This flow takes no arguments"
+}
+
+flow main {
+  echo "main is present"
+}

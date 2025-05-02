@@ -1,0 +1,16 @@
+flow main {
+  delta silence "The river asks no questions"
+  echo silence
+  call drift
+}
+
+flow drift {
+  delta thought "yet it carries every answer"
+  echo thought
+  call finale
+}
+
+flow finale {
+  delta breath "through stones it speaks"
+  echo breath
+}
