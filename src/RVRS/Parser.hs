@@ -30,12 +30,9 @@ argumentParser = do
   _ <- symbol ":"
   typ <- identifier
   return $ Argument name typ
+  
 
-argListParser :: Parser [Argument]
-argListParser =
-  between (symbol "(") (symbol ")") (argumentParser `sepBy` symbol ",")
-
--- ✅ UPDATED: uses `many (sc *> statementParser)` for clean flow body parsing
+-- | Parses a full flow definition
 flowParser :: Parser Flow
 flowParser = do
   _ <- symbol "flow"
@@ -43,6 +40,15 @@ flowParser = do
   args <- argListParser
   body <- between (symbol "{") (symbol "}") (many (sc *> statementParser))
   return $ Flow name args body
+
+
+argListParser :: Parser [Argument]
+argListParser =
+  option [] $ between (symbol "(") (symbol ")") (nameArg `sepBy` symbol ",")
+  where
+    nameArg = Argument <$> identifier <*> pure "Unknown"
+
+
 
 sc :: Parser ()
 sc = L.space space1 lineCmnt blockCmnt

@@ -2,18 +2,19 @@
 
 module RVRS.AST where
 
--- | Represents an entire RVRS flow
+-- | Represents a named flow of ritual logic
 data Flow = Flow
-  { flowName :: String
-  , flowArgs :: [Argument]        -- Named, typed arguments
-  , flowBody :: [Statement]       -- The ritual body
+  { flowName :: String           -- ^ The flow's name (e.g. "main", "add")
+  , flowArgs :: [Argument]       -- ^ Named ritual arguments, optionally typed
+  , flowBody :: [Statement]      -- ^ The ritual body (statements)
   } deriving (Show, Eq)
 
--- | An argument like user: Identity
+-- | A named argument to a flow, e.g., `x: Number`
 data Argument = Argument
-  { argName :: String
-  , argType :: String
+  { argName :: String            -- ^ The argument name
+  , argType :: String            -- ^ Placeholder for the type (optional for now)
   } deriving (Show, Eq)
+
 
 -- | Statements inside a flow block
 data Statement
