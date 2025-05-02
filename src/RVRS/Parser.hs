@@ -104,7 +104,7 @@ deltaParser :: Parser Statement
 deltaParser = do
   _ <- symbol "delta"
   var <- identifier
-  _ <- symbol "="
+  _ <- optional (symbol "=")  -- ← this line makes `=` optional
   expr <- exprParser
   return $ Delta var expr
 
