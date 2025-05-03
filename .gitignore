@@ -1,21 +1,26 @@
-# Additional Cabal output
+# Haskell build artifacts
 dist/
+dist-newstyle/
 *.hi
 *.o
-*.dyn_hi
 *.dyn_o
+*.dyn_hi
+*.prof
+*.aux
+*.hp
+*.eventlog
 
-# Cabal local config
-cabal.project.local
-cabal.project.local~
-
-# Editor files
-.vscode/
-*.swp
-*~
-
-# Stack (if ever used)
+# Cabal & Stack
+.cabal-sandbox/
+cabal.sandbox.config
 .stack-work/
 
-# Executables
-rvrs
+# Editors
+*.swp
+*.swo
+*.bak
+*~ 
+.DS_Store
+.vscode/
+.idea/
+
