@@ -1,6 +1,30 @@
 # RVRS Developer Log
 ---
 
+## 🌀 v0.4.0-alpha — The River Speaks  
+**Date:** 2025-05-03  
+**Tag:** v0.4.0-alpha
+
+RVRS now supports **poetic delta syntax** — allowing declarations like:
+
+```rvrs
+delta silence "The river asks no questions"
+```
+
+No equals sign required. This unlocks a new expressive mode for writing RVRS flows in symbolic, lyrical form.
+
+### 🔧 Changes:
+- `deltaParser` now accepts both `delta x = ...` and `delta x "..."` forms
+- Poetic flows now fully parse and evaluate
+- `.gitignore` updated to cleanly exclude build artifacts
+
+### ✅ Verified:
+- `examples/poetic/rvrs.rvrs`: poetic flow chain
+- `examples/full_test.rvrs`: full feature regressiong
+
+
+---
+
 ## 🧭 v0.3.5-alpha — Stable Parser + Full Flow Execution
 
 **Date:** 2025-05-01  
