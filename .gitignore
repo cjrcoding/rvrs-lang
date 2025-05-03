@@ -1,2 +1,21 @@
-# Cabal build output
-dist-newstyle/
+# Additional Cabal output
+dist/
+*.hi
+*.o
+*.dyn_hi
+*.dyn_o
+
+# Cabal local config
+cabal.project.local
+cabal.project.local~
+
+# Editor files
+.vscode/
+*.swp
+*~
+
+# Stack (if ever used)
+.stack-work/
+
+# Executables
+rvrs
