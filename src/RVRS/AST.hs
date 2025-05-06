@@ -25,8 +25,7 @@ data Statement
   | Echo Expr                           -- echo x
   | Pillar String Expr  -- pillar NAME = ...
   | Return Expr
-  | Call String              -- e.g., call attack
-
+  | Call String [Expr]
 
   deriving (Show, Eq)
 
@@ -44,7 +43,7 @@ data Expr
   | Not Expr     
   | And Expr Expr   
   | Or Expr Expr 
-  | CallExpr String         
+  | CallExpr String [Expr]       
 
 
   deriving (Show, Eq)

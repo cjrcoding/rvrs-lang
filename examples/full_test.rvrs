@@ -36,12 +36,27 @@ flow expressionTest() {
   echo x              -- expect 19.0
 }
 
-flow main() {
+flow main {
   echo "Testing RVRS full suite:"
   call shadowTest
   call controlFlow
   call expressionTest
   source result = call computeTotal()
-  echo result         -- expect 90.0
+  echo result
+  call argTest
   mouth "✅ All systems go"
+}
+
+flow greet(name) {
+  echo name
+}
+
+flow add(x, y) {
+  delta result x + y
+  echo result
+}
+
+flow argTest {
+  call greet("Carlos")
+  call add(7, 8)
 }

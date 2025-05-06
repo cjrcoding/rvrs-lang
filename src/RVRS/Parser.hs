@@ -59,8 +59,14 @@ sc = L.space space1 lineCmnt blockCmnt
 lexeme :: Parser a -> Parser a
 lexeme = L.lexeme sc
 
+
 symbol :: String -> Parser String
 symbol = L.symbol sc
+
+
+parens :: Parser a -> Parser a
+parens = between (symbol "(") (symbol ")")
+
 
 identifier :: Parser String
 identifier = lexeme $ (:) <$> letterChar <*> many (alphaNumChar <|> char '_')
@@ -161,8 +167,9 @@ callExprParser :: Parser Expr
 callExprParser = do
   _ <- symbol "call"
   name <- identifier
-  _ <- symbol "(" *> symbol ")"
-  return $ CallExpr name
+  args <- between (symbol "(") (symbol ")") (exprParser `sepBy` symbol ",")
+  return $ CallExpr name args
+
 
 pillarParser :: Parser Statement
 pillarParser = do
@@ -186,4 +193,6 @@ callStmt :: Parser Statement
 callStmt = do
   _ <- symbol "call"
   name <- identifier
-  return $ Call name
+  args <- option [] (parens (exprParser `sepBy` symbol ","))
+  return $ Call name args
+

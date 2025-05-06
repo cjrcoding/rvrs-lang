@@ -107,12 +107,26 @@ evalExpr flowEnv env (Or e1 e2) = do
   return $ Just $ VBool (b1 || b2)
 
 
-evalExpr flowEnv env (CallExpr name) =
+evalExpr flowEnv env (CallExpr name args) = do
+  argVals <- mapM (evalExpr flowEnv env) args
   case M.lookup name flowEnv of
-    Just flow -> evalFlow flowEnv flow (pushScope env)
+    Just (Flow _ params body) -> do
+      if length argVals /= length params
+        then do
+          putStrLn $ "Error: argument count mismatch in call to " ++ name
+          return Nothing
+        else do
+          let scopedArgs = zip (map argName params) argVals
+              newEnv = pushScope [M.empty]
+              envWithArgs = foldl (\e (k, Just v) -> insertSource k v e) newEnv scopedArgs
+          result <- evalBody flowEnv envWithArgs body
+          case result of
+            Returned val -> return (Just val)
+            Continue _   -> return Nothing
     Nothing -> do
       putStrLn $ "Error: flow '" ++ name ++ "' not found"
       return Nothing
+
 
 evalExpr _ _ expr = error $ "Unhandled expression: " ++ show expr
 
@@ -194,15 +208,27 @@ evalStmt flowEnv env stmt = case stmt of
       Just val -> return (Returned val)
       Nothing  -> putStrLn ("Could not evaluate return value: " ++ show expr) >> return (Returned VUnit)
 
-  Call name ->
-    case M.lookup name flowEnv of
-      Just targetFlow -> do
-        result <- evalFlow flowEnv targetFlow (pushScope env)
-        case result of
-          Just val -> return (Returned val)
-          Nothing  -> return (Continue env)
-      Nothing -> do
-        putStrLn $ "Error: flow '" ++ name ++ "' not found"
-        return (Continue env)
+  Call name args -> case M.lookup name flowEnv of
+    Just (Flow _ params body) -> do
+      argVals <- mapM (evalExpr flowEnv env) args
+      let paramNames = map argName params
+      if length argVals /= length paramNames
+        then do
+          putStrLn $ "Error: argument count mismatch in call to " ++ name
+          return (Continue env)
+        else do
+          let bindings = zip paramNames argVals
+              newEnv = pushScope [M.empty]
+              envWithArgs = foldl (\e (k, Just v) -> insertSource k v e) newEnv bindings
+          result <- evalBody flowEnv envWithArgs body
+          case result of
+            Returned val -> return (Returned val)
+            Continue _   -> return (Continue env)
+    Nothing -> do
+      putStrLn $ "Error: flow '" ++ name ++ "' not found"
+      return (Continue env)
+
+
+
 
   _ -> putStrLn "Unknown statement encountered." >> return (Continue env)
