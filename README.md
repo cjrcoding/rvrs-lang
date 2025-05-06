@@ -13,7 +13,6 @@
 </p>
 
 
-
 **“Not all contracts are code. Some are rivers.”**
 
 RVRS is an experimental smart contract language for Cardano.
@@ -24,7 +23,7 @@ It is still forming. Still flowing.
 
 ---
 
-## ✨ The Core 6
+### ✨ The Core 6
 
 These elemental constructs shape every ritual:
 
@@ -33,64 +32,63 @@ These elemental constructs shape every ritual:
 - `delta`: A transformation, a shift in state  
 - `branch`: A decision point — a fork in the current  
 - `mouth`: A voice — the moment the contract speaks  
-- `echo`: A return, the final reflection
+- `echo`: A return, the final reflection  
 
 These are the riverbed. The rest flows from here.
 
 ---
 
-## ✅ Built So Far (April 2025)
+### ✅ Built So Far (May 2025)
 
-You can now write real, conditional, branching RVRS flows with computation and state.
+You can now write full-featured RVRS flows with arguments, branching logic, and return values.
 
-- ✅ Full parser for `flow`, `delta`, `branch`, `mouth`, `echo`, and expressions  
+- ✅ Full parser for all Core 6 constructs  
 - ✅ Arithmetic expression support: `+`, `-`, `*`, `/`  
-- ✅ Variable bindings and state mutation via `delta`  
-- ✅ Logical evaluation in `branch` blocks  
-- ✅ `mouth` logs the trace of the contract  
-- ✅ Pretty-printed AST output for debugging and clarity  
-- ✅ CLI interface for `.rvrs` execution and interpretation
+- ✅ Logical comparisons: `==`, `!=`, `<`, `>`, etc.  
+- ✅ Variable state mutation via `delta`  
+- ✅ Scoped variables and shadowing behavior  
+- ✅ Function-style `flow` blocks with arguments  
+- ✅ Flow-to-flow calling using `call`  
+- ✅ `echo` used as return value from flows  
+- ✅ `mouth` emits trace logs  
+- ✅ Multi-flow file support with `main` as entrypoint  
+- ✅ CLI tool for `.rvrs` execution and AST visualization  
 
 ---
 
-## 🧪 Real Example (Now Possible)
+### 🧪 Real Example: Now Running
 
 ```rvrs
-flow full_test {
-  delta x = 5
-  delta check = (x == 5)
-  mouth "start"
-  branch check {
-    echo "matched"
-    delta x = 10
-  } else {
-    echo "did not match"
-  }
-  echo "done"
+flow giveDiscount {
+  return 0.1
 }
-```
-```rvrs
-Output:
 
+flow computeTotal {
+  source base = 100
+  delta discount = call giveDiscount
+  source total = base - (base * discount)
+  mouth "start"
+  echo total
+}
+````
+
+````Output:
 mouth: start  
-echo: matched  
-echo: done
-```
+echo: 90.0
+````
 
 🔮 What’s Flowing Next
 Coming soon to RVRS:
 
-- `echo` returns as meaningful output from a flow
+- Type annotations on flow parameters (e.g. x: `Num`)
 
-- Function-style flows with arguments and scoped return
+- Flow selection and invocation by name (like `flow main`)
 
-- Nested branch logic
+- Companion test flows for validation and simulation
 
-- Improved type safety and runtime checks
+- Better runtime error reporting and validation
 
-- Support for multi-flow files and contracts
-
-- Companion test flows and demo contracts
+- Aiken backend compiler integration
 
 🎨 Design Philosophy
 RVRS is more than syntax. It’s a style of thinking.
@@ -101,9 +99,7 @@ Readable, symbolic code with intent
 
 Calm aesthetic — designed for clarity and reflection
 
-Inspired by nature, myth, and meaning
-
-This is a language with soul.
+Inspired by nature, myth, and meaning.
 
 ---
 
