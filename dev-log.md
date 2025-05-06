@@ -1,6 +1,31 @@
 # RVRS Developer Log
 ---
 
+## 🧭 v0.5.0-alpha – Flow Arguments & Expression Calling  
+**📅 Date:** 2025-05-06  
+**🔖 Tag:** v0.5.0-alpha
+
+✅ Summary:
+Flows can now take arguments and return values. Expressions can call flows directly (e.g. `call myFlow(1, 2)`). This unlocks real composability between flows and introduces full test coverage for argument binding, expression math, shadowing, branching, and flow result usage.
+
+🔨 Core Changes:
+- AST updated to support `CallExpr name [Expr]`
+- Parser supports flow calls in both statement and expression form
+- Evaluator binds argument values and executes in scoped environments
+- Return values from flows can now be used in expressions (e.g., `source result = call myFlow()`)
+
+🧪 Tests:
+- ✅ `arg_bind_test.rvrs`
+- ✅ `full_test.rvrs`
+
+🎯 Next Goals:
+- Type annotation enforcement
+- Argument count validation errors
+- Standard library flows: `bless`, `mirror`, `curse`
+
+
+---
+
 ## 🌀 v0.4.0-alpha — The River Speaks  
 **Date:** 2025-05-03  
 **Tag:** v0.4.0-alpha
