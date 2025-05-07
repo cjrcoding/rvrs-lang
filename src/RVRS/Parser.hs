@@ -153,6 +153,7 @@ term =
   <|> try (StrLit <$> stringLiteral)
   <|> try parseNumber
   <|> try (Not <$> (symbol "not" *> term))
+  <|> try (Neg <$> (symbol "-" *> term))
   <|> try (between (symbol "(") (symbol ")") exprParser)
   <|> Var <$> identifier
 

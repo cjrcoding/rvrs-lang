@@ -127,6 +127,14 @@ evalExpr flowEnv env (CallExpr name args) = do
       putStrLn $ "Error: flow '" ++ name ++ "' not found"
       return Nothing
 
+evalExpr flowEnv env (Neg e) = do
+  val <- evalExpr flowEnv env e
+  case val of
+    Just (VNum n) -> return $ Just $ VNum (-n)
+    _             -> do
+      putStrLn "Error: Cannot negate non-numeric value"
+      return Nothing      
+
 
 evalExpr _ _ expr = error $ "Unhandled expression: " ++ show expr
 

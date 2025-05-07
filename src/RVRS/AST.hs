@@ -43,7 +43,8 @@ data Expr
   | Not Expr     
   | And Expr Expr   
   | Or Expr Expr 
-  | CallExpr String [Expr]       
+  | CallExpr String [Expr]   
+  | Neg Expr 
 
 
   deriving (Show, Eq)
