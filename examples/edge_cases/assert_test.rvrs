@@ -1,0 +1,11 @@
+flow main() {
+  delta x 10
+
+  -- This should pass
+  assert (x == 10)
+
+  -- This should fail
+  assert (x == 42)
+
+  echo "Finished assertions."
+}

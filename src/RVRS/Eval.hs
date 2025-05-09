@@ -4,6 +4,8 @@ module RVRS.Eval where
 
 import RVRS.AST
 import qualified Data.Map as M
+import RVRS.Pretty (prettyExpr)
+
 
 -- | Values produced by evaluating expressions
 data Value
@@ -172,9 +174,23 @@ evalStmt flowEnv env stmt = case stmt of
   Whisper expr -> do
     result <- evalExpr flowEnv env expr
     case result of
-      Just val  -> putStrLn ("→ whisper: " ++ formatVal val)
-      Nothing   -> putStrLn "→ whisper: [unresolved expression]"
+      Just val  -> putStrLn $ "→ whisper: " ++ prettyExpr expr ++ " = " ++ formatVal val
+      Nothing   -> putStrLn $ "→ whisper: " ++ prettyExpr expr ++ " = [unresolved]"
     return (Continue env)
+
+  Assert expr -> do
+    result <- evalExpr flowEnv env expr
+    case result of
+      Just (VBool True)  -> return (Continue env)
+      Just (VBool False) -> do
+        putStrLn $ "Assertion failed: " ++ prettyExpr expr
+        return (Continue env)
+      Just val -> do
+        putStrLn $ "Assertion error: non-boolean value " ++ formatVal val
+        return (Continue env)
+      Nothing -> do
+        putStrLn $ "Assertion could not be evaluated: " ++ prettyExpr expr
+        return (Continue env)
 
   Mouth expr -> do
     result <- evalExpr flowEnv env expr
@@ -189,13 +205,13 @@ evalStmt flowEnv env stmt = case stmt of
         case insertVar var (Mutable val) env of
           Left err     -> putStrLn ("Error: " ++ err) >> return (Continue env)
           Right newEnv -> return (Continue newEnv)
-      Nothing -> putStrLn ("Could not evaluate: " ++ show expr) >> return (Continue env)
+      Nothing -> putStrLn ("Could not evaluate: " ++ prettyExpr expr) >> return (Continue env)
 
   Source var expr -> do
     result <- evalExpr flowEnv env expr
     case result of
       Just val -> return (Continue (insertSource var val env))
-      Nothing  -> putStrLn ("Could not evaluate: " ++ show expr) >> return (Continue env)
+      Nothing  -> putStrLn ("Could not evaluate: " ++ prettyExpr expr) >> return (Continue env)
 
   Branch cond thenStmts elseStmts -> do
     result <- evalExpr flowEnv env cond
@@ -211,17 +227,17 @@ evalStmt flowEnv env stmt = case stmt of
           Continue _ -> return (Continue env)
           Returned v -> return (Returned v)
       Just val -> do
-        putStrLn $ "Non-boolean condition in branch: " ++ show val
+        putStrLn $ "Non-boolean condition in branch: " ++ formatVal val
         return (Continue env)
       Nothing -> do
-        putStrLn $ "Failed to evaluate branch condition: " ++ show cond
+        putStrLn $ "Failed to evaluate branch condition: " ++ prettyExpr cond
         return (Continue env)
 
   Return expr -> do
     result <- evalExpr flowEnv env expr
     case result of
       Just val -> return (Returned val)
-      Nothing  -> putStrLn ("Could not evaluate return value: " ++ show expr) >> return (Returned VUnit)
+      Nothing  -> putStrLn ("Could not evaluate return value: " ++ prettyExpr expr) >> return (Returned VUnit)
 
   Call name args -> case M.lookup name flowEnv of
     Just (Flow _ params body) -> do

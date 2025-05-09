@@ -36,6 +36,13 @@ whisperParser = do
   _ <- symbol "whisper"
   expr <- exprParser
   return $ Whisper expr
+
+
+assertParser :: Parser Statement
+assertParser = do
+  _ <- symbol "assert"
+  expr <- exprParser
+  return $ Assert expr
   
 
 -- | Parses a full flow definition
@@ -85,7 +92,8 @@ statementParser :: Parser Statement
 statementParser = lexeme $
       try pillarParser
   <|> try mouthParser
-  <|> try whisperParser    
+  <|> try whisperParser  
+  <|> try assertParser   
   <|> try echoParser
   <|> try sourceParser
   <|> try deltaParser

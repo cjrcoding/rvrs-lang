@@ -27,6 +27,7 @@ data Statement
   | Pillar String Expr  -- pillar NAME = ...
   | Return Expr
   | Call String [Expr]
+  | Assert Expr
 
   deriving (Show, Eq)
 

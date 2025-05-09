@@ -1,7 +1,5 @@
 flow main() {
-  delta x 5
-  delta y (x + 3)
-  whisper "Checking value of y..."
-  whisper y
-  echo "Done tracing."
+  delta x 4
+  delta y (x + 6)
+  whisper (y * 2)
 }
