@@ -22,6 +22,7 @@ data Statement
   | Delta String Expr                   -- delta x = ...
   | Branch Expr [Statement] [Statement]-- branch cond { ... } else { ... }
   | Mouth Expr                          -- mouth "..."
+  | Whisper Expr
   | Echo Expr                           -- echo x
   | Pillar String Expr  -- pillar NAME = ...
   | Return Expr

@@ -30,6 +30,12 @@ argumentParser = do
   _ <- symbol ":"
   typ <- identifier
   return $ Argument name typ
+
+whisperParser :: Parser Statement
+whisperParser = do
+  _ <- symbol "whisper"
+  expr <- exprParser
+  return $ Whisper expr
   
 
 -- | Parses a full flow definition
@@ -79,6 +85,7 @@ statementParser :: Parser Statement
 statementParser = lexeme $
       try pillarParser
   <|> try mouthParser
+  <|> try whisperParser    
   <|> try echoParser
   <|> try sourceParser
   <|> try deltaParser

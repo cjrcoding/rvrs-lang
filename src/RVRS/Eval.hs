@@ -169,6 +169,13 @@ evalStmt flowEnv env stmt = case stmt of
       Just val -> putStrLn ("echo: " ++ formatVal val) >> return (Continue env)
       Nothing  -> putStrLn "echo: [error: unsupported value]" >> return (Continue env)
 
+  Whisper expr -> do
+    result <- evalExpr flowEnv env expr
+    case result of
+      Just val  -> putStrLn ("→ whisper: " ++ formatVal val)
+      Nothing   -> putStrLn "→ whisper: [unresolved expression]"
+    return (Continue env)
+
   Mouth expr -> do
     result <- evalExpr flowEnv env expr
     case result of
@@ -196,7 +203,7 @@ evalStmt flowEnv env stmt = case stmt of
       Just (VBool True) -> do
         res <- evalBody flowEnv (pushScope env) thenStmts
         case res of
-          Continue _ -> return (Continue env)  -- discard inner scope
+          Continue _ -> return (Continue env)
           Returned v -> return (Returned v)
       Just (VBool False) -> do
         res <- evalBody flowEnv (pushScope env) elseStmts
@@ -235,7 +242,6 @@ evalStmt flowEnv env stmt = case stmt of
     Nothing -> do
       putStrLn $ "Error: flow '" ++ name ++ "' not found"
       return (Continue env)
-
 
 
 
