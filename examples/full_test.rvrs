@@ -36,17 +36,6 @@ flow expressionTest() {
   echo x              -- expect 19.0
 }
 
-flow main {
-  echo "Testing RVRS full suite:"
-  call shadowTest
-  call controlFlow
-  call expressionTest
-  source result = call computeTotal()
-  echo result
-  call argTest
-  mouth "✅ All systems go"
-}
-
 flow greet(name) {
   echo name
 }
@@ -59,4 +48,55 @@ flow add(x, y) {
 flow argTest {
   call greet("Carlos")
   call add(7, 8)
+}
+
+flow testAssert {
+  assert 1 == 1           -- should pass
+  assert 2 == 3           -- should fail
+  assert "hello"          -- non-boolean
+}
+
+flow logicTest {
+  assert not void         -- expect true
+  assert truth and truth  -- expect true
+  assert truth or void    -- expect true
+  assert void or void     -- expect false
+}
+
+flow divZeroTest {
+  source fail = 10 / 0
+  whisper fail
+}
+
+flow returnInsideBranch {
+  branch truth {
+    return 99
+  }
+  echo "This should not appear"
+}
+
+flow negationTest {
+  source x = -42
+  echo x
+}
+
+flow mouthError {
+  mouth missingVar
+}
+
+flow main {
+  echo "Testing RVRS full suite:"
+  call shadowTest
+  call controlFlow
+  call expressionTest
+  call logicTest
+  call testAssert
+  call divZeroTest
+  call returnInsideBranch
+  call negationTest
+  call mouthError
+  source result = call computeTotal()
+  echo result
+  call argTest
+  mouth "✅ All systems go"
 }
