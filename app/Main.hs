@@ -7,10 +7,15 @@ import RVRS.AST (Flow, flowName)
 import System.Environment (getArgs)
 import qualified Data.Map as M
 import Text.Megaparsec (errorBundlePretty)
+import Control.Monad (when)
+
+-- 🔧 Debug toggle
+debug :: Bool
+debug = False  -- Set to True if you want to show parsed flow output
 
 main :: IO ()
 main = do
-  putStrLn "🟢 Running REAL Main.hs (from src/app/Main.hs)"
+  -- putStrLn "🟢 Running REAL Main.hs (from src/app/Main.hs)"
   args <- getArgs
   case args of
     [filename] -> do
@@ -21,11 +26,11 @@ main = do
           let flowEnv = M.fromList [(flowName f, f) | f <- flows]
           case M.lookup "main" flowEnv of
             Just mainFlow -> do
-              putStrLn "Parsed Flow:\n"
-              putStrLn (prettyPrintFlow mainFlow)
+              when debug $ do
+                putStrLn "Parsed Flow:\n"
+                putStrLn (prettyPrintFlow mainFlow)
+
               putStrLn "\nEvaluation Output:"
-              
-              -- 🔧 STARTING WITH A SCOPED ENVIRONMENT STACK
               result <- evalFlow flowEnv mainFlow [M.empty]
 
               case result of

@@ -1,9 +1,0 @@
-flow check_flags() {
-  source a = truth
-  source b = void
-  echo "done"
-}
-
-flow main() {
-  call check_flags
-}

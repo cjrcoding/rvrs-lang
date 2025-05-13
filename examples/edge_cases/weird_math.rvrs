@@ -1,6 +1,0 @@
-flow main() {
-  delta y (1 * (2 + -3))
-  echo y
-  delta x (1 / 0)
-  echo x
-}

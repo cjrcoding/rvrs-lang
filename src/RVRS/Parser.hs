@@ -11,12 +11,19 @@ import Data.Char (isAlphaNum)
 
 type Parser = Parsec Void String
 
+-- 🔧 Debug toggle
+debug :: Bool
+debug = False  -- Set to True if you want parser debug output
+
 -- Top-level parse function
 parseRVRS :: String -> Either (ParseErrorBundle String Void) [Flow]
 parseRVRS input =
   case parse (between sc eof (many flowParser)) "RVRS" input of
     Left err -> trace "❌ PARSE FAILED" (Left err)
-    Right flows -> trace ("✅ Parsed flows:\n" ++ show flows) (Right flows)
+    Right flows ->
+      if debug
+        then trace ("✅ Parsed flows:\n" ++ show flows) (Right flows)
+        else Right flows
 
 -- Flow definition
 flowParser :: Parser Flow

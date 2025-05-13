@@ -1,7 +1,0 @@
-flow main() {
-  call noArgs()
-}
-
-flow noArgs() {
-  echo "No arguments needed."
-}
