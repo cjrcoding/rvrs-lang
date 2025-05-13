@@ -1,0 +1,31 @@
+flow mood_chooser() {
+    echo "Welcome to Mood Chooser."
+
+    -- Simulate mood choice (1 = Happy, 2 = Thoughtful, 3 = Adventurous)
+    delta mood = 5
+
+    branch mood == 1 {
+        echo "You are feeling happy!"
+        mouth "Joy is your companion."
+    } else {
+        branch mood == 2 {
+            echo "You are feeling thoughtful."
+            mouth "Thoughts swirl within."
+        } else {
+            branch mood == 3 {
+                echo "You are feeling adventurous!"
+                mouth "Adventure calls you."
+            } else {
+                echo "Mood unknown."
+                mouth "Wandering in uncertainty."
+            }
+        }
+    }
+
+    echo "Mood check completed."
+}
+
+
+flow main() {
+  call mood_chooser
+}

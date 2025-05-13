@@ -1,0 +1,11 @@
+flow main() {
+  call test_arg_mismatch()
+}
+
+flow test_arg_mismatch() {
+  call add(1)
+}
+
+flow add(x, y) {
+  echo x
+}

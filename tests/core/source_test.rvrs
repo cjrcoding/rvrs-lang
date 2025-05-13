@@ -1,0 +1,19 @@
+flow source_test() {
+    source pi = 3
+    delta radius = 5
+    delta area = pi * radius * radius
+
+    echo "Area is:"
+    echo area
+
+    -- Now attempt to illegally reassign pi (should trigger error)
+    delta pi = 42
+
+    echo "After illegal reassignment attempt:"
+    echo pi
+}
+
+flow main() {
+  call source_test
+}
+

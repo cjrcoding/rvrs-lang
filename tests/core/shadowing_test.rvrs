@@ -1,0 +1,11 @@
+flow main() {
+  delta x = 10
+  echo x            -- should print 10
+
+  branch truth {
+    delta x = 99
+    echo x          -- should print 99 (shadowed x)
+  }
+
+  echo x            -- should print 10 (outer x restored)
+}

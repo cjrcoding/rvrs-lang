@@ -1,0 +1,20 @@
+flow calc() {
+  delta a = 10 + 5
+  delta b = a * 2
+  delta c = b - 4
+
+  echo a        -- should print 15
+  echo b        -- should print 30
+  echo c        -- should print 26
+
+  branch c == 26 {
+    echo "Math checks out"
+  }
+
+  return c
+}
+
+flow main() {
+  call calc
+  echo 999      -- will only run if `calc` doesn’t return
+}

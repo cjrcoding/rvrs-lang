@@ -1,0 +1,5 @@
+flow main() {
+  delta x 4
+  delta y (x + 6)
+  whisper (y * 2)
+}
