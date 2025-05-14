@@ -29,7 +29,7 @@ cabal run rvrs examples/core/math_test.rvrs
 To run the full integration test:
 
 ````bash
-cabal run rvrs examples/regression/full_test.rvrs
+cabal run RunAll
 ````
 
 ## Running a Test

@@ -24,3 +24,28 @@ executable rvrs
     , containers
 
   default-language:    Haskell2010
+
+executable RunAll
+  main-is:             RunAll.hs
+  hs-source-dirs:      tests, src
+  other-modules:
+      RVRS.AST
+    , RVRS.Codegen
+    , RVRS.Parser
+    , RVRS.Parser.Expression
+    , RVRS.Parser.Statement
+    , RVRS.Eval
+    , RVRS.Pretty
+
+  build-depends:
+      base >=4.14 && <5
+    , text
+    , megaparsec
+    , prettyprinter
+    , parser-combinators
+    , containers
+    , directory
+    , filepath
+    , process 
+
+  default-language:    Haskell2010
