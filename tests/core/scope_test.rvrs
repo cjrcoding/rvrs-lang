@@ -10,9 +10,10 @@ flow main() {
   echo x
 
   branch truth {
-    delta y = 42
+    delta y = 42 -- expect-fail
     echo y
   }
 
   echo y
 }
+

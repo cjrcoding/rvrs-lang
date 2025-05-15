@@ -3,7 +3,7 @@ flow greet(name) {
 }
 
 flow add(x, y) {
-  delta result x + y
+  delta result = x + y
   echo result
 }
 

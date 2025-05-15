@@ -1,0 +1,9 @@
+flow main {
+  delta age: Num = 42
+  delta name: Str = "River"
+  delta valid: Bool = truth
+
+  echo age
+  echo name
+  echo valid
+}

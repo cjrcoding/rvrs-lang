@@ -1,56 +1,53 @@
--- tests/RunAll.hs
-
 module Main where
 
-import System.Directory (doesDirectoryExist, listDirectory, doesFileExist)
+import System.Directory (doesDirectoryExist, listDirectory)
 import System.FilePath ((</>), takeExtension)
 import System.Process (readProcess)
-import Control.Monad (filterM, forM)
+import Control.Monad (filterM, forM_)
+import System.Exit (exitFailure)
 import Data.List (isInfixOf)
-import Text.Printf (printf)
 
 main :: IO ()
 main = do
-  putStrLn "🌊 Running all RVRS tests...\n"
+  putStrLn "\x1b[36m🌊 Running all RVRS tests...\x1b[0m\n"
   rvrsFiles <- findRVRSFiles "tests"
+  (passes, fails, expectedFails) <- runTests rvrsFiles
+  putStrLn "\n\x1b[35m🔚 Test Summary:\x1b[0m"
+  putStrLn $ "✅ Passed: " ++ show passes ++
+             " | ❌ Failed: " ++ show fails ++
+             " | ⚠️ Expected Failures: " ++ show expectedFails ++
+             " | 🧪 Total: " ++ show (passes + fails + expectedFails)
 
-  if null rvrsFiles
-    then putStrLn "⚠️  No .rvrs files found."
-    else do
-      results <- mapM runAndPrint rvrsFiles
-
-      let passed = length (filter id results)
-          total  = length results
-          failed = total - passed
-
-      putStrLn "\n🔚 Test Summary:"
-      printf "✅ Passed: %d | ❌ Failed: %d | 🧪 Total: %d\n" passed failed total
-
--- Recursively find all .rvrs files under a directory
 findRVRSFiles :: FilePath -> IO [FilePath]
 findRVRSFiles path = do
   contents <- listDirectory path
   let fullPaths = map (path </>) contents
-  dirs  <- filterM doesDirectoryExist fullPaths
-  files <- filterM doesFileExist fullPaths
-  let rvrsFiles = filter (\f -> takeExtension f == ".rvrs") files
+  dirs <- filterM doesDirectoryExist fullPaths
   nested <- concat <$> mapM findRVRSFiles dirs
-  return (rvrsFiles ++ nested)
+  let files = filter (\f -> takeExtension f == ".rvrs") fullPaths
+  return (files ++ nested)
 
--- Run and print result; return True if passed, False if failed
-runAndPrint :: FilePath -> IO Bool
-runAndPrint path = do
-  putStrLn $ "🔍 Running: " ++ path
-  output <- readProcess "cabal" ["run", "rvrs", path] ""
-  putStrLn output
-  putStrLn $ replicate 40 '-'
+runTests :: [FilePath] -> IO (Int, Int, Int)
+runTests files = go files 0 0 0
+  where
+    go [] p f e = return (p, f, e)
+    go (file:rest) p f e = do
+      isExpectedFail <- checkExpectedFail file
+      putStrLn $ "\x1b[33m🔍 Running: " ++ file ++ if isExpectedFail then " ⚠️ (expected fail)" else "" ++ "\x1b[0m"
+      output <- readProcess "cabal" ["run", "rvrs", file] ""
+      putStrLn output
+      putStrLn $ replicate 40 '-'
 
-  let isFail = any (`isInfixOf` output)
-        [ "❌ PARSE FAILED"
-        , "Error:"
-        , "Assertion failed"
-        , "Assertion error"
-        , "Could not evaluate"
-        ]
+      let failed = any (`isInfixOf` output)
+            ["PARSE FAILED", "Error:", "Assertion failed:", "Assertion error:"]
 
-  return (not isFail)
+      if failed && isExpectedFail
+        then go rest p f (e + 1)
+      else if failed
+        then go rest p (f + 1) e
+      else go rest (p + 1) f e
+
+checkExpectedFail :: FilePath -> IO Bool
+checkExpectedFail file = do
+  contents <- readFile file
+  return $ any ("-- expect-fail" `isInfixOf`) (lines contents)

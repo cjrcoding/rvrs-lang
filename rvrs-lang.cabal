@@ -14,6 +14,7 @@ executable rvrs
     , RVRS.Pretty  
     , RVRS.Parser.Expression
     , RVRS.Parser.Statement
+    , RVRS.Parser.Type
 
   build-depends:
       base >=4.14 && <5
@@ -36,6 +37,7 @@ executable RunAll
     , RVRS.Parser.Statement
     , RVRS.Eval
     , RVRS.Pretty
+    , RVRS.Parser.Type
 
   build-depends:
       base >=4.14 && <5

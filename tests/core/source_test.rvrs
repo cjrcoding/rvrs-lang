@@ -1,3 +1,5 @@
+-- expect-fail
+
 flow source_test() {
     source pi = 3
     delta radius = 5

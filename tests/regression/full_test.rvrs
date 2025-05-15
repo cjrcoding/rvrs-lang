@@ -1,3 +1,7 @@
+-- expect-fail
+
+-- 🧪 Function & Return Value Tests
+
 flow giveDiscount() {
   return 0.10
 }
@@ -12,15 +16,21 @@ flow computeTotal() {
   return total
 }
 
-flow shadowTest() {
-  delta x = 5
-  echo x
-  branch truth {
-    delta x = 99
-    echo x
-  }
-  echo x
+flow greet(name) {
+  echo name
 }
+
+flow add(x, y) {
+  delta result = x + y
+  echo result
+}
+
+flow noArgs() {
+  echo "No arguments needed."
+}
+
+
+-- 🔄 Control Flow & Branching
 
 flow controlFlow() {
   source val = 42
@@ -31,29 +41,19 @@ flow controlFlow() {
   }
 }
 
+flow returnInsideBranch {
+  branch truth {
+    return 99
+  }
+  echo "This should not appear"
+}
+
+
+-- 🧠 Expression, Logic, and Math
+
 flow expressionTest() {
   source x = 10 + 2 * 5 - 3 / 3
   echo x              -- expect 19.0
-}
-
-flow greet(name) {
-  echo name
-}
-
-flow add(x, y) {
-  delta result x + y
-  echo result
-}
-
-flow argTest {
-  call greet("Carlos")
-  call add(7, 8)
-}
-
-flow testAssert {
-  assert 1 == 1           -- should pass
-  assert 2 == 3           -- should fail
-  assert "hello"          -- non-boolean
 }
 
 flow logicTest {
@@ -63,26 +63,74 @@ flow logicTest {
   assert void or void     -- expect false
 }
 
-flow divZeroTest {
-  source fail = 10 / 0
-  whisper fail
-}
-
-flow returnInsideBranch {
-  branch truth {
-    return 99
-  }
-  echo "This should not appear"
-}
-
 flow negationTest {
   source x = -42
   echo x
 }
 
-flow mouthError {
-  mouth missingVar
+
+-- 🧪 Assertions & Error Cases
+
+flow testAssert {
+  assert 1 == 1           -- should pass
+  assert 2 == 3           -- should fail
+  assert "hello"          -- non-boolean
 }
+
+flow divZeroTest {
+  source fail = 10 / 0
+  whisper fail
+}
+
+flow mouthError {
+  mouth missingVar        -- undefined variable
+}
+
+
+-- 🔒 Scoping, Shadowing, and Source Constraints
+
+flow shadowTest() {
+  delta x = 5
+  echo x
+  branch truth {
+    delta x = 99
+    echo x
+  }
+  echo x
+}
+
+flow testScope {
+  branch truth {
+    delta temp = 42
+    echo temp
+  }
+  echo temp               -- should error: out of scope
+}
+
+flow testSourceReassign {
+  source pi = 3.14
+  delta pi = 0.0          -- should error: cannot reassign source
+  echo pi
+}
+
+
+-- ⚠️ Argument Handling
+
+flow argTest {
+  call greet("Carlos")
+  call add(7, 8)
+}
+
+flow testArgMismatch {
+  call add(1)             -- too few arguments
+}
+
+flow testEmptyCall {
+  call noArgs()
+}
+
+
+-- 🎬 Entry Point
 
 flow main {
   echo "Testing RVRS full suite:"
@@ -95,6 +143,10 @@ flow main {
   call returnInsideBranch
   call negationTest
   call mouthError
+  call testScope
+  call testSourceReassign
+  call testArgMismatch
+  call testEmptyCall
   source result = call computeTotal()
   echo result
   call argTest

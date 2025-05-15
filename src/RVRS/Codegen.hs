@@ -14,7 +14,7 @@ generateAiken (Flow name args body) =
 genStmt :: Statement -> [String]
 genStmt stmt = case stmt of
   Source var expr -> ["let " ++ var ++ " = " ++ genExpr expr]
-  Delta var expr  -> ["let " ++ var ++ " = " ++ genExpr expr]
+  Delta var _ expr -> ["let " ++ var ++ " = " ++ genExpr expr]
   Mouth expr      -> ["trace " ++ show (genExpr expr)]
   Echo expr       -> ["return " ++ genExpr expr]
   Branch cond tBranch fBranch ->

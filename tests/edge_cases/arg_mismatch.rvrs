@@ -1,3 +1,5 @@
+-- expect-fail
+
 flow main() {
   call test_arg_mismatch()
 }

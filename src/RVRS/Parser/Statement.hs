@@ -4,15 +4,13 @@ module RVRS.Parser.Statement (statementParser, blockParser) where
 
 import RVRS.AST
 import RVRS.Parser.Expression (exprParser)
+import RVRS.Parser.Type (typeParser)
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 import Control.Monad (void)
 import Control.Monad.Combinators.Expr
 import Data.Void
-
--- Local parser type alias
-
 import Data.Char (isAlphaNum)
 
 type Parser = Parsec Void String
@@ -64,13 +62,29 @@ sourceParser = do
   expr <- exprParser
   return $ Source var expr
 
+-- Delta parser supporting both typed and untyped declarations
 deltaParser :: Parser Statement
-deltaParser = do
+deltaParser = try typedDelta <|> try equalsDelta
+
+-- delta x: Num = 42
+typedDelta :: Parser Statement
+typedDelta = do
   _ <- symbol "delta"
   var <- identifier
-  _ <- optional (symbol "=")
+  _ <- symbol ":"
+  typ <- typeParser
+  _ <- symbol "="
   expr <- exprParser
-  return $ Delta var expr
+  return $ Delta var (Just typ) expr
+
+-- delta x = 42
+equalsDelta :: Parser Statement
+equalsDelta = do
+  _ <- symbol "delta"
+  var <- identifier
+  _ <- symbol "="
+  expr <- exprParser
+  return $ Delta var Nothing expr
 
 pillarParser :: Parser Statement
 pillarParser = do

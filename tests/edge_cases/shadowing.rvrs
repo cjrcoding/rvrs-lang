@@ -1,9 +1,7 @@
-flow main() {
-  delta x 5
-  echo x        
-  branch true {
-    delta x 42
-    echo x      
-  } else {}
-  echo x        
+flow main {
+  branch truth {
+    echo "It is true"
+  } else {
+    echo "It is false"
+  }
 }

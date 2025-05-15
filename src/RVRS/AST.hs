@@ -19,7 +19,7 @@ data Argument = Argument
 -- | Statements inside a flow block
 data Statement
   = Source String Expr                  -- source x = ...
-  | Delta String Expr                   -- delta x = ...
+  | Delta String (Maybe RVRSType) Expr
   | Branch Expr [Statement] [Statement]-- branch cond { ... } else { ... }
   | Mouth Expr                          -- mouth "..."
   | Whisper Expr
@@ -48,5 +48,19 @@ data Expr
   | CallExpr String [Expr]   
   | Neg Expr 
 
-
   deriving (Show, Eq)
+
+-- Type system for annotated variables
+data RVRSType
+  = TypeNum
+  | TypeStr
+  | TypeBool
+  | Unknown     -- for unannotated variables or unresolved types
+  
+  
+  
+  
+  deriving (Show, Eq)
+
+
+  

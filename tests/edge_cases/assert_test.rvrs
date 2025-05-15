@@ -1,5 +1,7 @@
+-- expect-fail
+
 flow main() {
-  delta x 10
+  delta x = 10
 
   -- This should pass
   assert (x == 10)

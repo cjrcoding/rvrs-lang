@@ -145,6 +145,15 @@ evalBody flowEnv env (stmt:stmts) = do
     Continue newEnv -> evalBody flowEnv newEnv stmts
     Returned val    -> return (Returned val)
 
+
+-- === Scope Management Helper ===
+
+-- Discard inner scope, return to previous scope after a branch
+stripScope :: ExecResult -> Env -> ExecResult
+stripScope (Continue _) outer = Continue outer
+stripScope (Returned v) _     = Returned v
+
+
 -- === Eval Dispatcher ===
 evalStmt :: FlowEnv -> Env -> Statement -> IO ExecResult
 evalStmt flowEnv env stmt = case stmt of
@@ -152,7 +161,7 @@ evalStmt flowEnv env stmt = case stmt of
   Whisper expr    -> evalWhisper flowEnv env expr
   Assert expr     -> evalAssert flowEnv env expr
   Mouth expr      -> evalMouth flowEnv env expr
-  Delta var expr  -> evalDelta flowEnv env var expr
+  Delta var mType expr -> evalDelta flowEnv env var expr
   Source var expr -> evalSource flowEnv env var expr
   Branch c t e    -> evalBranch flowEnv env c t e
   Return expr     -> evalReturn flowEnv env expr
@@ -211,10 +220,22 @@ evalBranch :: FlowEnv -> Env -> Expr -> [Statement] -> [Statement] -> IO ExecRes
 evalBranch flowEnv env cond thenStmts elseStmts = do
   result <- evalExpr flowEnv env cond
   case result of
-    Just (VBool True)  -> evalBody flowEnv (pushScope env) thenStmts
-    Just (VBool False) -> evalBody flowEnv (pushScope env) elseStmts
-    Just val           -> putStrLn ("Non-boolean condition in branch: " ++ formatVal val) >> return (Continue env)
-    Nothing            -> putStrLn ("Failed to evaluate branch condition: " ++ prettyExpr cond) >> return (Continue env)
+    Just (VBool True) -> do
+      let scopedEnv = pushScope env
+      branchResult <- evalBody flowEnv scopedEnv thenStmts
+      return $ stripScope branchResult env
+
+    Just (VBool False) -> do
+      let scopedEnv = pushScope env
+      branchResult <- evalBody flowEnv scopedEnv elseStmts
+      return $ stripScope branchResult env
+
+    Just val ->
+      putStrLn ("Non-boolean condition in branch: " ++ formatVal val) >> return (Continue env)
+
+    Nothing ->
+      putStrLn ("Failed to evaluate branch condition: " ++ prettyExpr cond) >> return (Continue env)
+
 
 evalReturn :: FlowEnv -> Env -> Expr -> IO ExecResult
 evalReturn flowEnv env expr = do

@@ -1,6 +1,8 @@
+-- expect-fail
+
 flow main() {
-  delta y (1 * (2 + -3))
+  delta y = (1 * (2 + -3))
   echo y
-  delta x (1 / 0)
+  delta x = (1 / 0)
   echo x
 }
