@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="#">
-    <img src="https://img.shields.io/badge/Version-v0.5.2--alpha-blueviolet?style=for-the-badge" alt="RVRS Version Badge"/>
+    <img src="https://img.shields.io/badge/Version-v0.6.0--alpha-blueviolet?style=for-the-badge" alt="RVRS Version Badge"/>
   </a>
 </p>
 
