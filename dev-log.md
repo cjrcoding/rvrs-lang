@@ -1,6 +1,44 @@
 # RVRS Developer Log
 ---
 
+## 🗓️ 2025-05-15 — Milestone Reached: v0.6.0-alpha
+
+### ✅ Summary
+- Merged `type-anno-dev` into `main` after full test suite passed
+- Tagged `v0.6.0-alpha` as the stable foundation of RVRS
+- Deleted old branches: `type-anno-dev`, `safe-base-v052`
+- Confirmed all 20 tests:
+  - ✅ 15 passed
+  - ⚠️ 5 failed as expected
+  - ❌ 0 unexpected failures
+- Clean file structure under `tests/`
+- All `-- expect-fail` logic handled by `RunAll.hs`
+- `main` now reflects a clean, auditable, and production-ready alpha
+
+### 🧠 Key Features in This Milestone
+- Type annotations (e.g. `delta x: Num = 5`)
+- Full test infrastructure with expected failure support
+- Structured flow logic: branching, return, scope enforcement
+- Boolean logic, assertions, mouth/whisper tested
+- Preparatory groundwork for `v0.7.0`: ready for imports & IR
+
+### 🧹 Repo Cleanup
+- Local and remote branches removed:
+  - `type-anno-dev`
+  - `safe-base-v052`
+- Hard reset synced local `main` to match forced push state
+- Symbolic commit added to mark milestone
+
+### 🧭 Next Steps (v0.7.0-dev)
+- Begin `imports` syntax and implementation
+- Sketch intermediate representation (IR) structure
+- Add contract-mode flags/hooks (e.g. `@onchain`, `@mint`)
+- Optional: begin stdlib structure or `use` system
+
+> "🔖 Tag anchored, branches cleaned — v0.6.0-alpha stands stable and flowing."
+
+---
+
 ## 🧭 v0.5.0-alpha – Flow Arguments & Expression Calling  
 **📅 Date:** 2025-05-06  
 **🔖 Tag:** v0.5.0-alpha
