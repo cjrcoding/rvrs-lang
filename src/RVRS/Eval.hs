@@ -53,6 +53,7 @@ formatVal (VBool b) = show b
 formatVal VUnit     = "unit"
 
 -- === Eval Expression ===
+-- === Eval Expression ===
 evalExpr :: FlowEnv -> Env -> Expr -> IO (Maybe Value)
 evalExpr flowEnv env expr = case expr of
   Var name ->
@@ -65,11 +66,14 @@ evalExpr flowEnv env expr = case expr of
   BoolLit b -> return $ Just $ VBool b
   StrLit s -> return $ Just $ VStr s
 
-  Equals e1 e2 -> liftBinEq (==) flowEnv env e1 e2
-  Add e1 e2    -> liftNumOp (+) flowEnv env e1 e2
-  Sub e1 e2    -> liftNumOp (-) flowEnv env e1 e2
-  Mul e1 e2    -> liftNumOp (*) flowEnv env e1 e2
-  Div e1 e2    -> do
+  Equals e1 e2     -> liftBinEq (==) flowEnv env e1 e2
+  GreaterThan e1 e2 -> liftNumComp (>) flowEnv env e1 e2
+  LessThan    e1 e2 -> liftNumComp (<) flowEnv env e1 e2
+
+  Add e1 e2 -> liftNumOp (+) flowEnv env e1 e2
+  Sub e1 e2 -> liftNumOp (-) flowEnv env e1 e2
+  Mul e1 e2 -> liftNumOp (*) flowEnv env e1 e2
+  Div e1 e2 -> do
     Just (VNum x) <- evalExpr flowEnv env e1
     Just (VNum y) <- evalExpr flowEnv env e2
     if y == 0
@@ -81,7 +85,7 @@ evalExpr flowEnv env expr = case expr of
     return $ Just $ VBool (not b)
 
   And e1 e2 -> liftBoolOp (&&) flowEnv env e1 e2
-  Or e1 e2  -> liftBoolOp (||) flowEnv env e1 e2
+  Or  e1 e2 -> liftBoolOp (||) flowEnv env e1 e2
 
   CallExpr name args -> do
     argVals <- mapM (evalExpr flowEnv env) args
@@ -105,6 +109,16 @@ evalExpr flowEnv env expr = case expr of
       _             -> putStrLn "Error: Cannot negate non-numeric value" >> return Nothing
 
   _ -> error $ "Unhandled expression: " ++ show expr
+
+
+liftNumComp :: (Double -> Double -> Bool) -> FlowEnv -> Env -> Expr -> Expr -> IO (Maybe Value)
+liftNumComp op flowEnv env e1 e2 = do
+  v1 <- evalExpr flowEnv env e1
+  v2 <- evalExpr flowEnv env e2
+  case (v1, v2) of
+    (Just (VNum x), Just (VNum y)) -> return $ Just $ VBool (op x y)
+    _ -> putStrLn "Error: expected numeric values in comparison" >> return Nothing
+
 
 liftNumOp :: (Double -> Double -> Double) -> FlowEnv -> Env -> Expr -> Expr -> IO (Maybe Value)
 liftNumOp op flowEnv env e1 e2 = do

@@ -1,0 +1,15 @@
+flow identity(x) {
+  echo x
+}
+
+flow add(x, y) {
+  echo x + y
+}
+
+flow max(a, b) {
+  branch a > b {
+    echo a
+  } else {
+    echo b
+  }
+}

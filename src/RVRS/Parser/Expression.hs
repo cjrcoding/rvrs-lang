@@ -25,11 +25,15 @@ operatorTable =
   , [ InfixL (Add <$ symbol "+")
     , InfixL (Sub <$ symbol "-")
     ]
-  , [ InfixL (Equals <$ symbol "==") ]
+  , [ InfixN (Equals <$ symbol "==")
+    , InfixN (GreaterThan <$ symbol ">")
+    , InfixN (LessThan <$ symbol "<")
+    ]
   , [ InfixL (And <$ symbol "and")
     , InfixL (Or <$ symbol "or")
     ]
   ]
+
 
 -- Terms in the expression grammar
 term :: Parser Expr

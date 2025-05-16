@@ -31,7 +31,7 @@ flowParser = do
   _ <- symbol "flow"
   name <- identifier
   args <- argListParser
-  body <- between (symbol "{") (symbol "}") (many (sc *> statementParser))
+  body <- between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc))
   return $ Flow name args body
 
 -- Optional argument list

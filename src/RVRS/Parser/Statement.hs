@@ -1,5 +1,3 @@
--- src/RVRS/Parser/Statement.hs
-
 module RVRS.Parser.Statement (statementParser, blockParser) where
 
 import RVRS.AST
@@ -17,19 +15,21 @@ type Parser = Parsec Void String
 
 -- Top-level statement parser
 statementParser :: Parser Statement
-statementParser = lexeme $
-      try pillarParser
-  <|> try mouthParser
-  <|> try whisperParser  
-  <|> try assertParser   
-  <|> try echoParser
-  <|> try sourceParser
-  <|> try deltaParser
-  <|> try branchParser
-  <|> try returnParser
-  <|> try callStmt
+statementParser = choice
+  [ try pillarParser
+  , try mouthParser
+  , try whisperParser
+  , try assertParser
+  , try echoParser
+  , try sourceParser
+  , try deltaParser
+  , try branchParser
+  , try returnParser
+  , try callStmt
+  ]
 
 -- Individual statement parsers
+
 whisperParser :: Parser Statement
 whisperParser = do
   _ <- symbol "whisper"
@@ -45,13 +45,13 @@ assertParser = do
 mouthParser :: Parser Statement
 mouthParser = do
   _ <- symbol "mouth"
-  expr <- exprParser  
+  expr <- exprParser
   return $ Mouth expr
 
 echoParser :: Parser Statement
 echoParser = do
   _ <- symbol "echo"
-  expr <- exprParser  
+  expr <- exprParser
   return $ Echo expr
 
 sourceParser :: Parser Statement
@@ -63,10 +63,10 @@ sourceParser = do
   return $ Source var expr
 
 -- Delta parser supporting both typed and untyped declarations
+
 deltaParser :: Parser Statement
 deltaParser = try typedDelta <|> try equalsDelta
 
--- delta x: Num = 42
 typedDelta :: Parser Statement
 typedDelta = do
   _ <- symbol "delta"
@@ -77,7 +77,6 @@ typedDelta = do
   expr <- exprParser
   return $ Delta var (Just typ) expr
 
--- delta x = 42
 equalsDelta :: Parser Statement
 equalsDelta = do
   _ <- symbol "delta"
@@ -104,21 +103,12 @@ branchParser :: Parser Statement
 branchParser = do
   _ <- symbol "branch"
   cond <- exprParser
-  thenBlock <- blockParser
-  elseBlock <- optionalElseParser
-  return $ Branch cond thenBlock elseBlock
-
-optionalElseParser :: Parser [Statement]
-optionalElseParser =
-      (symbol "else" *> blockParser)
-  <|> pure []
+  thenBlock <- sc *> blockParser
+  elseBlock <- optional (try (sc *> symbol "else" *> sc *> blockParser))
+  return $ Branch cond thenBlock (maybe [] id elseBlock)
 
 blockParser :: Parser [Statement]
-blockParser = do
-  _ <- symbol "{"
-  stmts <- many statementParser
-  _ <- symbol "}"
-  return stmts
+blockParser = between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc))
 
 callStmt :: Parser Statement
 callStmt = do
@@ -127,7 +117,8 @@ callStmt = do
   args <- option [] (parens (exprParser `sepBy` symbol ","))
   return $ Call name args
 
--- Shared utility parsers
+-- Shared utilities
+
 lexeme :: Parser a -> Parser a
 lexeme = L.lexeme sc
 

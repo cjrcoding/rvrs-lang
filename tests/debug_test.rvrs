@@ -1,11 +1,7 @@
 flow main {
-  delta x = 5
-  echo x        -- Expect: 5
-
-  branch truth {
-    delta x = 99
-    echo x      -- Expect: 99 (new inner scope)
-  } else {}
-
-  echo x        -- Expect: 5 (outer x still intact)
+  branch 5 > 3 {
+    echo "ok"
+  } else {
+    echo "bad"
+  }
 }
