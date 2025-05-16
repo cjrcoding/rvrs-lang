@@ -1,11 +1,13 @@
--- app/TestLower.hs
 module Main where
 
 import RVRS.Parser (parseRVRS)
 import RVRS.Lower (lowerFlow)
+import RVRS.EvalIR (evalIRFlow)
+import RVRS.Value (Value(..))
+import RVRS.AST (flowName)  -- Import flowName accessor
 import Text.Megaparsec (parse)
 import System.Environment (getArgs)
-import Control.Monad (mapM_)
+import Data.List (find)
 
 main :: IO ()
 main = do
@@ -15,8 +17,13 @@ main = do
       content <- readFile filePath
       case parseRVRS content of
         Left err -> putStrLn $ "❌ Parse error:\n" ++ show err
-        Right flows -> do
-          let lowered = map lowerFlow flows
-          putStrLn "✅ Lowered IR:"
-          mapM_ print lowered
+        Right flows -> case find (\f -> flowName f == "main") flows of
+          Nothing -> putStrLn "❌ No 'main' flow found."
+          Just flow -> do
+            let lowered = lowerFlow flow
+            putStrLn "✅ Lowered IR:"
+            print lowered
+            putStrLn "🔁 Evaluation Output:"
+            _ <- evalIRFlow lowered []
+            return ()
     _ -> putStrLn "Usage: cabal run TestLower path/to/file.rvrs"

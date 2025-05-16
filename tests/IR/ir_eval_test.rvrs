@@ -1,0 +1,15 @@
+flow main() {
+  delta x = 10
+  echo x
+
+  branch x == 10 {
+    delta x = 20
+    echo x
+  } else {
+    echo "wrong"
+  }
+
+  echo x
+
+  return x
+}

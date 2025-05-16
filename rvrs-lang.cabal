@@ -61,11 +61,13 @@ executable TestLower
   other-modules:
       RVRS.AST
     , RVRS.IR
+    , RVRS.EvalIR
     , RVRS.Lower
     , RVRS.Parser
     , RVRS.Parser.Expression
     , RVRS.Parser.Statement
     , RVRS.Parser.Type
+    , RVRS.Value
 
   build-depends:
       base >=4.14 && <5
