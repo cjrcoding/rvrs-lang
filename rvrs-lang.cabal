@@ -54,7 +54,7 @@ executable RunAll
 
   default-language:    Haskell2010
 
--- === ✅ New Executable: TestLower ===
+-- === ✅ Executable: TestLower ===
 executable TestLower
   main-is:             TestLower.hs
   hs-source-dirs:      app, src
@@ -76,5 +76,32 @@ executable TestLower
     , prettyprinter
     , parser-combinators
     , containers
+
+  default-language:    Haskell2010
+
+-- === ✅ New Executable: RunIRTests ===
+executable RunIRTests
+  main-is:             RunIRTests.hs
+  hs-source-dirs:      tests, src
+  other-modules:
+      RVRS.AST
+    , RVRS.IR
+    , RVRS.EvalIR
+    , RVRS.Lower
+    , RVRS.Parser
+    , RVRS.Parser.Expression
+    , RVRS.Parser.Statement
+    , RVRS.Parser.Type
+    , RVRS.Value
+
+  build-depends:
+      base >=4.14 && <5
+    , text
+    , megaparsec
+    , prettyprinter
+    , parser-combinators
+    , containers
+    , directory
+    , filepath
 
   default-language:    Haskell2010
