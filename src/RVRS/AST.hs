@@ -31,12 +31,14 @@ data Statement
 
   deriving (Show, Eq)
 
--- | Expression types used in RVRS
+
 data Expr
   = Var String                          -- x
   | StrLit String                       -- "hello"
   | BoolLit Bool                        -- true, false
   | Equals Expr Expr                    -- a == b
+  | GreaterThan Expr Expr              -- a > b
+  | LessThan Expr Expr                 -- a < b
   | Add Expr Expr
   | Sub Expr Expr
   | Mul Expr Expr

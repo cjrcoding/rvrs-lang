@@ -3,6 +3,7 @@ name:                rvrs-lang
 version:             0.1.0.0
 build-type:          Simple
 
+-- === Executable: rvrs ===
 executable rvrs
   main-is:             Main.hs
   hs-source-dirs:      app, src
@@ -26,6 +27,7 @@ executable rvrs
 
   default-language:    Haskell2010
 
+-- === Executable: RunAll ===
 executable RunAll
   main-is:             RunAll.hs
   hs-source-dirs:      tests, src
@@ -49,5 +51,28 @@ executable RunAll
     , directory
     , filepath
     , process 
+
+  default-language:    Haskell2010
+
+-- === ✅ New Executable: TestLower ===
+executable TestLower
+  main-is:             TestLower.hs
+  hs-source-dirs:      app, src
+  other-modules:
+      RVRS.AST
+    , RVRS.IR
+    , RVRS.Lower
+    , RVRS.Parser
+    , RVRS.Parser.Expression
+    , RVRS.Parser.Statement
+    , RVRS.Parser.Type
+
+  build-depends:
+      base >=4.14 && <5
+    , text
+    , megaparsec
+    , prettyprinter
+    , parser-combinators
+    , containers
 
   default-language:    Haskell2010
