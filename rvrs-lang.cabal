@@ -17,6 +17,7 @@ executable rvrs
     , RVRS.Parser.Statement
     , RVRS.Parser.Type
 
+
   build-depends:
       base >=4.14 && <5
     , text

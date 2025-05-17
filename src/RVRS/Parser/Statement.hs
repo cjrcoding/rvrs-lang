@@ -20,6 +20,7 @@ statementParser = choice
   , try mouthParser
   , try whisperParser
   , try assertParser
+  , try speaksParser
   , try echoParser
   , try sourceParser
   , try deltaParser
@@ -53,6 +54,13 @@ echoParser = do
   _ <- symbol "echo"
   expr <- exprParser
   return $ Echo expr
+
+speaksParser :: Parser Statement
+speaksParser = do
+  symbol "speaks"
+  expr <- exprParser
+  return $ Echo expr
+
 
 sourceParser :: Parser Statement
 sourceParser = do

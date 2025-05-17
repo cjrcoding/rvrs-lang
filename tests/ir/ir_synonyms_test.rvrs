@@ -1,5 +1,6 @@
 ceremony truth() {
-  speaks ("RVRS flows like spirit")
+  speaks "flowing"
+  whisper (1 + 2)
 }
 
 flow main() {

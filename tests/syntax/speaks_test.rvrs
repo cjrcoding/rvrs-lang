@@ -1,0 +1,4 @@
+flow main() {
+  speaks "This is a test of the ritual voice"
+  speaks 42 + 8
+}

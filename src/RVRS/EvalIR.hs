@@ -5,45 +5,65 @@ import qualified Data.Map as Map
 import RVRS.Value (Value(..))
 
 type Env = Map.Map String Value
+type FlowEnv = Map.Map String FlowIR
 
--- Entry point for running a flow
-evalIRFlow :: FlowIR -> [Value] -> IO (Maybe Value)
-evalIRFlow (FlowIR name args body) argVals = do
-  let initialEnv = Map.fromList (zip args argVals)
-  evalStmts body initialEnv
+-- Entry point: run a named flow with args from the IR FlowEnv
+evalIRFlow :: FlowEnv -> String -> [Value] -> IO (Maybe Value)
+evalIRFlow flowMap entryName args = case Map.lookup entryName flowMap of
+  Just (FlowIR _ params body) -> do
+    let initialEnv = Map.fromList (zip params args)
+    evalStmtsWithEnv flowMap body initialEnv
+  Nothing -> do
+    putStrLn $ "Error: No flow named '" ++ entryName ++ "' found."
+    return Nothing
 
--- Evaluate a list of IR statements (handles IRDelta here)
-evalStmts :: [StmtIR] -> Env -> IO (Maybe Value)
-evalStmts [] _ = return Nothing
-evalStmts (stmt:rest) env = case stmt of
+-- Evaluate a sequence of IR statements with full context
+evalStmtsWithEnv :: FlowEnv -> [StmtIR] -> Env -> IO (Maybe Value)
+evalStmtsWithEnv _ [] _ = return Nothing
+evalStmtsWithEnv flowMap (stmt:rest) env = case stmt of
   IRDelta name expr -> do
     val <- evalIRExpr expr env
     let newEnv = Map.insert name val env
-    evalStmts rest newEnv
+    evalStmtsWithEnv flowMap rest newEnv
 
   _ -> do
-    result <- evalIRStmt stmt env
+    result <- evalIRStmt flowMap stmt env
     case result of
-      Just val -> return (Just val)  -- early return short-circuits flow
-      Nothing  -> evalStmts rest env
+      Just val -> return (Just val)
+      Nothing  -> evalStmtsWithEnv flowMap rest env
 
--- Evaluate a single IR statement (except Delta, handled above)
-evalIRStmt :: StmtIR -> Env -> IO (Maybe Value)
-evalIRStmt stmt env = case stmt of
+-- Evaluate a single IR statement
+evalIRStmt :: FlowEnv -> StmtIR -> Env -> IO (Maybe Value)
+evalIRStmt flowMap stmt env = case stmt of
   IREcho expr -> do
     val <- evalIRExpr expr env
     putStrLn ("echo: " ++ show val)
     return Nothing
 
+  IRWhisper label expr -> do
+    val <- evalIRExpr expr env
+    putStrLn ("→ whisper: " ++ label ++ " = " ++ show val)
+    return Nothing
+
+
+  IRCallStmt name args -> case Map.lookup name flowMap of
+    Just (FlowIR _ params body) -> do
+      argVals <- mapM (`evalIRExpr` env) args
+      let callEnv = Map.fromList (zip params argVals)
+      evalStmtsWithEnv flowMap body callEnv
+    Nothing -> do
+      putStrLn ("Unknown flow: " ++ name)
+      return Nothing
+
   IRReturn expr -> do
     val <- evalIRExpr expr env
     return (Just val)
 
-  IRBranch cond thenStmts elseStmts -> do
+  IRBranch cond tBlock eBlock -> do
     condVal <- evalIRExpr cond env
     case condVal of
-      VBool True  -> evalStmts thenStmts env
-      VBool False -> evalStmts elseStmts env
+      VBool True  -> evalStmtsWithEnv flowMap tBlock env
+      VBool False -> evalStmtsWithEnv flowMap eBlock env
       _ -> return $ Just $ VError "Condition must be boolean"
 
   IRDelta{} -> error "IRDelta should be handled in evalStmts"

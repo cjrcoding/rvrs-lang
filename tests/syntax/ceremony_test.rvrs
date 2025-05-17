@@ -1,0 +1,7 @@
+ceremony greet(name) {
+  speaks name
+}
+
+flow main() {
+  call greet("Carlos")
+}

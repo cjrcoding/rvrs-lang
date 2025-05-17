@@ -25,14 +25,16 @@ parseRVRS input =
         then trace ("✅ Parsed flows:\n" ++ show flows) (Right flows)
         else Right flows
 
--- Flow definition
+
 flowParser :: Parser Flow
 flowParser = do
-  _ <- symbol "flow"
+  _ <- symbol "flow" <|> symbol "ceremony"
   name <- identifier
   args <- argListParser
   body <- between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc))
   return $ Flow name args body
+
+
 
 -- Optional argument list
 argListParser :: Parser [Argument]
