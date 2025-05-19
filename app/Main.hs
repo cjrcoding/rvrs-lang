@@ -14,34 +14,43 @@ import Control.Monad (when)
 import qualified Data.Map as M
 import Text.Megaparsec (errorBundlePretty)
 
-
 -- 🔧 Debug toggle
 debug :: Bool
 debug = False  -- Set to True if you want to show parsed flow output
 
 main :: IO ()
 main = do
-  -- putStrLn "🟢 Running REAL Main.hs (from src/app/Main.hs)"
   args <- getArgs
   case args of
     [filename] -> do
-      content <- readFile filename
-      case parseRVRS content of
+      -- Parse user file
+      userContent <- readFile filename
+      case parseRVRS userContent of
         Left err -> putStrLn $ errorBundlePretty err
-        Right flows -> do
-          let flowEnv = M.fromList [(flowName f, f) | f <- flows]
-          case M.lookup "main" flowEnv of
-            Just mainFlow -> do
-              when debug $ do
-                putStrLn "Parsed Flow:\n"
-                putStrLn (prettyPrintFlow mainFlow)
+        Right userFlows -> do
 
-              putStrLn "\nEvaluation Output:"
-              result <- evalFlow flowEnv mainFlow [M.empty]
+          -- Parse stdlib
+          stdlibContent <- readFile "stdlib/stdlib.rvrs"
+          case parseRVRS stdlibContent of
+            Left stdErr -> putStrLn $ "Stdlib error:\n" ++ errorBundlePretty stdErr
+            Right stdlibFlows -> do
 
-              case result of
-                Just val -> putStrLn ("Returned: " ++ show val)
-                Nothing  -> putStrLn "(Flow completed with no return)"
-            Nothing ->
-              putStrLn "Error: No flow named 'main' found."
+              -- Combine flows
+              let allFlows = userFlows ++ stdlibFlows
+              let flowEnv = M.fromList [(flowName f, f) | f <- allFlows]
+
+              case M.lookup "main" flowEnv of
+                Just mainFlow -> do
+                  when debug $ do
+                    putStrLn "Parsed Flow:\n"
+                    putStrLn (prettyPrintFlow mainFlow)
+
+                  putStrLn "\nEvaluation Output:"
+                  result <- evalFlow flowEnv mainFlow [M.empty]
+
+                  case result of
+                    Just val -> putStrLn ("Returned: " ++ show val)
+                    Nothing  -> putStrLn "(Flow completed with no return)"
+                Nothing -> putStrLn "Error: No flow named 'main' found."
+
     _ -> putStrLn "Usage: rvrs <file>.rvrs"

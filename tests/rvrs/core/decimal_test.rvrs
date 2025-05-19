@@ -3,6 +3,6 @@ flow givePi() {
 }
 
 flow main() {
-  source pi = call givePi()
+  source pi = givePi()
   echo pi
 }

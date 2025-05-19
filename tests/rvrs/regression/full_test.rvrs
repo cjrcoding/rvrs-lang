@@ -8,7 +8,7 @@ flow giveDiscount() {
 
 flow computeTotal() {
   source base = 100.0
-  delta discount = call giveDiscount()
+  delta discount = giveDiscount()
   source total = base - (base * discount)
 
   echo discount         -- expect 0.10
@@ -117,16 +117,16 @@ flow testSourceReassign {
 -- ⚠️ Argument Handling
 
 flow argTest {
-  call greet("Carlos")
-  call add(7, 8)
+  greet("Carlos")
+  add(7, 8)
 }
 
 flow testArgMismatch {
-  call add(1)             -- too few arguments
+  add(1)             -- too few arguments
 }
 
 flow testEmptyCall {
-  call noArgs()
+  noArgs()
 }
 
 
@@ -134,21 +134,21 @@ flow testEmptyCall {
 
 flow main {
   echo "Testing RVRS full suite:"
-  call shadowTest
-  call controlFlow
-  call expressionTest
-  call logicTest
-  call testAssert
-  call divZeroTest
-  call returnInsideBranch
-  call negationTest
-  call mouthError
-  call testScope
-  call testSourceReassign
-  call testArgMismatch
-  call testEmptyCall
-  source result = call computeTotal()
+  shadowTest()
+  controlFlow()
+  expressionTest()
+  logicTest()
+  testAssert()
+  divZeroTest()
+  returnInsideBranch()
+  negationTest()
+  mouthError()
+  testScope()
+  testSourceReassign()
+  testArgMismatch()
+  testEmptyCall()
+  source result = computeTotal()
   echo result
-  call argTest
+  argTest()
   mouth "✅ All systems go"
 }

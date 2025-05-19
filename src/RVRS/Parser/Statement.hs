@@ -13,13 +13,10 @@ import Data.Char (isAlphaNum)
 
 type Parser = Parsec Void String
 
--- Top-level statement parser
-statementParser :: Parser Statement
 statementParser = choice
   [ try pillarParser
   , try mouthParser
-  , try callStmt
-  , try whisperParser
+  , try whisperParser     
   , try assertParser
   , try speaksParser
   , try echoParser
@@ -27,8 +24,10 @@ statementParser = choice
   , try deltaParser
   , try branchParser
   , try returnParser
-  
+  , try callStmt           
+  , try bareCallStmt
   ]
+
 
 -- Individual statement parsers
 
@@ -70,6 +69,14 @@ sourceParser = do
   _ <- symbol "="
   expr <- exprParser
   return $ Source var expr
+
+
+bareCallStmt :: Parser Statement
+bareCallStmt = do
+  name <- identifier
+  args <- between (symbol "(") (symbol ")") (exprParser `sepBy` symbol ",")
+  return $ Call name args
+
 
 -- Delta parser supporting both typed and untyped declarations
 

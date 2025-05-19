@@ -11,7 +11,7 @@ import Control.Monad (filterM, forM_)
 
 -- Data utilities
 import Data.List (isInfixOf)
-
+import Data.Char (toLower)
 
 main :: IO ()
 main = do
@@ -44,8 +44,14 @@ runTests files = go files 0 0 0
       putStrLn output
       putStrLn $ replicate 40 '-'
 
-      let failed = any (`isInfixOf` output)
-            ["PARSE FAILED", "Error:", "Assertion failed:", "Assertion error:"]
+      let lowerOutput = map toLower output
+          failed = any (`isInfixOf` lowerOutput)
+            [ "parse failed"
+            , "runtime error"
+            , "error:"
+            , "assertion failed"
+            , "assertion error"
+            ]
 
       if failed && isExpectedFail
         then go rest p f (e + 1)
