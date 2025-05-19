@@ -1,15 +1,28 @@
-flow identity(x) {
+-- Prelude of Rituals —
+
+flow mirror(x) {
+  mouth x
+}
+
+flow void(x) {
+  mouth -x
+}
+
+flow fuse_x(x) {
+  delta self = x
+  mouth self + 5
+}
+
+flow is_four(x) {
+  mouth x == 4
+}
+
+flow fork_true(x) {
   echo x
 }
 
-flow add(x, y) {
-  echo x + y
-}
 
-flow max(a, b) {
-  branch a > b {
-    echo a
-  } else {
-    echo b
-  }
+flow echo_twice(x) {
+  echo x
+  echo x
 }

@@ -18,6 +18,7 @@ statementParser :: Parser Statement
 statementParser = choice
   [ try pillarParser
   , try mouthParser
+  , try callStmt
   , try whisperParser
   , try assertParser
   , try speaksParser
@@ -26,7 +27,7 @@ statementParser = choice
   , try deltaParser
   , try branchParser
   , try returnParser
-  , try callStmt
+  
   ]
 
 -- Individual statement parsers

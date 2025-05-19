@@ -1,0 +1,9 @@
+flow main {
+  echo mirror("ritual")          -- expect: "ritual"
+  echo void(10)                  -- expect: -10
+  echo fuse_x(2)                 -- expect: 7
+  echo is_four(4)                -- expect: true
+  echo is_four(3)                -- expect: false
+  echo fork_true("choice")       -- expect: "choice"
+  echo echo_twice("again")       -- expect: "again" twice
+}

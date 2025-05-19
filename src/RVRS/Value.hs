@@ -6,4 +6,5 @@ data Value
   | VStr String
   | VBool Bool
   | VError String
+  | VVoid            
   deriving (Eq, Show)

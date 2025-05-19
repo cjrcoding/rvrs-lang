@@ -29,21 +29,20 @@ operatorTable =
   , [ InfixL (Add <$ symbol "+")
     , InfixL (Sub <$ symbol "-")
     ]
-  , [ InfixN (Equals <$ symbol "==")
+  , [ InfixN (Equals      <$ symbol "==")
     , InfixN (GreaterThan <$ symbol ">")
-    , InfixN (LessThan <$ symbol "<")
+    , InfixN (LessThan    <$ symbol "<")
     ]
   , [ InfixL (And <$ symbol "and")
-    , InfixL (Or <$ symbol "or")
+    , InfixL (Or  <$ symbol "or")
     ]
   ]
-
 
 -- Terms in the expression grammar
 term :: Parser Expr
 term =
-      try callExprParser
-  <|> try (BoolLit True <$ symbol "truth")
+      try funcCallExpr
+  <|> try (BoolLit True  <$ symbol "truth")
   <|> try (BoolLit False <$ symbol "void")
   <|> try (StrLit <$> stringLiteral)
   <|> try parseNumber
@@ -58,13 +57,12 @@ parseNumber = do
   num <- lexeme $ try L.float <|> (fromInteger <$> L.decimal)
   return $ NumLit num
 
--- Function call expressions
-callExprParser :: Parser Expr
-callExprParser = do
-  _ <- symbol "call"
-  name <- identifier
-  args <- between (symbol "(") (symbol ")") (exprParser `sepBy` symbol ",")
-  return $ CallExpr name args
+-- Function call expressions (e.g., fuse(2, 3))
+funcCallExpr :: Parser Expr
+funcCallExpr = do
+  funcName <- identifier
+  args <- parens (exprParser `sepBy` symbol ",")
+  return $ CallExpr funcName args
 
 -- Utility parsers
 lexeme :: Parser a -> Parser a
