@@ -39,5 +39,8 @@ main = do
             putStrLn "✅ Lowered IR:"
             print mainFlow
             putStrLn "🔁 Evaluation Output:"
-            _ <- evalIRFlow flowMap (IR.flowName mainFlow) []
-            return ()
+            result <- evalIRFlow flowMap (IR.flowName mainFlow) []
+            case result of
+              Right (Just val) -> putStrLn $ "✅ Flow returned: " ++ show val
+              Right Nothing    -> putStrLn "✅ Flow completed without explicit return"
+              Left err         -> putStrLn $ "❌ Runtime error: " ++ show err

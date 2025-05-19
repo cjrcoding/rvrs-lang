@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-overlapping-patterns #-}
 
-module RVRS.Eval where
+module RVRS.Eval.Eval where
 
 -- Internal modules
 import RVRS.AST

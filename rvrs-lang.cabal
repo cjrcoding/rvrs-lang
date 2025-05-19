@@ -11,12 +11,15 @@ executable rvrs
       RVRS.AST
     , RVRS.Codegen
     , RVRS.Parser
-    , RVRS.Eval
+    , RVRS.Eval.Eval               
+    , RVRS.EvalIR                  
     , RVRS.Pretty  
     , RVRS.Parser.Expression
     , RVRS.Parser.Statement
     , RVRS.Parser.Type
-
+    , RVRS.Value
+    , RVRS.IR
+    , RVRS.Lower
 
   build-depends:
       base >=4.14 && <5
@@ -25,6 +28,7 @@ executable rvrs
     , prettyprinter
     , parser-combinators
     , containers
+    , mtl                           
 
   default-language:    Haskell2010
 
@@ -38,9 +42,13 @@ executable RunAll
     , RVRS.Parser
     , RVRS.Parser.Expression
     , RVRS.Parser.Statement
-    , RVRS.Eval
+    , RVRS.Eval.Eval               
+    , RVRS.EvalIR                
     , RVRS.Pretty
     , RVRS.Parser.Type
+    , RVRS.Value
+    , RVRS.IR
+    , RVRS.Lower
 
   build-depends:
       base >=4.14 && <5
@@ -52,6 +60,7 @@ executable RunAll
     , directory
     , filepath
     , process
+    , mtl                           
 
   default-language:    Haskell2010
 
@@ -69,6 +78,9 @@ executable TestLower
     , RVRS.Parser.Statement
     , RVRS.Parser.Type
     , RVRS.Value
+    , RVRS.Eval.Eval               
+    , RVRS.Codegen
+    , RVRS.Pretty
 
   build-depends:
       base >=4.14 && <5
@@ -77,6 +89,7 @@ executable TestLower
     , prettyprinter
     , parser-combinators
     , containers
+    , mtl                          
 
   default-language:    Haskell2010
 
@@ -94,6 +107,9 @@ executable RunIRTests
     , RVRS.Parser.Statement
     , RVRS.Parser.Type
     , RVRS.Value
+    , RVRS.Eval.Eval              
+    , RVRS.Codegen
+    , RVRS.Pretty
 
   build-depends:
       base >=4.14 && <5
@@ -104,5 +120,6 @@ executable RunIRTests
     , containers
     , directory
     , filepath
+    , mtl                           
 
   default-language:    Haskell2010

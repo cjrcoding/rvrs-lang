@@ -3,7 +3,7 @@ module Main where
 -- Internal modules
 import RVRS.AST (Flow, flowName)
 import RVRS.Parser (parseRVRS)
-import RVRS.Eval (evalFlow)
+import RVRS.Eval.Eval (evalFlow)
 import RVRS.Codegen (prettyPrintFlow)
 
 -- System/environment
