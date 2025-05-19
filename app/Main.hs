@@ -1,13 +1,19 @@
 module Main where
 
-import RVRS.Parser (parseRVRS)
-import RVRS.Codegen (prettyPrintFlow)
-import RVRS.Eval (evalFlow)
+-- Internal modules
 import RVRS.AST (Flow, flowName)
+import RVRS.Parser (parseRVRS)
+import RVRS.Eval (evalFlow)
+import RVRS.Codegen (prettyPrintFlow)
+
+-- System/environment
 import System.Environment (getArgs)
+
+-- External libraries
+import Control.Monad (when)
 import qualified Data.Map as M
 import Text.Megaparsec (errorBundlePretty)
-import Control.Monad (when)
+
 
 -- 🔧 Debug toggle
 debug :: Bool

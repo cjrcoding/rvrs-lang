@@ -1,7 +1,9 @@
 module RVRS.Lower where
 
+-- Internal modules
 import RVRS.AST
 import RVRS.IR
+
 
 -- | Convert a full Flow into IR
 lowerFlow :: Flow -> FlowIR

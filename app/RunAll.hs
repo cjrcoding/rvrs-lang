@@ -1,11 +1,17 @@
 module Main where
 
+-- System and file utilities
 import System.Directory (doesDirectoryExist, listDirectory)
 import System.FilePath ((</>), takeExtension)
 import System.Process (readProcess)
-import Control.Monad (filterM, forM_)
 import System.Exit (exitFailure)
+
+-- Functional utilities
+import Control.Monad (filterM, forM_)
+
+-- Data utilities
 import Data.List (isInfixOf)
+
 
 main :: IO ()
 main = do

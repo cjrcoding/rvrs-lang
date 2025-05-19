@@ -1,13 +1,16 @@
 module Main where
 
-import System.Directory (listDirectory)
-import System.FilePath ((</>), takeExtension)
+-- Internal modules
 import RVRS.Parser (parseRVRS)
 import RVRS.Lower (lowerFlow)
 import RVRS.EvalIR (evalIRFlow)
 import RVRS.Value (Value(..))
 import qualified RVRS.AST as AST
 import qualified RVRS.IR as IR
+
+-- System / standard libraries
+import System.Directory (listDirectory)
+import System.FilePath ((</>), takeExtension)
 import Data.List (find)
 import Control.Monad (forM_)
 import qualified Data.Map as Map

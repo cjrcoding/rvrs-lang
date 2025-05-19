@@ -1,13 +1,21 @@
 module RVRS.Parser (parseRVRS) where
 
+-- Internal: RVRS language components
 import RVRS.AST
 import RVRS.Parser.Statement (statementParser)
+
+-- External: Parsing libraries
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
-import Debug.Trace (trace)
-import Data.Void
+
+-- External: General utilities
 import Data.Char (isAlphaNum)
+import Data.Void
+
+-- Debug (last and clear it's temporary)
+import Debug.Trace (trace)
+
 
 type Parser = Parsec Void String
 

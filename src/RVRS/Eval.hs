@@ -2,10 +2,14 @@
 
 module RVRS.Eval where
 
+-- Internal modules
 import RVRS.AST
-import qualified Data.Map as M
 import RVRS.Pretty (prettyExpr)
+
+-- External libraries
+import qualified Data.Map as M
 import Control.Applicative (liftA2)
+
 
 
 -- | Values produced by evaluating expressions

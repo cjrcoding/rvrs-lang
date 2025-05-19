@@ -1,14 +1,18 @@
 module Main where
 
+-- Internal modules
 import RVRS.Parser (parseRVRS)
 import RVRS.Lower (lowerFlow)
 import RVRS.EvalIR (evalIRFlow)
 import RVRS.Value (Value(..))
-import qualified RVRS.IR as IR         -- Import FlowIR and flowName
-import qualified RVRS.AST as AST       -- Import AST flowName for original flows
+import qualified RVRS.AST as AST       -- for original flowName
+import qualified RVRS.IR as IR         -- for FlowIR and IR flowName
+
+-- System / standard libs
 import System.Environment (getArgs)
 import Data.List (find)
 import qualified Data.Map as Map
+
 
 main :: IO ()
 main = do

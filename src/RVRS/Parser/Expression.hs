@@ -2,13 +2,17 @@
 
 module RVRS.Parser.Expression (exprParser) where
 
+-- Internal modules
 import RVRS.AST
-import Text.Megaparsec
-import Text.Megaparsec.Char
-import qualified Text.Megaparsec.Char.Lexer as L
+
+-- External libraries
 import Control.Monad (void)
 import Control.Monad.Combinators.Expr
 import Data.Void
+import Text.Megaparsec
+import Text.Megaparsec.Char
+import qualified Text.Megaparsec.Char.Lexer as L
+
 
 type Parser = Parsec Void String
 
