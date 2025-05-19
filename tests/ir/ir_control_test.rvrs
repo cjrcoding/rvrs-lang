@@ -1,0 +1,15 @@
+flow assert_test() {
+  assert truth
+  echo "passed"
+}
+
+flow mouth_test() {
+  echo "start"
+  mouth 7
+  echo "after"
+}
+
+flow main() {
+  call assert_test()
+  call mouth_test()
+}

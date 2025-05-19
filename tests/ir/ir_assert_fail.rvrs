@@ -1,0 +1,6 @@
+-- expect-fail
+
+flow main() {
+  assert false
+  echo "should not reach here"
+}

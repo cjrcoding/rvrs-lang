@@ -71,14 +71,22 @@ isolate action = do
 -- evalIRFlow: Given a map of flows, an entry name, and argument values,
 -- look up the appropriate flow and evaluate its body.
 evalIRFlow :: FlowEnv -> String -> [Value] -> IO (Either EvalError (Maybe Value))
-evalIRFlow flowMap entryName args = do
+evalIRFlow flowMap entryName args =
   case Map.lookup entryName flowMap of
     Just (FlowIR _ params body) -> do
       let initialEnv = Map.fromList (zip params args)
-      result <- runEvalIR initialEnv (evalStmtsWithEnv flowMap body)
+      result <- runEvalIR initialEnv $
+                  catchError
+                    (evalStmtsWithEnv flowMap body)
+                    handleReturn
       return $ fmap fst result
     Nothing ->
       return $ Left (RuntimeError $ "No flow named '" ++ entryName ++ "' found.")
+  where
+    handleReturn :: EvalError -> EvalIR (Maybe Value)
+    handleReturn (Return v) = return (Just v)
+    handleReturn err        = throwError err
+
 
 
 -- =============================================================================
