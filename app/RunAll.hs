@@ -1,15 +1,10 @@
 module Main where
 
--- System and file utilities
 import System.Directory (doesDirectoryExist, listDirectory)
 import System.FilePath ((</>), takeExtension)
-import System.Process (readProcess)
+import System.Process (readProcessWithExitCode)
 import System.Exit (exitFailure)
-
--- Functional utilities
-import Control.Monad (filterM, forM_)
-
--- Data utilities
+import Control.Monad (filterM)
 import Data.List (isInfixOf)
 import Data.Char (toLower)
 
@@ -40,18 +35,21 @@ runTests files = go files 0 0 0
     go (file:rest) p f e = do
       isExpectedFail <- checkExpectedFail file
       putStrLn $ "\x1b[33m🔍 Running: " ++ file ++ if isExpectedFail then " ⚠️ (expected fail)" else "" ++ "\x1b[0m"
-      output <- readProcess "cabal" ["run", "rvrs", file] ""
-      putStrLn output
-      putStrLn $ replicate 40 '-'
-
-      let lowerOutput = map toLower output
-          failed = any (`isInfixOf` lowerOutput)
-            [ "parse failed"
+      (exitCode, stdout, stderr) <- readProcessWithExitCode "cabal" ["run", "rvrs", file] ""
+      putStrLn stdout
+      let combinedOutput = map toLower (stdout ++ stderr)
+          failed = any (`isInfixOf` combinedOutput)
+            [ "❌ parse failed"
+            , "parse failed"
+            , "unexpected"
             , "runtime error"
-            , "error:"
             , "assertion failed"
             , "assertion error"
+            , "error:"
+            , "could not evaluate"
             ]
+
+      putStrLn $ replicate 40 '-'
 
       if failed && isExpectedFail
         then go rest p f (e + 1)

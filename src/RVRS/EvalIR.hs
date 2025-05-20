@@ -128,12 +128,15 @@ evalIRStmt stmt = case stmt of
       VBool False -> isolate (evalStmtsWithEnv eBlock)
       _ -> throwError $ RuntimeError "Condition must be boolean"
 
-  IRDelta name expr -> do
+
+  IRDelta name expr _mType -> do
     val <- evalIRExpr expr
     modify (Map.insert name val)
     return Nothing
 
-  IRSource name expr -> do
+
+
+  IRSource name expr _mType -> do
     val <- evalIRExpr expr
     env <- get
     case Map.lookup name env of

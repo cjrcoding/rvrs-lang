@@ -2,6 +2,9 @@
 
 module RVRS.AST where
 
+import RVRS.Parser.Type (RVRSType(..))
+
+
 -- | Represents a named flow of ritual logic
 data Flow = Flow
   { flowName :: String           -- ^ The flow's name (e.g. "main", "add")
@@ -18,7 +21,7 @@ data Argument = Argument
 
 -- | Statements inside a flow block
 data Statement
-  = Source String Expr                  -- source x = ...
+  = Source String (Maybe RVRSType) Expr                 -- source x = ...
   | Delta String (Maybe RVRSType) Expr
   | Branch Expr [Statement] [Statement]-- branch cond { ... } else { ... }
   | Mouth Expr                          -- mouth "..."
@@ -49,16 +52,6 @@ data Expr
   | Or Expr Expr 
   | CallExpr String [Expr]   
   | Neg Expr 
-
-  deriving (Show, Eq)
-
--- Type system for annotated variables
-data RVRSType
-  = TypeNum
-  | TypeStr
-  | TypeBool
-  | Unknown     -- for unannotated variables or unresolved types
-  
   
   
   

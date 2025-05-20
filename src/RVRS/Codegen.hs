@@ -13,7 +13,7 @@ generateAiken (Flow name args body) =
 -- | Convert a statement into one or more Aiken lines
 genStmt :: Statement -> [String]
 genStmt stmt = case stmt of
-  Source var expr -> ["let " ++ var ++ " = " ++ genExpr expr]
+  Source var _ expr -> ["let " ++ var ++ " = " ++ genExpr expr]
   Delta var _ expr -> ["let " ++ var ++ " = " ++ genExpr expr]
   Mouth expr      -> ["trace " ++ show (genExpr expr)]
   Echo expr       -> ["return " ++ genExpr expr]

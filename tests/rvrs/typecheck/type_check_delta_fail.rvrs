@@ -1,0 +1,6 @@
+-- expect-fail
+
+flow main {
+  delta x: Bool = 123
+  echo x
+}

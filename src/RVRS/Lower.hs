@@ -14,8 +14,8 @@ lowerFlow (Flow name args body) =
 -- | Lower an AST Statement into IR
 lowerStmt :: Statement -> StmtIR
 lowerStmt stmt = case stmt of
-  Delta name _ expr     -> IRDelta name (lowerExpr expr)
-  Source name expr      -> IRSource name (lowerExpr expr)
+  Delta name mAnn expr -> IRDelta name (lowerExpr expr) mAnn
+  Source name mAnn expr    -> IRSource name (lowerExpr expr) mAnn
   Echo expr             -> IREcho (lowerExpr expr)
   Whisper expr          -> IRWhisper "unnamed" (lowerExpr expr)
   Mouth expr            -> IRMouth (lowerExpr expr)

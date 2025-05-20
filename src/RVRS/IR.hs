@@ -2,6 +2,10 @@
 
 module RVRS.IR where
 
+
+import RVRS.Parser.Type (RVRSType)
+
+
 -- | Intermediate representation of a flow
 data FlowIR = FlowIR
   { flowName :: String
@@ -11,8 +15,8 @@ data FlowIR = FlowIR
 
 -- | Lowered statements (IR version of AST Statement)
 data StmtIR
-  = IRDelta String ExprIR
-  | IRSource String ExprIR
+  = IRDelta String ExprIR (Maybe RVRSType)
+  | IRSource String ExprIR (Maybe RVRSType)
   | IREcho ExprIR
   | IRWhisper String ExprIR
   | IRMouth ExprIR

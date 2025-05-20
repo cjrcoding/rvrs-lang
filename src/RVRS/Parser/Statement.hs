@@ -68,7 +68,8 @@ sourceParser = do
   var <- identifier
   _ <- symbol "="
   expr <- exprParser
-  return $ Source var expr
+  return $ Source var Nothing expr
+
 
 
 bareCallStmt :: Parser Statement
