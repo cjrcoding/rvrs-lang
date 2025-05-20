@@ -63,12 +63,26 @@ speaksParser = do
 
 
 sourceParser :: Parser Statement
-sourceParser = do
+sourceParser = try typedSource <|> untypedSource
+
+typedSource :: Parser Statement
+typedSource = do
+  _ <- symbol "source"
+  var <- identifier
+  _ <- symbol ":"
+  typ <- typeParser
+  _ <- symbol "="
+  expr <- exprParser
+  return $ Source var (Just typ) expr
+
+untypedSource :: Parser Statement
+untypedSource = do
   _ <- symbol "source"
   var <- identifier
   _ <- symbol "="
   expr <- exprParser
   return $ Source var Nothing expr
+
 
 
 
