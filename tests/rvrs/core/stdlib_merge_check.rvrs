@@ -1,0 +1,4 @@
+flow main() {
+  delta x = fuse_x(3)   
+  return x
+}
