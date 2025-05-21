@@ -1,16 +1,19 @@
--- src/RVRS/Parser/Type.hs
 module RVRS.Parser.Type (RVRSType(..), typeParser) where
 
--- Internal modules
-import RVRS.AST
-
--- External libraries
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 
+-- The core type tags used for annotations
+data RVRSType
+  = TypeNum
+  | TypeStr
+  | TypeBool
+  | TypeAny   -- Optional catch-all
+  deriving (Eq, Show)
 
+-- Parser for these types (used in annotations)
 typeParser :: Parsec Void String RVRSType
 typeParser = choice
   [ symbol "Num"  >> return TypeNum
@@ -18,7 +21,7 @@ typeParser = choice
   , symbol "Bool" >> return TypeBool
   ]
 
--- Local copy of symbol for now
+-- Local symbol parser
 sc :: Parsec Void String ()
 sc = L.space space1 (L.skipLineComment "--") (L.skipBlockComment "{-" "-}")
 

@@ -1,0 +1,10 @@
+flow main {
+  call mirror("ritual")         
+  call void(10)                 
+  call fuse_x(2)                
+  call is_four(4)               
+  call is_four(3)               
+  call fork_true("choice")      
+  call echo_twice("again")
+  return "done"
+}

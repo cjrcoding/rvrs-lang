@@ -1,0 +1,4 @@
+flow main {
+  source msg: Str = "hello"
+  echo msg
+}

@@ -1,0 +1,4 @@
+flow main {
+  delta x: Num = 123
+  echo x
+}

@@ -1,7 +1,3 @@
-ceremony truth() {
-  speaks ("RVRS flows like spirit")
-}
-
-flow main() {
-  call truth()
+flow main {
+  echo "ritual"
 }

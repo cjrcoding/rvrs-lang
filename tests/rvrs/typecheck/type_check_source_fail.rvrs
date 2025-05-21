@@ -1,0 +1,6 @@
+-- expect-fail 
+
+flow main {
+  source flag: Bool = "nope"
+  echo flag
+}
