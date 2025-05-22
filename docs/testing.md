@@ -4,49 +4,86 @@ Welcome to the test suite for RVRS — the Ritual Virtual River System. This gui
 
 ---
 
-## Folder Structure
+## 📁 Folder Structure
 
 All test files live under the `examples/` directory and are grouped by intent:
 
-| Folder            | Purpose                                             |
-|-------------------|-----------------------------------------------------|
-| `core/`           | Fundamental language features (math, scope, etc.)   |
-| `edge_cases/`     | Unexpected or error-prone behaviors                 |
-| `flows/`          | Multi-step flow logic and function call behavior    |
-| `poetic/`         | Symbolic, expressive, or aesthetic RVRS syntax      |
-| `regression/`     | Full-suite integration tests (`full_test.rvrs`)     |
+| Folder         | Purpose                                                  |
+|----------------|----------------------------------------------------------|
+| `core/`        | Fundamental language features (math, scope, delta, etc.) |
+| `edge_cases/`  | Unexpected, invalid, or boundary-case behaviors           |
+| `flows/`       | Flow invocation, arguments, return logic                  |
+| `poetic/`      | Symbolic, expressive, or aesthetic RVRS patterns          |
+| `regression/`  | Full integration and coverage tests (`full_test.rvrs`)    |
 
 ---
 
-## Running a Test
+## ▶️ Running Tests
 
-To run a single test file from the repo root:
+To run a single test file:
 
 ```bash
 cabal run rvrs examples/core/math_test.rvrs
-````
+```
 
-To run the full integration test:
+To run the full test suite:
 
-````bash
+```bash
 cabal run RunAll
-````
+```
 
-## Running a Test
+To run IR-level evaluations (internal flow logic):
 
-Each test file is a complete .rvrs script.
+```bash
+cabal run RunIRTests
+```
 
-RVRS always runs the main flow in each file.
+---
 
-Output will appear in your terminal via:
+## 🧪 Test Format
 
-echo → prints human-facing values
+Each `.rvrs` file is a complete script and must contain a `flow main()` declaration.
 
-whisper → prints expression + value
+RVRS will automatically evaluate the `main` flow in each test.
 
-mouth → returns a value and halts the flow
+Expected forms of output and diagnostics:
 
-Failed assertions or unresolved values will print diagnostic messages.
+- `echo` → returns a value and halts flow
+- `mouth` → prints/logs a value (non-halting)
+- `assert` → enforces truth, halts on failure
+- `-- expect-fail` → marks a test expected to fail (e.g., type error)
 
+Example:
 
+```rvrs
+flow main(): Num {
+  delta x: Num = 4 * 2
+  assert x == 8
+  echo x
+}
+```
 
+---
+
+## ⚠️ Failure Reporting
+
+- Type mismatches, undefined names, and assertion failures produce error messages
+- Expected failures are tracked by `RunAll.hs` and `RunIRTests.hs`
+- If a file marked `-- expect-fail` passes, the test fails intentionally
+- If a file not marked `-- expect-fail` fails, the test fails genuinely
+
+---
+
+## ✅ Best Practices
+
+- Group tests logically and name descriptively
+- Use `assert` to verify correctness
+- Always include a `main` flow
+- Prefer `echo` or `mouth` for clarity
+- Mark failing tests explicitly with `-- expect-fail`
+
+---
+
+> "Tests in RVRS aren’t just checks. They’re affirmations — that each branch splits, each echo returns, and each flow holds."
+
+**Last Updated: 2025-05-22**
