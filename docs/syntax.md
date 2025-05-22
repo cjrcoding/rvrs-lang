@@ -2,73 +2,115 @@
 
 > "Not all contracts are code. Some are rivers."
 
-This document defines the evolving syntax of RVRS — a ceremonial language for writing smart contracts on Cardano.
+This is the living syntax document for **RVRS** — a ceremonial, expressive language for writing smart contracts on Cardano. It outlines the current capabilities (as of `v0.8.0-dev`) and previews functionality expected in the `v1.0` launch.
 
 ---
 
-## 🌿 Core Keywords (Minimum Viable Ritual)
-These are essential for writing any valid RVRS `flow`:
+## 🌿 Core Rituals (Executable Essentials)
 
-| Keyword   | Meaning                        | Aiken Equivalent |
-|-----------|---------------------------------|------------------|
-| `flow`    | Function definition / ritual    | `fn`             |
-| `source`  | Bind a value                    | `let`            |
-| `delta`   | Reassign / update a value       | `let`            |
-| `branch`  | Conditional block               | `if` / `else`    |
-| `mouth`   | Output / log a value            | `trace`          |
-| `echo`    | Return a value from the flow    | `return`         |
+These are the minimum required to write working flows (functions) in RVRS:
 
----
-
-## ✨ Symbolic Keywords (Poetic & Expressive)
-These enhance meaning and provide expressive ritual structure:
-
-| Keyword     | Meaning                                | Aiken Mapping / Role |
-|-------------|-----------------------------------------|----------------------|
-| `veil`      | Hide, guard, or reveal a truth          | `Maybe`, `match`     |
-| `invoke`    | Call another flow                       | function call        |
-| `tide`      | Iterate over a list or sequence         | loop / stream        |
-| `stream`    | Represents a flowing list               | list structure       |
-| `bless`     | Symbolic permission or action trigger   | user-defined         |
-| `chant`     | Symbolic evaluation / transformation    | expression wrapper   |
-| `glyph`     | Declare a symbolic or reusable type     | `type`               |
-| `ritual`    | Define reusable flow/module             | module / type        |
+| Keyword   | Meaning                             | Aiken Equivalent |
+|-----------|--------------------------------------|------------------|
+| `flow`    | Function definition / ritual         | `fn`             |
+| `delta`   | Define or mutate a scoped variable   | `let` / rebind   |
+| `source`  | Top-level constant definition        | `let` (const)    |
+| `echo`    | Return a value from a flow           | `return`         |
+| `mouth`   | Emit/log a value without halting     | `trace`          |
+| `branch`  | Conditional block                    | `if` / `else`    |
+| `return`  | (Alternative to `echo`, optional)    | `return`         |
 
 ---
 
-## 🪨 Structural & Meta Keywords (Constants & Control)
-These control flow outside the core runtime — like constants, errors, or structure.
+## 🧠 Type System (Enforced Constructs)
 
-| Keyword     | Meaning                              | Aiken Equivalent  |
-|-------------|---------------------------------------|-------------------|
-| `pillar`    | Immutable constant                    | `const`           |
-| `mark`      | Annotate or tag a declaration         | (not yet mapped)  |
-| `drift`     | Exit or fail early                    | `fail`            |
-| `mouthpiece`| Conditional trace/output              | `trace_if`        |
-| `echo_if`   | Conditional return                    | n/a               |
+RVRS supports static typing via annotations (enforced in `v0.8.0+`):
 
----
+```rvrs
+delta x: Num = 5
+flow identity(n: Num): Num {
+  echo n
+}
+```
 
-## 🧪 Future Visual Language Ideas (Design Notes)
-RVRS may later support a well-defined aesthetic to enhance readability and expression:
-
-- 🎨 **Color Palette:**
-  - Each keyword group (Core, Symbolic, Structural) could have a dedicated hue
-  - E.g. `flow` = river blue, `branch` = moss green, `echo` = silver or mirror tones
-
-- 🧱 **Visual Themes:**
-  - Flows are structured like poems or spells — their formatting should reflect ritual spacing
-  - Syntax highlighting or editor themes should reflect calm, natural elements (stone, ink, water)
-
-- 📘 **Glyphs/Icons (Documentation only):**
-  - Minimal, symbolic glyphs (not emojis) may be used in docs or READMEs to visually anchor concepts
-  - Should be used sparingly to avoid overwhelming the core tone
-
-- ⚙️ **Terminal Style (Optional):**
-  - CLI might later support ANSI-colored output for statement types or errors, inspired by natural tones
-
-These visuals are not required for compiling or authoring — but they serve to deepen the emotional resonance of the language.
+Supported base types:
+- `Num`
+- `Bool`
+- `Str` *(planned for v1.0)*
+- `List[T]` *(planned)*
 
 ---
 
-### Last Updated: April 17, 2025
+## 📦 Flow Composition (Calls & Modularity)
+
+| Keyword   | Meaning                          | Role in Execution     |
+|-----------|----------------------------------|------------------------|
+| `call`    | Invoke another flow              | Function call          |
+| `return`  | Exit with a value                | Return from flow       |
+| `assert`  | Require truth or halt            | Assertion guard        |
+| `import`  | Bring in external `.rvrs` flows  | Module inclusion (v1)  |
+| `@onchain`, `@mint`, `@view` | Flow attributes | Contract modes (planned) |
+
+---
+
+## 🕊️ Symbolic & Expressive Keywords *(Experimental / Future)*
+
+These are poetic or expressive tools that may evolve post-v1:
+
+| Keyword     | Meaning                             | Mapping / Status     |
+|-------------|--------------------------------------|-----------------------|
+| `veil`      | Optional or hidden logic             | `Maybe` / planned     |
+| `tide`      | Iterate over a sequence              | `for` / planned       |
+| `stream`    | Represents a flowing list            | `List` / placeholder  |
+| `chant`     | Symbolic transformation              | Expression macro?     |
+| `glyph`     | User-defined symbolic type           | `type` / long-term    |
+| `ritual`    | Named reusable block/module          | Planned               |
+
+---
+
+## 🪨 Structural & Meta Keywords
+
+Used for constants, annotation, or symbolic structure.
+
+| Keyword     | Meaning                              | Notes                  |
+|-------------|---------------------------------------|------------------------|
+| `pillar`    | Immutable constant                   | `const`                |
+| `mark`      | Annotation or tag                    | Could support metadata |
+| `drift`     | Halt flow early / fail               | `fail` / `error`       |
+| `mouthpiece`| Conditional trace                    | Planned                |
+| `echo_if`   | Conditional return                   | Internal sugar         |
+
+---
+
+## 🧪 Syntax & Style Notes
+
+### 🎨 Visual Identity *(Design Layer — Optional)*
+
+- **Syntax Themes:** River-blue for flows, moss-green for branches, ink-black for deltas
+- **Poetic Formatting:** Flows should be readable like ritual text or spells — indented with space to breathe
+- **CLI Aesthetic:** Terminal colors based on type or keyword class (e.g. `delta` = blue, `echo` = white)
+
+### 🔖 Annotations & Contracts
+
+- Planned decorator-style flags for `@onchain`, `@mint`, `@test`, `@view`
+- Could extend into validator-type generation or behavior-based compilation paths
+
+### 📘 Icons/Glyphs (Docs Only)
+
+- Use symbolic icons sparingly (no emojis) to represent conceptually heavy constructs
+- Example: `🌊` = `flow`, `🪨` = `pillar`, `🔀` = `branch` — docs only
+
+---
+
+### ✅ Current Status:  
+RVRS v0.8.0-dev supports:
+- Full `flow` and variable definition syntax
+- Type annotations and basic enforcement
+- IR evaluation and test infrastructure
+- Standard library merging at runtime
+
+---
+
+> "RVRS is not just a language. It's a current — designed to carry intent with clarity, weight, and meaning."
+
+**Last Updated: 2025-05-22**

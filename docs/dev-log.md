@@ -1,6 +1,50 @@
 # RVRS Developer Log
 ---
 
+## 🗓️ 2025-05-22 — Type Enforcement Begins (v0.8.0-dev in Progress)
+
+### ✅ Summary  
+- Implemented type enforcement for:
+  - `delta` bindings with annotations (e.g. `delta x: Num = 5`)
+  - `source` top-level definitions with type expectations  
+- Validated early enforcement in both source and IR evaluators  
+- Confirmed that type mismatches raise runtime errors  
+- Refactored structure to support type inference scaffolding in future  
+- Ran all 31 source tests + 5 IR tests:
+  - ✅ 33 passed
+  - ⚠️ 3 expected failures
+  - ❌ 0 unknown failures  
+- `RunAll` and `RunIRTests` continue to support failure expectations cleanly
+
+### 🧠 Key Features Progressing Toward v0.8.0
+- ✅ Enforce `delta` and `source` types  
+- 🚧 Implement `typeCheckExpr` for expression-level checking  
+- 🚧 Enforce binary op constraints (e.g., `Num + Num`, `Bool && Bool`)  
+- 🛠️ Design type environment propagation for flows and function calls  
+- 🛠️ Align branch conditions to enforce `Bool` types only  
+- 🛠️ Validate return type correctness for flows
+
+### 🧭 What’s Next
+- [ ] Finish `typeCheckExpr` for all expressions
+- [ ] Introduce arity/type checking for function (`flow`) calls
+- [ ] Add `ReturnTypeMismatch` error variants with better messaging
+- [ ] Begin IR-level error messages for mismatched ops
+- [ ] Add regression tests for:
+  - Branch condition type errors
+  - Function arity/type mismatch
+  - Return path mismatches
+
+### 🧹 Repo State
+- Branch: `typecheck-expr-dev` (WIP)  
+- Mainline: stable at `v0.7.0-rc`  
+- Working files:
+  - `EvalIR.hs` expanded to track type checking errors
+  - `RVRS/Type.hs` scaffolded for type validation utilities
+
+> "🌊 As the syntax deepens, the types rise — structure begins to assert itself."
+
+
+---
 ## 🗓️ 2025-05-15 — Milestone Reached: v0.6.0-alpha
 
 ### ✅ Summary
