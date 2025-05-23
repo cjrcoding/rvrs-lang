@@ -1,46 +1,53 @@
 -- src/RVRS/Lower.hs
 
-module RVRS.Lower where
+module RVRS.Lower (lowerFlow, mergeAndLower) where
 
--- Internal modules
-import RVRS.AST
-import RVRS.IR
+import qualified RVRS.AST as AST
+import qualified RVRS.IR as IR
+import qualified Data.Map as M
+
+-- | Lower a list of flows into a FlowEnv (Map of flow names to FlowIRs)
+mergeAndLower :: [AST.Flow] -> M.Map String IR.FlowIR
+mergeAndLower flows =
+  let lowered = map lowerFlow flows
+      names = map AST.flowName flows
+  in M.fromList (zip names lowered)
 
 -- | Convert a full Flow into IR
-lowerFlow :: Flow -> FlowIR
-lowerFlow (Flow name args body) =
-  FlowIR name (map argName args) (map lowerStmt body)
+lowerFlow :: AST.Flow -> IR.FlowIR
+lowerFlow (AST.Flow name args body) =
+  IR.FlowIR name (map AST.argName args) (map lowerStmt body)
 
 -- | Lower an AST Statement into IR
-lowerStmt :: Statement -> StmtIR
+lowerStmt :: AST.Statement -> IR.StmtIR
 lowerStmt stmt = case stmt of
-  Delta name mAnn expr -> IRDelta name (lowerExpr expr) mAnn
-  Source name mAnn expr    -> IRSource name (lowerExpr expr) mAnn
-  Echo expr             -> IREcho (lowerExpr expr)
-  Whisper expr          -> IRWhisper "unnamed" (lowerExpr expr)
-  Mouth expr            -> IRMouth (lowerExpr expr)
-  Branch cond t f       -> IRBranch (lowerExpr cond) (map lowerStmt t) (map lowerStmt f)
-  Return expr           -> IRReturn (lowerExpr expr)
-  Call name args        -> IRCallStmt name (map lowerExpr args)
-  Assert expr           -> IRAssert (lowerExpr expr)
-  Pillar name expr      -> IRWhisper name (lowerExpr expr) -- fallback until Pillar is IR'd
+  AST.Delta name mAnn expr     -> IR.IRDelta name (lowerExpr expr) mAnn
+  AST.Source name mAnn expr    -> IR.IRSource name (lowerExpr expr) mAnn
+  AST.Echo expr                -> IR.IREcho (lowerExpr expr)
+  AST.Whisper expr             -> IR.IRWhisper "unnamed" (lowerExpr expr)
+  AST.Mouth expr               -> IR.IRMouth (lowerExpr expr)
+  AST.Branch cond t f          -> IR.IRBranch (lowerExpr cond) (map lowerStmt t) (map lowerStmt f)
+  AST.Return expr              -> IR.IRReturn (lowerExpr expr)
+  AST.Call name args           -> IR.IRCallStmt name (map lowerExpr args)
+  AST.Assert expr              -> IR.IRAssert (lowerExpr expr)
+  AST.Pillar name expr         -> IR.IRWhisper name (lowerExpr expr)  -- fallback
 
 -- | Lower an AST Expr into IR
-lowerExpr :: Expr -> ExprIR
+lowerExpr :: AST.Expr -> IR.ExprIR
 lowerExpr expr = case expr of
-  Var name         -> IRVar name
-  StrLit s         -> IRStrLit s
-  NumLit n         -> IRNumLit n
-  BoolLit b        -> IRBoolLit b
-  Add a b          -> IRAdd (lowerExpr a) (lowerExpr b)
-  Sub a b          -> IRSub (lowerExpr a) (lowerExpr b)
-  Mul a b          -> IRMul (lowerExpr a) (lowerExpr b)
-  Div a b          -> IRDiv (lowerExpr a) (lowerExpr b)
-  Neg e            -> IRNeg (lowerExpr e)
-  Not e            -> IRNot (lowerExpr e)
-  And a b          -> IRAnd (lowerExpr a) (lowerExpr b)
-  Or a b           -> IROr  (lowerExpr a) (lowerExpr b)
-  Equals a b       -> IREquals (lowerExpr a) (lowerExpr b)
-  GreaterThan a b  -> IRGreaterThan (lowerExpr a) (lowerExpr b)
-  LessThan a b     -> IRLessThan (lowerExpr a) (lowerExpr b)
-  CallExpr name es -> IRCallExpr name (map lowerExpr es)
+  AST.Var name         -> IR.IRVar name
+  AST.StrLit s         -> IR.IRStrLit s
+  AST.NumLit n         -> IR.IRNumLit n
+  AST.BoolLit b        -> IR.IRBoolLit b
+  AST.Add a b          -> IR.IRAdd (lowerExpr a) (lowerExpr b)
+  AST.Sub a b          -> IR.IRSub (lowerExpr a) (lowerExpr b)
+  AST.Mul a b          -> IR.IRMul (lowerExpr a) (lowerExpr b)
+  AST.Div a b          -> IR.IRDiv (lowerExpr a) (lowerExpr b)
+  AST.Neg e            -> IR.IRNeg (lowerExpr e)
+  AST.Not e            -> IR.IRNot (lowerExpr e)
+  AST.And a b          -> IR.IRAnd (lowerExpr a) (lowerExpr b)
+  AST.Or a b           -> IR.IROr  (lowerExpr a) (lowerExpr b)
+  AST.Equals a b       -> IR.IREquals (lowerExpr a) (lowerExpr b)
+  AST.GreaterThan a b  -> IR.IRGreaterThan (lowerExpr a) (lowerExpr b)
+  AST.LessThan a b     -> IR.IRLessThan (lowerExpr a) (lowerExpr b)
+  AST.CallExpr name es -> IR.IRCallExpr name (map lowerExpr es)

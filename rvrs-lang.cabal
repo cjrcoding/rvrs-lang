@@ -11,9 +11,12 @@ executable rvrs
       RVRS.AST
     , RVRS.Codegen
     , RVRS.Parser
-    , RVRS.Eval.Eval               
-    , RVRS.EvalIR                  
-    , RVRS.Pretty  
+    , RVRS.Eval
+    , RVRS.Eval.Expr
+    , RVRS.Eval.Stmt
+    , RVRS.Eval.Flow
+    , RVRS.Eval.Types
+    , RVRS.Pretty
     , RVRS.Parser.Expression
     , RVRS.Parser.Statement
     , RVRS.Parser.Type
@@ -28,7 +31,7 @@ executable rvrs
     , prettyprinter
     , parser-combinators
     , containers
-    , mtl                           
+    , mtl
 
   default-language:    Haskell2010
 
@@ -40,11 +43,14 @@ executable RunAll
       RVRS.AST
     , RVRS.Codegen
     , RVRS.Parser
+    , RVRS.Eval
+    , RVRS.Eval.Expr
+    , RVRS.Eval.Stmt
+    , RVRS.Eval.Flow
+    , RVRS.Eval.Types
+    , RVRS.Pretty
     , RVRS.Parser.Expression
     , RVRS.Parser.Statement
-    , RVRS.Eval.Eval               
-    , RVRS.EvalIR                
-    , RVRS.Pretty
     , RVRS.Parser.Type
     , RVRS.Value
     , RVRS.IR
@@ -60,25 +66,28 @@ executable RunAll
     , directory
     , filepath
     , process
-    , mtl                           
+    , mtl
 
   default-language:    Haskell2010
 
--- === ✅ Executable: TestLower ===
+-- === Executable: TestLower ===
 executable TestLower
   main-is:             TestLower.hs
   hs-source-dirs:      app, src
   other-modules:
       RVRS.AST
     , RVRS.IR
-    , RVRS.EvalIR
+    , RVRS.Eval
+    , RVRS.Eval.Expr
+    , RVRS.Eval.Stmt
+    , RVRS.Eval.Flow
+    , RVRS.Eval.Types
     , RVRS.Lower
     , RVRS.Parser
     , RVRS.Parser.Expression
     , RVRS.Parser.Statement
     , RVRS.Parser.Type
     , RVRS.Value
-    , RVRS.Eval.Eval               
     , RVRS.Codegen
     , RVRS.Pretty
 
@@ -89,7 +98,7 @@ executable TestLower
     , prettyprinter
     , parser-combinators
     , containers
-    , mtl                          
+    , mtl
 
   default-language:    Haskell2010
 
@@ -100,14 +109,17 @@ executable RunIRTests
   other-modules:
       RVRS.AST
     , RVRS.IR
-    , RVRS.EvalIR
+    , RVRS.Eval
+    , RVRS.Eval.Expr
+    , RVRS.Eval.Stmt
+    , RVRS.Eval.Flow
+    , RVRS.Eval.Types
     , RVRS.Lower
     , RVRS.Parser
     , RVRS.Parser.Expression
     , RVRS.Parser.Statement
     , RVRS.Parser.Type
     , RVRS.Value
-    , RVRS.Eval.Eval              
     , RVRS.Codegen
     , RVRS.Pretty
 
@@ -120,6 +132,6 @@ executable RunIRTests
     , containers
     , directory
     , filepath
-    , mtl                           
+    , mtl
 
   default-language:    Haskell2010

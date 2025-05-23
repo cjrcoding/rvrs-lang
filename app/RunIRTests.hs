@@ -3,7 +3,7 @@ module Main where
 -- Internal modules
 import RVRS.Parser (parseRVRS)
 import RVRS.Lower (lowerFlow)
-import RVRS.EvalIR (evalIRFlow, EvalError)
+import RVRS.Eval (evalIRFlow, EvalError)
 import RVRS.Value (Value(..))
 import qualified RVRS.AST as AST
 import qualified RVRS.IR as IR

@@ -1,10 +1,11 @@
 module Main where
 
 -- Internal modules
-import RVRS.AST (Flow, flowName)
+import RVRS.AST (Flow)
 import RVRS.Parser (parseRVRS)
-import RVRS.Eval.Eval (evalFlow)
+import RVRS.Eval (evalIRFlow, EvalError)
 import RVRS.Codegen (prettyPrintFlow)
+import RVRS.Lower (mergeAndLower)
 
 -- System/environment
 import System.Environment (getArgs)
@@ -16,7 +17,7 @@ import Text.Megaparsec (errorBundlePretty)
 
 -- 🔧 Debug toggle
 debug :: Bool
-debug = False  -- Set to True if you want to show parsed flow output
+debug = False  -- Set to True to show parsed flows
 
 main :: IO ()
 main = do
@@ -35,22 +36,21 @@ main = do
             Left stdErr -> putStrLn $ "Stdlib error:\n" ++ errorBundlePretty stdErr
             Right stdlibFlows -> do
 
-              -- Combine flows
+              -- Combine and lower flows
               let allFlows = userFlows ++ stdlibFlows
-              let flowEnv = M.fromList [(flowName f, f) | f <- allFlows]
+              let lowered = mergeAndLower allFlows
 
-              case M.lookup "main" flowEnv of
-                Just mainFlow -> do
-                  when debug $ do
-                    putStrLn "Parsed Flow:\n"
-                    putStrLn (prettyPrintFlow mainFlow)
+              when debug $ do
+                putStrLn "Parsed User Flows:"
+                mapM_ (putStrLn . prettyPrintFlow) userFlows
 
-                  putStrLn "\nEvaluation Output:"
-                  result <- evalFlow flowEnv mainFlow [M.empty]
+              -- Evaluate main flow
+              putStrLn "\nEvaluation Output:"
+              evalResult <- evalIRFlow lowered "main" []
 
-                  case result of
-                    Just val -> putStrLn ("Returned: " ++ show val)
-                    Nothing  -> putStrLn "(Flow completed with no return)"
-                Nothing -> putStrLn "Error: No flow named 'main' found."
+              case evalResult of
+                Left err -> putStrLn ("Eval Error: " ++ show err)
+                Right (Just val) -> putStrLn ("Returned: " ++ show val)
+                Right Nothing    -> putStrLn "(Flow completed with no return)"
 
     _ -> putStrLn "Usage: rvrs <file>.rvrs"
