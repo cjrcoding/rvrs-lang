@@ -1,4 +1,0 @@
-flow main() {
-  delta x = fuse_x(3)   -- This is only defined in stdlib
-  return x
-}
