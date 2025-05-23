@@ -8,6 +8,6 @@ module RVRS.Eval (
   EvalError(..)
 ) where
 
-import RVRS.Eval.Expr (evalIRExpr)
-import RVRS.Eval.Stmt (evalIRStmt, evalStmtsWithEnv)
-import RVRS.Eval.Flow (evalIRFlow, runEvalIR, EvalError(..))
+import RVRS.Eval.EvalExpr (evalIRExpr)
+import RVRS.Eval.EvalStmt (evalIRStmt, evalStmtsWithEnv)
+import RVRS.Eval.EvalFlow (evalIRFlow, runEvalIR, EvalError(..))

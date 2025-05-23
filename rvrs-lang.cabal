@@ -11,15 +11,15 @@ executable rvrs
       RVRS.AST
     , RVRS.Codegen
     , RVRS.Parser
+    , RVRS.Parser.ExprParser
+    , RVRS.Parser.StmtParser
+    , RVRS.Parser.Type
     , RVRS.Eval
-    , RVRS.Eval.Expr
-    , RVRS.Eval.Stmt
-    , RVRS.Eval.Flow
+    , RVRS.Eval.EvalExpr
+    , RVRS.Eval.EvalStmt
+    , RVRS.Eval.EvalFlow
     , RVRS.Eval.Types
     , RVRS.Pretty
-    , RVRS.Parser.Expression
-    , RVRS.Parser.Statement
-    , RVRS.Parser.Type
     , RVRS.Value
     , RVRS.IR
     , RVRS.Lower
@@ -43,15 +43,15 @@ executable RunAll
       RVRS.AST
     , RVRS.Codegen
     , RVRS.Parser
+    , RVRS.Parser.ExprParser
+    , RVRS.Parser.StmtParser
+    , RVRS.Parser.Type
     , RVRS.Eval
-    , RVRS.Eval.Expr
-    , RVRS.Eval.Stmt
-    , RVRS.Eval.Flow
+    , RVRS.Eval.EvalExpr
+    , RVRS.Eval.EvalStmt
+    , RVRS.Eval.EvalFlow
     , RVRS.Eval.Types
     , RVRS.Pretty
-    , RVRS.Parser.Expression
-    , RVRS.Parser.Statement
-    , RVRS.Parser.Type
     , RVRS.Value
     , RVRS.IR
     , RVRS.Lower
@@ -76,20 +76,20 @@ executable TestLower
   hs-source-dirs:      app, src
   other-modules:
       RVRS.AST
-    , RVRS.IR
-    , RVRS.Eval
-    , RVRS.Eval.Expr
-    , RVRS.Eval.Stmt
-    , RVRS.Eval.Flow
-    , RVRS.Eval.Types
-    , RVRS.Lower
-    , RVRS.Parser
-    , RVRS.Parser.Expression
-    , RVRS.Parser.Statement
-    , RVRS.Parser.Type
-    , RVRS.Value
     , RVRS.Codegen
+    , RVRS.Parser
+    , RVRS.Parser.ExprParser
+    , RVRS.Parser.StmtParser
+    , RVRS.Parser.Type
+    , RVRS.Eval
+    , RVRS.Eval.EvalExpr
+    , RVRS.Eval.EvalStmt
+    , RVRS.Eval.EvalFlow
+    , RVRS.Eval.Types
     , RVRS.Pretty
+    , RVRS.Value
+    , RVRS.IR
+    , RVRS.Lower
 
   build-depends:
       base >=4.14 && <5
@@ -108,20 +108,20 @@ executable RunIRTests
   hs-source-dirs:      app, src
   other-modules:
       RVRS.AST
-    , RVRS.IR
-    , RVRS.Eval
-    , RVRS.Eval.Expr
-    , RVRS.Eval.Stmt
-    , RVRS.Eval.Flow
-    , RVRS.Eval.Types
-    , RVRS.Lower
-    , RVRS.Parser
-    , RVRS.Parser.Expression
-    , RVRS.Parser.Statement
-    , RVRS.Parser.Type
-    , RVRS.Value
     , RVRS.Codegen
+    , RVRS.Parser
+    , RVRS.Parser.ExprParser
+    , RVRS.Parser.StmtParser
+    , RVRS.Parser.Type
+    , RVRS.Eval
+    , RVRS.Eval.EvalExpr
+    , RVRS.Eval.EvalStmt
+    , RVRS.Eval.EvalFlow
+    , RVRS.Eval.Types
     , RVRS.Pretty
+    , RVRS.Value
+    , RVRS.IR
+    , RVRS.Lower
 
   build-depends:
       base >=4.14 && <5

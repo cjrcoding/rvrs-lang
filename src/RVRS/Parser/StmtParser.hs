@@ -1,7 +1,7 @@
-module RVRS.Parser.Statement (statementParser, blockParser) where
+module RVRS.Parser.StmtParser (statementParser, blockParser) where
 
 import RVRS.AST
-import RVRS.Parser.Expression (exprParser)
+import RVRS.Parser.ExprParser (exprParser)
 import RVRS.Parser.Type (typeParser)
 import Text.Megaparsec
 import Text.Megaparsec.Char

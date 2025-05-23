@@ -1,5 +1,5 @@
 -- src/RVRS/Eval/Expr.hs
-module RVRS.Eval.Expr (evalIRExpr) where
+module RVRS.Eval.EvalExpr (evalIRExpr) where
 
 import RVRS.IR
 import RVRS.Value (Value(..)) 

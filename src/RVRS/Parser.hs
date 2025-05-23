@@ -2,7 +2,7 @@ module RVRS.Parser (parseRVRS) where
 
 -- Internal: RVRS language components
 import RVRS.AST
-import RVRS.Parser.Statement (statementParser)
+import RVRS.Parser.StmtParser (statementParser)
 
 -- External: Parsing libraries
 import Text.Megaparsec

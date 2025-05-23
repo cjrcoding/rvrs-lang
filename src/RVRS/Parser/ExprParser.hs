@@ -1,6 +1,6 @@
 -- src/RVRS/Parser/Expression.hs
 
-module RVRS.Parser.Expression (exprParser) where
+module RVRS.Parser.ExprParser (exprParser) where
 
 -- Internal modules
 import RVRS.AST

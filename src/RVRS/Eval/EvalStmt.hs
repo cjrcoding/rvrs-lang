@@ -1,9 +1,9 @@
 -- src/RVRS/Eval/Stmt.hs
-module RVRS.Eval.Stmt (evalIRStmt, evalStmtsWithEnv) where
+module RVRS.Eval.EvalStmt (evalIRStmt, evalStmtsWithEnv) where
 
 import RVRS.IR
 import RVRS.Value (Value(..))
-import RVRS.Eval.Expr (evalIRExpr)
+import RVRS.Eval.EvalExpr (evalIRExpr)
 import RVRS.Eval.Types (EvalIR, EvalError(..))
 import qualified Data.Map as Map
 import Control.Monad.Except
