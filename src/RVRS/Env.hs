@@ -1,18 +1,9 @@
 module RVRS.Env
-  ( TypedVal(..)
-  , ValueEnv
-  , TypeEnv
+  ( ValueEnv
   ) where
 
 import qualified Data.Map as Map
 import RVRS.Value (Value)
 
--- TEMPORARY: define here until TypeCheck exists
-data RVRSValueType = VNum | VStr | VBool
-  deriving (Show, Eq)
-
-data TypedVal = TypedVal RVRSValueType Value
-  deriving (Show, Eq)
-
+-- Used only at runtime (in EvalIR)
 type ValueEnv = Map.Map String Value
-type TypeEnv  = Map.Map String TypedVal
