@@ -1,0 +1,6 @@
+-- expect fail
+
+flow main {
+  delta x: Num = 5 + truth
+  echo x
+}

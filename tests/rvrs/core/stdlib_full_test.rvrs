@@ -2,14 +2,14 @@ flow main() {
   delta x = mirror("ritual")     -- should return "ritual"
   delta y = void(10)             -- should return -10
   delta z = fuse_x(2)            -- 2 + 5 = 7
-  delta b1 = is_four(4)          -- true
-  delta b2 = is_four(3)          -- false
+  delta b1 = is_four(4)          -- truth
+  delta b2 = is_four(3)          -- void
 
   echo x                         -- "ritual"
   echo y                         -- -10
   echo z                         -- 7
-  echo b1                        -- true
-  echo b2                        -- false
+  echo b1                        -- truth
+  echo b2                        -- void
 
   call fork_true("choice")       -- side-effect: echo "choice"
   call echo_twice("again")       -- side-effect: echo "again" twice
@@ -20,3 +20,4 @@ flow main() {
 
   return final
 }
+

@@ -14,6 +14,7 @@ executable rvrs
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
+    , RVRS.Types
     , RVRS.Eval
     , RVRS.Eval.EvalExpr
     , RVRS.Eval.EvalStmt
@@ -47,6 +48,7 @@ executable RunAll
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
+    , RVRS.Types
     , RVRS.Eval
     , RVRS.Eval.EvalExpr
     , RVRS.Eval.EvalStmt
@@ -83,6 +85,7 @@ executable TestLower
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
+    , RVRS.Types
     , RVRS.Eval
     , RVRS.Eval.EvalExpr
     , RVRS.Eval.EvalStmt
@@ -116,6 +119,7 @@ executable RunIRTests
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
+    , RVRS.Types
     , RVRS.Eval
     , RVRS.Eval.EvalExpr
     , RVRS.Eval.EvalStmt

@@ -1,0 +1,10 @@
+-- expect fail
+
+flow shout msg: Str returns Str {
+  return msg
+}
+
+flow main {
+  delta bad: Str = shout(42)
+  echo bad
+}

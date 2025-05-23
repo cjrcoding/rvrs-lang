@@ -3,6 +3,7 @@ module RVRS.Parser (parseRVRS) where
 -- Internal: RVRS language components
 import RVRS.AST
 import RVRS.Parser.StmtParser (statementParser)
+import RVRS.Parser.Type (RVRSType(..), parseType)
 
 -- External: Parsing libraries
 import Text.Megaparsec
@@ -11,17 +12,16 @@ import qualified Text.Megaparsec.Char.Lexer as L
 
 -- External: General utilities
 import Data.Char (isAlphaNum)
-import Data.Void
+import Data.Void (Void)
 
--- Debug (last and clear it's temporary)
+-- Debug (optional, for tracing parse failures)
 import Debug.Trace (trace)
-
 
 type Parser = Parsec Void String
 
 -- 🔧 Debug toggle
 debug :: Bool
-debug = False  -- Set to True if you want parser debug output
+debug = False
 
 -- Top-level parse function
 parseRVRS :: String -> Either (ParseErrorBundle String Void) [Flow]
@@ -33,25 +33,47 @@ parseRVRS input =
         then trace ("✅ Parsed flows:\n" ++ show flows) (Right flows)
         else Right flows
 
-
+-- 🔁 Flow parser (supports both old + new styles)
 flowParser :: Parser Flow
-flowParser = do
+flowParser = try flowParserNew <|> flowParserLegacy
+
+-- 🆕 New-style flow:
+-- flow greet name: Str, age: Num returns Str { ... }
+flowParserNew :: Parser Flow
+flowParserNew = do
+  _ <- symbol "flow" <|> symbol "ceremony"
+  name <- identifier
+  args <- typedArgParser `sepBy` symbol ","
+  rtype <- optional (symbol "returns" *> parseType)
+  body <- between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc))
+  return $ Flow name args body
+
+-- 🧓 Legacy-style flow:
+-- flow greet(name) { ... }
+flowParserLegacy :: Parser Flow
+flowParserLegacy = do
   _ <- symbol "flow" <|> symbol "ceremony"
   name <- identifier
   args <- argListParser
   body <- between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc))
   return $ Flow name args body
 
-
-
--- Optional argument list
+-- Old-style arguments: (x, y)
 argListParser :: Parser [Argument]
 argListParser =
   option [] $ between (symbol "(") (symbol ")") (nameArg `sepBy` symbol ",")
   where
-    nameArg = Argument <$> identifier <*> pure "Unknown"
+    nameArg = Argument <$> identifier <*> pure TypeAny
 
--- Shared utilities
+-- New-style typed arg: x: Num
+typedArgParser :: Parser Argument
+typedArgParser = do
+  name <- identifier
+  _ <- symbol ":"
+  ty <- parseType
+  return $ Argument name ty
+
+-- Shared whitespace / token parsers
 sc :: Parser ()
 sc = L.space space1 lineCmnt blockCmnt
   where

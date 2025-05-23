@@ -49,7 +49,7 @@ runIRTest file = do
       return (if expectedFail then ExpectedFailCorrect else Failed)
     Right flows -> do
       let loweredFlows = map lowerFlow flows
-      let flowMap = Map.fromList [(IR.flowName f, f) | f <- loweredFlows]
+      let flowMap = Map.fromList [(IR.flowIRName f, f) | f <- loweredFlows]
       case lookupMain loweredFlows of
         Nothing -> do
           putStrLn "❌ No 'main' flow found."
@@ -58,7 +58,7 @@ runIRTest file = do
           putStrLn "✅ Lowered IR:"
           print mainFlow
           putStrLn "🔁 Evaluation Output:"
-          result <- try (evalIRFlow flowMap (IR.flowName mainFlow) []) :: IO (Either SomeException (Either EvalError (Maybe Value)))
+          result <- try (evalIRFlow flowMap (IR.flowIRName mainFlow) []) :: IO (Either SomeException (Either EvalError (Maybe Value)))
 
           case result of
             Left ex -> do
@@ -74,7 +74,7 @@ runIRTest file = do
               return (if expectedFail then ExpectedFailMismatch else Passed)
 
 lookupMain :: [IR.FlowIR] -> Maybe IR.FlowIR
-lookupMain = find (\f -> IR.flowName f == "main")
+lookupMain = find (\f -> IR.flowIRName f == "main")
 
 summarize :: [TestResult] -> IO ()
 summarize results = do

@@ -33,7 +33,7 @@ evalIRFlow userFlows entryName args = do
   let fullFlowMap = Map.union userFlows stdlibFlows
   case Map.lookup entryName fullFlowMap of
     Just (FlowIR _ params body) -> do
-      let initialEnv = Map.fromList (zip params args)
+      let initialEnv = Map.fromList (zip (map argNameIR params) args)
       result <- runEvalIR fullFlowMap initialEnv $ catchError (evalStmtsWithEnv body) handleReturn
       return $ fmap fst result
     Nothing -> return $ Left (RuntimeError $ "No flow named '" ++ entryName ++ "' found.")

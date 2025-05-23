@@ -1,0 +1,10 @@
+-- expect fail
+
+flow greet name: Str returns Str {
+  return name
+}
+
+flow main {
+  delta msg: Str = greet()
+  echo msg
+}

@@ -2,9 +2,10 @@
 module RVRS.Eval.EvalStmt (evalIRStmt, evalStmtsWithEnv) where
 
 import RVRS.IR
-import RVRS.Value (Value(..))
+import RVRS.Value (Value(..), Binding(..), valueToType, formatVal, matchesType)
 import RVRS.Eval.EvalExpr (evalIRExpr)
 import RVRS.Eval.Types (EvalIR, EvalError(..))
+import RVRS.Parser.Type (RVRSType(..))
 import qualified Data.Map as Map
 import Control.Monad.Except
 import Control.Monad.Reader
@@ -45,9 +46,21 @@ evalIRStmt stmt = case stmt of
   IRCallStmt name args -> do
     flowMap <- ask
     case Map.lookup name flowMap of
-      Just (FlowIR _ params body) -> do
+      Just (FlowIR _ paramIRs body) -> do
         argVals <- mapM evalIRExpr args
-        let callEnv = Map.fromList (zip params argVals)
+
+        -- Arity check
+        when (length args /= length paramIRs) $
+          throwError $ RuntimeError "Wrong number of arguments"
+
+        -- Type check
+        forM_ (zip paramIRs argVals) $ \(ArgumentIR _ expectedType, actualVal) ->
+          unless (matchesType expectedType actualVal) $
+            throwError $ RuntimeError "Argument type mismatch"
+
+        -- Build call environment and run
+        let names = map (\(ArgumentIR n _) -> n) paramIRs
+            callEnv = Map.fromList (zip names argVals)
         (result, _) <- lift $ lift $ runStateT (runReaderT (evalStmtsWithEnv body) flowMap) callEnv
         return result
       Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
@@ -85,5 +98,4 @@ evalIRStmt stmt = case stmt of
     case Map.lookup name env of
       Nothing -> modify (Map.insert name val) >> return Nothing
       Just _  -> throwError $ RuntimeError ("Variable '" ++ name ++ "' already defined")
-
 

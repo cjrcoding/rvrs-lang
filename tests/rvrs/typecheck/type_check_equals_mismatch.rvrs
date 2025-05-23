@@ -1,0 +1,6 @@
+-- expect fail
+
+flow main {
+  delta x: Bool = 7 == void
+  echo x
+}

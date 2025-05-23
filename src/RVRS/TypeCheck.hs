@@ -5,69 +5,106 @@ module RVRS.TypeCheck
   ) where
 
 import RVRS.IR (IRExpr(..))
-import RVRS.Env (TypeEnv(..), TypedVal(..))
-import RVRS.Types (RVRSValueType(..), TypeError(..), TypedVal(..), TypeEnv)
+import RVRS.Types
+  ( RVRSValueType(..)
+  , TypeError(..)
+  , TypedVal(..)
+  , TypeEnv
+  , FlowSig(..)
+  , FlowSigEnv
+  )
+
 import qualified Data.Map as Map
 
+-- Main type checker for IR expressions
+typeCheckExpr :: IRExpr -> TypeEnv -> FlowSigEnv -> Either TypeError RVRSValueType
 
--- Main type checker for expressions
-typeCheckExpr :: IRExpr -> TypeEnv -> Either TypeError RVRSValueType
+-- Literals
+typeCheckExpr (IRNumLit _) _ _   = Right VNum
+typeCheckExpr (IRStrLit _) _ _   = Right VStr
+typeCheckExpr (IRBoolLit _) _ _  = Right VBool
 
-typeCheckExpr (IRNumLit _) _ = Right VNum
-typeCheckExpr (IRStrLit _) _ = Right VStr
-typeCheckExpr (IRBoolLit _) _ = Right VBool
-
-typeCheckExpr (IRVar name) env =
+-- Variable lookup
+typeCheckExpr (IRVar name) env _ =
   case Map.lookup name env of
     Just (TypedVal t _) -> Right t
-    Nothing -> Left (UnknownVariable name)
+    Nothing             -> Left (UnknownVariable name)
 
-typeCheckExpr (IRAdd e1 e2) env = do
-  t1 <- typeCheckExpr e1 env
-  t2 <- typeCheckExpr e2 env
-  if t1 == VNum && t2 == VNum
-    then Right VNum
-    else Left (TypeMismatch "Add requires Num + Num")
+-- Arithmetic
+typeCheckExpr (IRAdd e1 e2) env fs = numericBinOp "Add" e1 e2 env fs
+typeCheckExpr (IRSub e1 e2) env fs = numericBinOp "Sub" e1 e2 env fs
+typeCheckExpr (IRMul e1 e2) env fs = numericBinOp "Mul" e1 e2 env fs
+typeCheckExpr (IRDiv e1 e2) env fs = numericBinOp "Div" e1 e2 env fs
 
-typeCheckExpr (IRSub e1 e2) env = do
-  t1 <- typeCheckExpr e1 env
-  t2 <- typeCheckExpr e2 env
-  if t1 == VNum && t2 == VNum
-    then Right VNum
-    else Left (TypeMismatch "Sub requires Num - Num")
-
-typeCheckExpr (IRMul e1 e2) env = do
-  t1 <- typeCheckExpr e1 env
-  t2 <- typeCheckExpr e2 env
-  if t1 == VNum && t2 == VNum
-    then Right VNum
-    else Left (TypeMismatch "Mul requires Num * Num")
-
-typeCheckExpr (IRDiv e1 e2) env = do
-  t1 <- typeCheckExpr e1 env
-  t2 <- typeCheckExpr e2 env
-  if t1 == VNum && t2 == VNum
-    then Right VNum
-    else Left (TypeMismatch "Div requires Num / Num")
-
-typeCheckExpr (IREquals e1 e2) env = do
-  t1 <- typeCheckExpr e1 env
-  t2 <- typeCheckExpr e2 env
-  if t1 == t2
+-- Boolean logic
+typeCheckExpr (IRAnd e1 e2) env fs = boolBinOp "and" e1 e2 env fs
+typeCheckExpr (IROr  e1 e2) env fs = boolBinOp "or" e1 e2 env fs
+typeCheckExpr (IRNot e)     env fs = do
+  t <- typeCheckExpr e env fs
+  if t == VBool
     then Right VBool
-    else Left (TypeMismatch "Equals requires both sides to be the same type")
+    else Left (TypeMismatch "not requires a Bool")
 
-typeCheckExpr (IRNotEquals e1 e2) env = do
-  t1 <- typeCheckExpr e1 env
-  t2 <- typeCheckExpr e2 env
-  if t1 == t2
-    then Right VBool
-    else Left (TypeMismatch "NotEquals requires both sides to be the same type")
+-- Comparison
+typeCheckExpr (IRGreaterThan e1 e2) env fs = compareNum ">" e1 e2 env fs
+typeCheckExpr (IRLessThan    e1 e2) env fs = compareNum "<" e1 e2 env fs
 
-typeCheckExpr (IRNegate e) env = do
-  t <- typeCheckExpr e env
+-- Equality
+typeCheckExpr (IREquals e1 e2) env fs = compareEq "==" e1 e2 env fs
+typeCheckExpr (IRNotEquals e1 e2) env fs = compareEq "!=" e1 e2 env fs
+
+-- Negation
+typeCheckExpr (IRNegate e) env fs = do
+  t <- typeCheckExpr e env fs
   if t == VNum
     then Right VNum
-    else Left (TypeMismatch "Negate requires a Num")
+    else Left (TypeMismatch "Negation requires a Num")
 
-typeCheckExpr _ _ = Left (TypeMismatch "Unsupported expression form")
+-- Function calls
+typeCheckExpr (IRCall fname args) env fsenv =
+  case Map.lookup fname fsenv of
+    Nothing -> Left (UnknownVariable ("flow: " ++ fname))
+    Just (FlowSig expectedArgs retType) ->
+      if length args /= length expectedArgs
+        then Left (TypeMismatch ("Arity mismatch in call to " ++ fname))
+        else do
+          actualTypes <- mapM (\arg -> typeCheckExpr arg env fsenv) args
+          if actualTypes == expectedArgs
+            then Right retType
+            else Left (TypeMismatch ("Argument type mismatch in call to " ++ fname))
+
+-- Fallback
+typeCheckExpr _ _ _ = Left (TypeMismatch "Unsupported expression form")
+
+-- Helpers
+numericBinOp :: String -> IRExpr -> IRExpr -> TypeEnv -> FlowSigEnv -> Either TypeError RVRSValueType
+numericBinOp label e1 e2 env fs = do
+  t1 <- typeCheckExpr e1 env fs
+  t2 <- typeCheckExpr e2 env fs
+  if t1 == VNum && t2 == VNum
+    then Right VNum
+    else Left (TypeMismatch (label ++ " requires Num operands"))
+
+boolBinOp :: String -> IRExpr -> IRExpr -> TypeEnv -> FlowSigEnv -> Either TypeError RVRSValueType
+boolBinOp label e1 e2 env fs = do
+  t1 <- typeCheckExpr e1 env fs
+  t2 <- typeCheckExpr e2 env fs
+  if t1 == VBool && t2 == VBool
+    then Right VBool
+    else Left (TypeMismatch (label ++ " requires Bool operands"))
+
+compareNum :: String -> IRExpr -> IRExpr -> TypeEnv -> FlowSigEnv -> Either TypeError RVRSValueType
+compareNum label e1 e2 env fs = do
+  t1 <- typeCheckExpr e1 env fs
+  t2 <- typeCheckExpr e2 env fs
+  if t1 == VNum && t2 == VNum
+    then Right VBool
+    else Left (TypeMismatch (label ++ " requires Num operands"))
+
+compareEq :: String -> IRExpr -> IRExpr -> TypeEnv -> FlowSigEnv -> Either TypeError RVRSValueType
+compareEq _ e1 e2 env fs = do
+  t1 <- typeCheckExpr e1 env fs
+  t2 <- typeCheckExpr e2 env fs
+  if t1 == t2
+    then Right VBool
+    else Left (TypeMismatch "Equality comparison requires both sides to have the same type")

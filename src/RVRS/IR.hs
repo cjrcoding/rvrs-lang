@@ -1,19 +1,21 @@
--- src/RVRS/IR.hs
-
 module RVRS.IR where
-
 
 import RVRS.Parser.Type (RVRSType)
 
-
--- | Intermediate representation of a flow
-data FlowIR = FlowIR
-  { flowName :: String
-  , flowArgs :: [String]
-  , flowBody :: [StmtIR]
+-- Argument in IR with type info
+data ArgumentIR = ArgumentIR
+  { argNameIR :: String
+  , argTypeIR :: RVRSType
   } deriving (Show, Eq)
 
--- | Lowered statements (IR version of AST Statement)
+-- Intermediate representation of a flow with typed args
+data FlowIR = FlowIR
+  { flowIRName :: String
+  , flowIRArgs :: [ArgumentIR]
+  , flowIRBody :: [StmtIR]
+  } deriving (Show, Eq)
+
+-- Lowered statements (IR version of AST Statement)
 data StmtIR
   = IRDelta String ExprIR (Maybe RVRSType)
   | IRSource String ExprIR (Maybe RVRSType)
@@ -26,7 +28,7 @@ data StmtIR
   | IRAssert ExprIR
   deriving (Show, Eq)
 
--- | Core IR expressions
+-- Core IR expressions
 data ExprIR
   = IRVar String
   | IRStrLit String

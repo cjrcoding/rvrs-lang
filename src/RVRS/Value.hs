@@ -1,6 +1,7 @@
 -- src/RVRS/Value.hs
 
-module RVRS.Value (Value(..), Binding(..), valueToType, formatVal) where
+module RVRS.Value (Value(..), Binding(..), valueToType, formatVal, matchesType) where
+
 
 import RVRS.Parser.Type (RVRSType(..))
 
@@ -39,3 +40,13 @@ formatVal (VBool b) = show b
 formatVal VUnit     = "unit"
 formatVal VVoid     = "void"
 formatVal (VError e)= "error: " ++ e
+
+
+-- | Type-matching utility: checks if a runtime Value matches a declared RVRSType
+matchesType :: RVRSType -> Value -> Bool
+matchesType ty val = case (ty, val) of
+  (TypeStr,  VStr _)  -> True
+  (TypeNum,  VNum _)  -> True
+  (TypeBool, VBool _) -> True
+  (TypeAny,  _)       -> True
+  _                   -> False

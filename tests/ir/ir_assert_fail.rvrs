@@ -2,6 +2,6 @@
 
 
 flow main() {
-  assert false
+  assert void
   echo "should not reach here"
 }
