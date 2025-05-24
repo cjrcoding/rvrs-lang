@@ -1,5 +1,5 @@
--- src/RVRS/Eval/Stmt.hs
 module RVRS.Eval.EvalStmt (evalIRStmt, evalStmtsWithEnv) where
+
 
 import RVRS.IR
 import RVRS.Value (Value(..), Binding(..), valueToType, formatVal, matchesType)
@@ -12,16 +12,7 @@ import Control.Monad.Reader
 import Control.Monad.State
 import Control.Monad.IO.Class (liftIO)
 
--- Core block runner
-evalStmtsWithEnv :: [StmtIR] -> EvalIR (Maybe Value)
-evalStmtsWithEnv [] = return Nothing
-evalStmtsWithEnv (stmt:rest) = do
-  result <- evalIRStmt stmt
-  case result of
-    Just val -> return (Just val)
-    Nothing  -> evalStmtsWithEnv rest
-
--- Isolate scope
+-- Isolate scope for conditionals and flow calls
 isolate :: EvalIR a -> EvalIR a
 isolate action = do
   env <- get
@@ -30,7 +21,7 @@ isolate action = do
   result <- lift $ lift $ runStateT inner env
   return (fst result)
 
--- Statement evaluator
+-- Evaluate a single statement
 evalIRStmt :: StmtIR -> EvalIR (Maybe Value)
 evalIRStmt stmt = case stmt of
   IREcho expr -> do
@@ -50,35 +41,22 @@ evalIRStmt stmt = case stmt of
         argVals <- mapM evalIRExpr args
 
         -- Arity check
-        when (length args /= length paramIRs) $
+        when (length argVals /= length paramIRs) $
           throwError $ RuntimeError "Wrong number of arguments"
 
-        -- Type check
+        -- Type check for arguments
         forM_ (zip paramIRs argVals) $ \(ArgumentIR _ expectedType, actualVal) ->
           unless (matchesType expectedType actualVal) $
             throwError $ RuntimeError "Argument type mismatch"
 
-        -- Build call environment and run
+        -- Evaluate body in new scope
         let names = map (\(ArgumentIR n _) -> n) paramIRs
             callEnv = Map.fromList (zip names argVals)
-        (result, _) <- lift $ lift $ runStateT (runReaderT (evalStmtsWithEnv body) flowMap) callEnv
-        return result
+
+        _ <- lift $ lift $ runStateT (runReaderT (evalStmtsWithEnv body) flowMap) callEnv
+        return Nothing
+
       Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
-
-  IRReturn expr -> do
-    val <- evalIRExpr expr
-    return (Just val)
-
-  IRMouth expr -> do
-    val <- evalIRExpr expr
-    throwError (Return val)
-
-  IRAssert expr -> do
-    val <- evalIRExpr expr
-    case val of
-      VBool True  -> return Nothing
-      VBool False -> throwError $ RuntimeError "Assertion failed"
-      _           -> throwError $ RuntimeError "Assert expects boolean"
 
   IRBranch cond tBlock eBlock -> do
     condVal <- evalIRExpr cond
@@ -87,15 +65,42 @@ evalIRStmt stmt = case stmt of
       VBool False -> isolate (evalStmtsWithEnv eBlock)
       _ -> throwError $ RuntimeError "Condition must be boolean"
 
-  IRDelta name expr _mType -> do
+  IRDelta name expr mType -> do
     val <- evalIRExpr expr
+    case mType of
+      Just expected ->
+        unless (matchesType expected val) $
+          throwError $ RuntimeError ("Type mismatch in delta for " ++ name)
+      Nothing -> return ()
     modify (Map.insert name val)
     return Nothing
 
-  IRSource name expr _mType -> do
+  IRSource name expr mType -> do
     val <- evalIRExpr expr
     env <- get
     case Map.lookup name env of
-      Nothing -> modify (Map.insert name val) >> return Nothing
-      Just _  -> throwError $ RuntimeError ("Variable '" ++ name ++ "' already defined")
+      Just _ -> throwError $ RuntimeError ("Variable '" ++ name ++ "' already defined")
+      Nothing -> case mType of
+        Just expected ->
+          unless (matchesType expected val) $
+            throwError $ RuntimeError ("Type mismatch in source for " ++ name)
+        Nothing -> return ()
+    modify (Map.insert name val)
+    return Nothing
 
+  IRAssert expr -> do
+    val <- evalIRExpr expr
+    case val of
+      VBool True  -> return Nothing
+      VBool False -> throwError $ RuntimeError "Assertion failed"
+      _           -> throwError $ RuntimeError "Assert expression must be boolean"
+
+
+-- Evaluates a list of statements until return
+evalStmtsWithEnv :: [StmtIR] -> EvalIR (Maybe Value)
+evalStmtsWithEnv [] = return Nothing
+evalStmtsWithEnv (stmt:rest) = do
+  result <- evalIRStmt stmt
+  case result of
+    Just val -> return (Just val)
+    Nothing  -> evalStmtsWithEnv rest

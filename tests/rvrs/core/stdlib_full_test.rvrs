@@ -1,23 +1,27 @@
 flow main() {
-  delta x = mirror("ritual")     -- should return "ritual"
-  delta y = void(10)             -- should return -10
-  delta z = fuse_x(2)            -- 2 + 5 = 7
-  delta b1 = is_four(4)          -- truth
-  delta b2 = is_four(3)          -- void
+  echo "🧪 stdlib smoke test: begin"
 
-  echo x                         -- "ritual"
-  echo y                         -- -10
-  echo z                         -- 7
-  echo b1                        -- truth
-  echo b2                        -- void
+  -- Basic usage of each stdlib function
+  delta a = mirror("test")          -- expect: "test"
+  delta b = void(5)                 -- expect: -5
+  delta c = fuse_x(10)              -- expect: 15
+  delta d = is_four(4)              -- expect: true
+  delta e = is_four(99)             -- expect: false
 
-  call fork_true("choice")       -- side-effect: echo "choice"
-  call echo_twice("again")       -- side-effect: echo "again" twice
+  echo a
+  echo b
+  echo c
+  echo d
+  echo e
 
-  -- Bonus: nested usage
-  delta final = fuse_x(void(1))  -- void(1) = -1 → fuse_x(-1) = 4
-  echo final
+  -- Confirm side-effect flows
+  call fork_true("side-effect one")
+  call echo_twice("side-effect two")
 
-  return final
+  -- Confirm nested call
+  delta f = fuse_x(void(3))         -- void(3) = -3 → fuse_x(-3) = 2
+  echo f
+
+  echo "🧪 stdlib smoke test: end"
+  return f
 }
-

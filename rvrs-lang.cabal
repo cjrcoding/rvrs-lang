@@ -10,21 +10,23 @@ executable rvrs
   other-modules:
       RVRS.AST
     , RVRS.Codegen
+    , RVRS.Env
+    , RVRS.Eval
+    , RVRS.Eval.EvalExpr
+    , RVRS.Eval.EvalFlow
+    , RVRS.Eval.EvalStmt
+    , RVRS.Eval.SharedExpr
+    , RVRS.Eval.Types
+    , RVRS.Eval.CallFlowOnly
+    , RVRS.IR
+    , RVRS.Lower
     , RVRS.Parser
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
-    , RVRS.Types
-    , RVRS.Eval
-    , RVRS.Eval.EvalExpr
-    , RVRS.Eval.EvalStmt
-    , RVRS.Eval.EvalFlow
-    , RVRS.Eval.Types
     , RVRS.Pretty
+    , RVRS.Types
     , RVRS.Value
-    , RVRS.IR
-    , RVRS.Lower
-    , RVRS.Env
 
   build-depends:
       base >=4.14 && <5
@@ -44,21 +46,23 @@ executable RunAll
   other-modules:
       RVRS.AST
     , RVRS.Codegen
+    , RVRS.Env
+    , RVRS.Eval
+    , RVRS.Eval.EvalExpr
+    , RVRS.Eval.EvalFlow
+    , RVRS.Eval.EvalStmt
+    , RVRS.Eval.SharedExpr
+    , RVRS.Eval.Types
+    , RVRS.Eval.CallFlowOnly
+    , RVRS.IR
+    , RVRS.Lower
     , RVRS.Parser
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
-    , RVRS.Types
-    , RVRS.Eval
-    , RVRS.Eval.EvalExpr
-    , RVRS.Eval.EvalStmt
-    , RVRS.Eval.EvalFlow
-    , RVRS.Eval.Types
     , RVRS.Pretty
+    , RVRS.Types
     , RVRS.Value
-    , RVRS.IR
-    , RVRS.Lower
-    , RVRS.Env
 
   build-depends:
       base >=4.14 && <5
@@ -81,21 +85,23 @@ executable TestLower
   other-modules:
       RVRS.AST
     , RVRS.Codegen
+    , RVRS.Env
+    , RVRS.Eval
+    , RVRS.Eval.EvalExpr
+    , RVRS.Eval.EvalFlow
+    , RVRS.Eval.EvalStmt
+    , RVRS.Eval.SharedExpr
+    , RVRS.Eval.Types
+    , RVRS.Eval.CallFlowOnly
+    , RVRS.IR
+    , RVRS.Lower
     , RVRS.Parser
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
-    , RVRS.Types
-    , RVRS.Eval
-    , RVRS.Eval.EvalExpr
-    , RVRS.Eval.EvalStmt
-    , RVRS.Eval.EvalFlow
-    , RVRS.Eval.Types
     , RVRS.Pretty
+    , RVRS.Types
     , RVRS.Value
-    , RVRS.IR
-    , RVRS.Lower
-    , RVRS.Env
 
   build-depends:
       base >=4.14 && <5
@@ -115,21 +121,23 @@ executable RunIRTests
   other-modules:
       RVRS.AST
     , RVRS.Codegen
+    , RVRS.Env
+    , RVRS.Eval
+    , RVRS.Eval.EvalExpr
+    , RVRS.Eval.EvalFlow
+    , RVRS.Eval.EvalStmt
+    , RVRS.Eval.SharedExpr
+    , RVRS.Eval.Types
+    , RVRS.Eval.CallFlowOnly
+    , RVRS.IR
+    , RVRS.Lower
     , RVRS.Parser
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
-    , RVRS.Types
-    , RVRS.Eval
-    , RVRS.Eval.EvalExpr
-    , RVRS.Eval.EvalStmt
-    , RVRS.Eval.EvalFlow
-    , RVRS.Eval.Types
     , RVRS.Pretty
+    , RVRS.Types
     , RVRS.Value
-    , RVRS.IR
-    , RVRS.Lower
-    , RVRS.Env
 
   build-depends:
       base >=4.14 && <5

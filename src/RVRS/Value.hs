@@ -15,6 +15,7 @@ data Value
   | VError String
   | VVoid
   | VUnit
+  | VNone 
   deriving (Eq, Show)
 
 -- | Variable bindings (mutable or immutable)
@@ -40,6 +41,7 @@ formatVal (VBool b) = show b
 formatVal VUnit     = "unit"
 formatVal VVoid     = "void"
 formatVal (VError e)= "error: " ++ e
+formatVal VNone = "none"
 
 
 -- | Type-matching utility: checks if a runtime Value matches a declared RVRSType
