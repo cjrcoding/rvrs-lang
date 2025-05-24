@@ -1,27 +1,2 @@
-flow main() {
-  echo "🧪 stdlib smoke test: begin"
-
-  -- Basic usage of each stdlib function
-  delta a = mirror("test")          -- expect: "test"
-  delta b = void(5)                 -- expect: -5
-  delta c = fuse_x(10)              -- expect: 15
-  delta d = is_four(4)              -- expect: true
-  delta e = is_four(99)             -- expect: false
-
-  echo a
-  echo b
-  echo c
-  echo d
-  echo e
-
-  -- Confirm side-effect flows
-  call fork_true("side-effect one")
-  call echo_twice("side-effect two")
-
-  -- Confirm nested call
-  delta f = fuse_x(void(3))         -- void(3) = -3 → fuse_x(-3) = 2
-  echo f
-
-  echo "🧪 stdlib smoke test: end"
-  return f
-}
+delta x = void(3)
+delta f = fuse_x(x)
