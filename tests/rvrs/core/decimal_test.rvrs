@@ -5,4 +5,5 @@ flow givePi() {
 flow main() {
   source pi = givePi()
   echo pi
+  return pi
 }
