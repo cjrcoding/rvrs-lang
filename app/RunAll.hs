@@ -12,12 +12,15 @@ main :: IO ()
 main = do
   putStrLn "\x1b[36m🌊 Running all RVRS tests...\x1b[0m\n"
   rvrsFiles <- findRVRSFiles "tests"
-  (passes, fails, expectedFails) <- runTests rvrsFiles
+  (passes, fails, expectedFails, silentTests) <- runTests rvrsFiles []
   putStrLn "\n\x1b[35m🔚 Test Summary:\x1b[0m"
   putStrLn $ "✅ Passed: " ++ show passes ++
              " | ❌ Failed: " ++ show fails ++
              " | ⚠️ Expected Failures: " ++ show expectedFails ++
              " | 🧪 Total: " ++ show (passes + fails + expectedFails)
+
+  putStrLn "\n🤫 Silent Tests:"
+  mapM_ putStrLn silentTests
 
 findRVRSFiles :: FilePath -> IO [FilePath]
 findRVRSFiles path = do
@@ -28,11 +31,11 @@ findRVRSFiles path = do
   let files = filter (\f -> takeExtension f == ".rvrs") fullPaths
   return (files ++ nested)
 
-runTests :: [FilePath] -> IO (Int, Int, Int)
-runTests files = go files 0 0 0
+runTests :: [FilePath] -> [FilePath] -> IO (Int, Int, Int, [FilePath])
+runTests files silent = go files 0 0 0 silent
   where
-    go [] p f e = return (p, f, e)
-    go (file:rest) p f e = do
+    go [] p f e s = return (p, f, e, reverse s)
+    go (file:rest) p f e s = do
       isExpectedFail <- checkExpectedFail file
       putStrLn $ "\x1b[33m🔍 Running: " ++ file ++ if isExpectedFail then " ⚠️ (expected fail)" else "" ++ "\x1b[0m"
       (exitCode, stdout, stderr) <- readProcessWithExitCode "cabal" ["run", "rvrs", file] ""
@@ -48,14 +51,17 @@ runTests files = go files 0 0 0
             , "error:"
             , "could not evaluate"
             ]
+          isSilent = not ("echo:" `isInfixOf` combinedOutput || "returned:" `isInfixOf` combinedOutput || "whisper:" `isInfixOf` combinedOutput || "eval error:" `isInfixOf` combinedOutput || "mouth:" `isInfixOf` combinedOutput)
 
       putStrLn $ replicate 40 '-'
 
+      let s' = if isSilent then file : s else s
+
       if failed && isExpectedFail
-        then go rest p f (e + 1)
+        then go rest p f (e + 1) s'
       else if failed
-        then go rest p (f + 1) e
-      else go rest (p + 1) f e
+        then go rest p (f + 1) e s'
+      else go rest (p + 1) f e s'
 
 checkExpectedFail :: FilePath -> IO Bool
 checkExpectedFail file = do
