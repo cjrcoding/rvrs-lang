@@ -58,7 +58,10 @@ evalIRStmt stmt = case stmt of
 
   IRMouth expr -> do
     val <- evalIRExpr expr
-    throwError (Return val)
+    liftIO $ putStrLn ("mouth: " ++ show val)
+    return Nothing
+
+          
 
   IRAssert expr -> do
     val <- evalIRExpr expr

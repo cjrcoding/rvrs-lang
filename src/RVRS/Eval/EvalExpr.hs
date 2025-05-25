@@ -1,15 +1,17 @@
--- src/RVRS/Eval/Expr.hs
+-- src/RVRS/Eval/EvalExpr.hs
 module RVRS.Eval.EvalExpr (evalIRExpr) where
 
 import RVRS.IR (ExprIR(..), StmtIR(..), FlowIR(..))
 import RVRS.Value (Value(..)) 
-import RVRS.Eval.Types (EvalIR, EvalError(..))
+import RVRS.Eval.Types (EvalIR, EvalError(..), FlowEnv)
+import RVRS.Env (ValueEnv)
 
 import qualified Data.Map as Map
 import Control.Monad.Except
 import Control.Monad.Reader
 import Control.Monad.State
 import Control.Monad.IO.Class (liftIO)
+import Data.Maybe (fromMaybe)
 
 -- Evaluate expressions
 
@@ -99,23 +101,12 @@ evalIRExpr expr = case expr of
         if length paramNames /= length argVals
           then throwError $ RuntimeError ("Arity mismatch calling: " ++ name)
           else do
-            let localEnv = Map.fromList (zip paramNames argVals)
-
-            let evalBody [] = return Nothing
-                evalBody (stmt:rest) = do
-                  (maybeVal, env') <- lift $ lift $ runStateT (runReaderT (evalIRStmt stmt) fsenv) localEnv
-                  case maybeVal of
-                    Just val -> return (Just val)
-                    Nothing -> do
-                      (res, _) <- lift $ lift $ runStateT (runReaderT (evalBody rest) fsenv) env'
-                      return res
-
-            result <- evalBody body
-            case result of
-              Just val -> return val
-              Nothing  -> throwError $ RuntimeError ("Flow '" ++ name ++ "' did not return a value")
+            let callEnv = Map.fromList (zip paramNames argVals)
+            (result, _) <- lift . lift $ runStateT (runReaderT (evalBody body) fsenv) callEnv
+            return $ fromMaybe VVoid result
 
 -- Statement evaluator
+
 evalIRStmt :: StmtIR -> EvalIR (Maybe Value)
 evalIRStmt stmt = case stmt of
   IREcho expr -> do
@@ -134,15 +125,8 @@ evalIRStmt stmt = case stmt of
       Just (FlowIR _ params body) -> do
         argVals <- mapM evalIRExpr args
         let callEnv = Map.fromList (zip params argVals)
-        let evalBody [] = return Nothing
-            evalBody (stmt:rest) = do
-              (maybeVal, env') <- lift $ lift $ runStateT (runReaderT (evalIRStmt stmt) flowMap) callEnv
-              case maybeVal of
-                Just val -> return (Just val)
-                Nothing -> do
-                  (res, _) <- lift $ lift $ runStateT (runReaderT (evalBody rest) flowMap) env'
-                  return res
-        evalBody body
+        (result, _) <- lift . lift $ runStateT (runReaderT (evalBody body) flowMap) callEnv
+        return result
       Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
 
   IRReturn expr -> do
@@ -151,7 +135,8 @@ evalIRStmt stmt = case stmt of
 
   IRMouth expr -> do
     val <- evalIRExpr expr
-    throwError (Return val)
+    liftIO $ putStrLn ("mouth: " ++ show val)
+    return Nothing
 
   IRAssert expr -> do
     val <- evalIRExpr expr
@@ -184,3 +169,13 @@ evalIRStmt stmt = case stmt of
     case Map.lookup name env of
       Nothing -> modify (Map.insert name val) >> return Nothing
       Just _  -> throwError $ RuntimeError ("Variable '" ++ name ++ "' already defined")
+
+-- Flow body evaluator used in both CallExpr and CallStmt
+
+evalBody :: [StmtIR] -> EvalIR (Maybe Value)
+evalBody [] = return Nothing
+evalBody (stmt:rest) = do
+  result <- evalIRStmt stmt
+  case result of
+    Just val -> return (Just val)
+    Nothing  -> evalBody rest

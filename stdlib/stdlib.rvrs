@@ -1,36 +1,34 @@
 -- Prelude of Rituals —
 -- Standard symbolic flows used in testing, validation, or as stdlib placeholders
 
--- Emits the value unchanged (identity printer)
+-- Returns the value unchanged (identity)
 flow mirror(x) {
-  mouth x
+  return x
 }
 
--- Emits the negated value
+-- Returns the negated value
 flow void(x) {
-  mouth -x
+  return -x
 }
 
--- Adds 5 to the given value and emits the result
+-- Adds 5 to the given value and returns the result
 flow fuse_x(x) {
   delta self = x
-  mouth self + 5
+  return self + 5
 }
 
--- Checks if the input is 4, emits true or false
+-- Checks if the input is 4, returns true or false
 flow is_four(x) {
-  mouth x == 4
+  return x == 4
 }
 
--- Returns the value (used for branching logic)
+-- Emits the value (used for branching logic or side-effects)
 flow fork_true(x) {
   echo x
 }
 
--- Attempts to return the same value twice (useful for return path tests)
+-- Emits the same value twice (side-effect only)
 flow echo_twice(x) {
   echo x
   echo x
 }
-
-

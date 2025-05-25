@@ -1,3 +1,5 @@
+-- app/Main.hs
+
 module Main where
 
 -- Internal modules
@@ -36,12 +38,12 @@ main = do
             Left stdErr -> putStrLn $ "Stdlib error:\n" ++ errorBundlePretty stdErr
             Right stdlibFlows -> do
 
-              -- Combine and lower flows
-              let allFlows = userFlows ++ stdlibFlows
+              -- 🛠️ Combine stdlib first, then user flows (user can override)
+              let allFlows = stdlibFlows ++ userFlows
               let lowered = mergeAndLower allFlows
 
               when debug $ do
-                putStrLn "Parsed User Flows:"
+                putStrLn "\n🔎 Parsed User Flows:"
                 mapM_ (putStrLn . prettyPrintFlow) userFlows
 
               -- Evaluate main flow

@@ -1,5 +1,6 @@
 -- src/RVRS/Eval/Types.hs
-module RVRS.Eval.Types (EvalIR, EvalError(..)) where
+module RVRS.Eval.Types (EvalIR, EvalError(..), FlowEnv) where
+
 
 import RVRS.Env (ValueEnv)
 import RVRS.Value (Value(..))
