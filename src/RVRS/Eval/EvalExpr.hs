@@ -1,4 +1,3 @@
--- src/RVRS/Eval/EvalExpr.hs
 module RVRS.Eval.EvalExpr (evalIRExpr) where
 
 import RVRS.IR (ExprIR(..), StmtIR(..), FlowIR(..))
@@ -122,12 +121,12 @@ evalIRStmt stmt = case stmt of
   IRCallStmt name args -> do
     flowMap <- ask
     case Map.lookup name flowMap of
+      Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
       Just (FlowIR _ params body) -> do
         argVals <- mapM evalIRExpr args
         let callEnv = Map.fromList (zip params argVals)
-        (result, _) <- lift . lift $ runStateT (runReaderT (evalBody body) flowMap) callEnv
-        return result
-      Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
+        _ <- lift . lift $ runStateT (runReaderT (evalBody body) flowMap) callEnv
+        return Nothing
 
   IRReturn expr -> do
     val <- evalIRExpr expr

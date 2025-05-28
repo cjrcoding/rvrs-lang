@@ -1,10 +1,10 @@
--- src/RVRS/Eval/Stmt.hs
 module RVRS.Eval.EvalStmt (evalIRStmt, evalStmtsWithEnv) where
 
 import RVRS.IR
 import RVRS.Value (Value(..))
 import RVRS.Eval.EvalExpr (evalIRExpr)
 import RVRS.Eval.Types (EvalIR, EvalError(..))
+
 import qualified Data.Map as Map
 import Control.Monad.Except
 import Control.Monad.Reader
@@ -20,7 +20,7 @@ evalStmtsWithEnv (stmt:rest) = do
     Just val -> return (Just val)
     Nothing  -> evalStmtsWithEnv rest
 
--- Isolate scope
+-- Isolate scope for branches
 isolate :: EvalIR a -> EvalIR a
 isolate action = do
   env <- get
@@ -42,15 +42,16 @@ evalIRStmt stmt = case stmt of
     liftIO $ putStrLn ("→ whisper: " ++ label ++ " = " ++ show val)
     return Nothing
 
+  -- ✅ Correct: discard subflow return value
   IRCallStmt name args -> do
     flowMap <- ask
     case Map.lookup name flowMap of
+      Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
       Just (FlowIR _ params body) -> do
         argVals <- mapM evalIRExpr args
         let callEnv = Map.fromList (zip params argVals)
-        (result, _) <- lift $ lift $ runStateT (runReaderT (evalStmtsWithEnv body) flowMap) callEnv
-        return result
-      Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
+        _ <- lift . lift $ runStateT (runReaderT (evalStmtsWithEnv body) flowMap) callEnv
+        return Nothing
 
   IRReturn expr -> do
     val <- evalIRExpr expr
@@ -60,8 +61,6 @@ evalIRStmt stmt = case stmt of
     val <- evalIRExpr expr
     liftIO $ putStrLn ("mouth: " ++ show val)
     return Nothing
-
-          
 
   IRAssert expr -> do
     val <- evalIRExpr expr
@@ -75,7 +74,7 @@ evalIRStmt stmt = case stmt of
     case condVal of
       VBool True  -> isolate (evalStmtsWithEnv tBlock)
       VBool False -> isolate (evalStmtsWithEnv eBlock)
-      _ -> throwError $ RuntimeError "Condition must be boolean"
+      _           -> throwError $ RuntimeError "Condition must be boolean"
 
   IRDelta name expr _mType -> do
     val <- evalIRExpr expr
@@ -88,5 +87,3 @@ evalIRStmt stmt = case stmt of
     case Map.lookup name env of
       Nothing -> modify (Map.insert name val) >> return Nothing
       Just _  -> throwError $ RuntimeError ("Variable '" ++ name ++ "' already defined")
-
-

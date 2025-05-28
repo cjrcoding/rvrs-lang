@@ -1,4 +1,4 @@
-flow main {
+flow main() {
   call mirror("ritual")         
   call void(10)                 
   call fuse_x(2)                
