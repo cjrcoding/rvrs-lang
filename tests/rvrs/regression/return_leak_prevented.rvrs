@@ -1,0 +1,8 @@
+flow leaky(x) {
+  return x
+}
+
+flow main() {
+  call leaky("shadow")
+  return "actual"
+}
