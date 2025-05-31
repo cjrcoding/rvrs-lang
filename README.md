@@ -1,5 +1,3 @@
-
-
 <p align="center">
   <img src="https://raw.githubusercontent.com/cjrcoding/rvrs-lang/main/assets/rvrs-logo-clean.jpg" alt="RVRS Logo" width="600"/>
 </p>
@@ -12,13 +10,12 @@
   </a>
 </p>
 
-
 **“Not all contracts are code. Some are rivers.”**
 
-RVRS is an experimental smart contract language for Cardano.
+RVRS is an experimental smart contract language for Cardano.  
 It treats code as ritual. Every contract is a flow: deliberate, symbolic, and evolving.
 
-RVRS is aiming to compile into [Aiken](https://aiken-lang.org).  
+RVRS is written in **Haskell**, fully custom, and aims to compile into [Aiken](https://aiken-lang.org) once the interpreter is complete.  
 It is still forming. Still flowing.
 
 ---
@@ -42,6 +39,7 @@ These are the riverbed. The rest flows from here.
 
 You can now write full-featured RVRS flows with arguments, branching logic, and return values.
 
+#### 🌐 Language Features
 - ✅ Full parser for all Core 6 constructs  
 - ✅ Arithmetic expression support: `+`, `-`, `*`, `/`  
 - ✅ Logical comparisons: `==`, `!=`, `<`, `>`, etc.  
@@ -52,7 +50,15 @@ You can now write full-featured RVRS flows with arguments, branching logic, and 
 - ✅ `echo` used as return value from flows  
 - ✅ `mouth` emits trace logs  
 - ✅ Multi-flow file support with `main` as entrypoint  
-- ✅ CLI tool for `.rvrs` execution and AST visualization  
+
+#### ⚙️ Runtime + Infrastructure
+- ✅ Full interpreter with scoped evaluation  
+- ✅ Intermediate Representation (IR) and evaluator  
+- ✅ Type annotations on `delta` and `source`  
+- ✅ CLI for `.rvrs` file execution and IR visualization  
+- ✅ Standard library merging (`stdlib.rvrs`)  
+- ✅ Test runners: `RunAll`, `RunIRTests`  
+- ✅ Flow return control + runtime error detection
 
 ---
 
@@ -70,47 +76,42 @@ flow computeTotal {
   mouth "start"
   echo total
 }
-````
-
-````Output:
+```
+```
 mouth: start  
 echo: 90.0
-````
+```
 
 🔮 What’s Flowing Next
 Coming soon to RVRS:
 
-- Type annotations on flow parameters (e.g. x: `Num`)
+⏳ Type checking for flow arguments
 
-- Flow selection and invocation by name (like `flow main`)
+⏳ Full expression-level type enforcement
 
-- Companion test flows for validation and simulation
+⏳ Better error messages + flow tracing
 
-- Better runtime error reporting and validation
+⏳ Companion test flows and simulations
 
-- Aiken backend compiler integration
+⏳ REPL mode (ritual scripting, live evaluation)
+
+⏳ Aiken backend compiler integration
 
 🎨 Design Philosophy
 RVRS is more than syntax. It’s a style of thinking.
 
 Ritual language and sacred geometry
 
-Readable, symbolic code with intent
+Symbolic, readable code with intent
 
 Calm aesthetic — designed for clarity and reflection
 
-Inspired by nature, myth, and meaning.
+Inspired by nature, myth, and meaning
 
----
+👤 Created by Carlos Javier Rivera
+Actor. Writer. Builder.
 
-## 👤 Created by Carlos Javier Rivera  
-*Actor. Writer. Builder.*
-
-<p align="center">
-  <a href="./dev-log.md">
-    <img src="https://img.shields.io/badge/Dev%20Log-View%20Here-blue?style=for-the-badge" alt="Dev Log Button"/>
-  </a>
-  
 - [GitHub: @cjrcoding](https://github.com/cjrcoding)  
 - [IMDb](https://www.imdb.com/name/nm7121880/)
 
+<p align="center"> <a href="./dev-log.md"> <img src="https://img.shields.io/badge/Dev%20Log-View%20Here-blue?style=for-the-badge" alt="Dev Log Button"/> </a> </p>
