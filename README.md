@@ -109,6 +109,7 @@ Calm aesthetic — designed for clarity and reflection
 Inspired by nature, myth, and meaning
 
 👤 Created by Carlos Javier Rivera
+
 Actor. Writer. Builder.
 
 - [GitHub: @cjrcoding](https://github.com/cjrcoding)  
