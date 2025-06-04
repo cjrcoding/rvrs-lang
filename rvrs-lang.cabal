@@ -36,6 +36,9 @@ executable rvrs
 
   default-language:    Haskell2010
 
+  default-extensions:
+    LambdaCase
+
 -- === Executable: RunAll ===
 executable RunAll
   main-is:             RunAll.hs
@@ -72,6 +75,9 @@ executable RunAll
 
   default-language:    Haskell2010
 
+  default-extensions:
+    LambdaCase
+
 -- === Executable: TestLower ===
 executable TestLower
   main-is:             TestLower.hs
@@ -104,6 +110,9 @@ executable TestLower
     , mtl
 
   default-language:    Haskell2010
+
+  default-extensions:
+    LambdaCase
 
 -- === Executable: RunIRTests ===
 executable RunIRTests
@@ -139,3 +148,6 @@ executable RunIRTests
     , mtl
 
   default-language:    Haskell2010
+
+  default-extensions:
+    LambdaCase
