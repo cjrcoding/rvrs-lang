@@ -1,0 +1,11 @@
+// Equivalent Aiken code (manually written for now)
+
+fn check_eligibility(age: Int) -> Bool {
+  if age >= 18 {
+    log("eligible")
+    true
+  } else {
+    log("not eligible")
+    false
+  }
+}

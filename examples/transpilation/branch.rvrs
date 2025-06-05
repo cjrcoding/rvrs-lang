@@ -1,0 +1,11 @@
+-- A basic conditional flow in RVRS
+
+flow checkEligibility(age) {
+  branch age >= 18 then {
+    mouth "eligible"
+    echo true
+  } else {
+    mouth "not eligible"
+    echo false
+  }
+}

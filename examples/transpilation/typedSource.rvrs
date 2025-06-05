@@ -1,0 +1,6 @@
+-- An example using a typed source declaration
+
+flow getGreeting(name) {
+  source message: Str = "Hello, " + name
+  echo message
+}
