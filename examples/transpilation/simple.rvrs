@@ -1,0 +1,6 @@
+-- A basic RVRS flow that doubles a number
+
+flow double(x) {
+  delta result = x + x
+  mouth result
+}

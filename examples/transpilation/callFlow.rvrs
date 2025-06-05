@@ -1,0 +1,11 @@
+-- A flow that squares a number by calling a doubling function
+
+flow double(x) {
+  delta result = x + x
+  echo result
+}
+
+flow squareByDouble(x) {
+  delta result = call double(x)
+  echo result
+}

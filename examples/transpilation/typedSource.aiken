@@ -1,0 +1,7 @@
+// Equivalent Aiken code (manually written for now)
+
+fn get_greeting(name: String) -> String {
+  let message: String = "Hello, " + name
+  message
+}
+

@@ -1,0 +1,11 @@
+// Equivalent Aiken code (manually written for now)
+
+fn double(x: Int) -> Int {
+  let result = x + x
+  result
+}
+
+fn square_by_double(x: Int) -> Int {
+  let result = double(x)
+  result
+}
