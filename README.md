@@ -82,7 +82,28 @@ mouth: start
 echo: 90.0
 ```
 
-🔮 What’s Flowing Next
+---
+
+### 🔁 Why Aiken First?
+
+
+RVRS is designed to compile into [Aiken](https://aiken-lang.org), a functional smart contract language for Cardano known for its strong typing and clean syntax.
+
+Why not compile directly to Plutus Core?
+
+- **Faster Development:** Aiken provides a modern, structured target that mirrors many of RVRS's core ideas.
+- **Safer Code:** Aiken handles type inference and safety checks, which RVRS can leverage during codegen.
+- **Readable Output:** Compiling to Aiken lets developers audit and learn from the generated contracts.
+- **Community-Backed:** Aiken has active tooling and a growing ecosystem—ideal for early RVRS users.
+
+Long-term, RVRS may support multiple backends (including direct Plutus Core). But Aiken offers the best foundation today.
+
+📂 See [`examples/transpilation`](./examples/transpilation) for hand-written example flows and their expected Aiken output.
+
+
+
+### 🔮 What’s Flowing Next
+
 Coming soon to RVRS:
 
 ⏳ Type checking for flow arguments
@@ -96,6 +117,9 @@ Coming soon to RVRS:
 ⏳ REPL mode (ritual scripting, live evaluation)
 
 ⏳ Aiken backend compiler integration
+
+---
+
 
 🎨 Design Philosophy
 RVRS is more than syntax. It’s a style of thinking.
