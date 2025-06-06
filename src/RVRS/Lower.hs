@@ -16,7 +16,7 @@ mergeAndLower flows =
 -- | Convert a full Flow into IR
 lowerFlow :: AST.Flow -> IR.FlowIR
 lowerFlow (AST.Flow name args body) =
-  IR.FlowIR name (map AST.argName args) (map lowerStmt body)
+  IR.FlowIR name (AST.argName <$> args) (lowerStmt <$> body)
 
 -- | Lower an AST Statement into IR
 lowerStmt :: AST.Statement -> IR.StmtIR
