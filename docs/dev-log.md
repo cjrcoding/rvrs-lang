@@ -83,7 +83,7 @@
 
 ---
 
-## 🧭 v0.5.0-alpha – Flow Arguments & Expression Calling  
+## 🧭 v0.5.0-alpha – Flow Arguments & Expr Calling  
 **📅 Date:** 2025-05-06  
 **🔖 Tag:** v0.5.0-alpha
 

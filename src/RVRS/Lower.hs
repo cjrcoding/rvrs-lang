@@ -33,21 +33,21 @@ lowerStmt stmt = case stmt of
   AST.Pillar name expr         -> IR.IRWhisper name (lowerExpr expr)  -- fallback
 
 -- | Lower an AST Expr into IR
-lowerExpr :: AST.Expr -> IR.ExprIR
+lowerExpr :: AST.Recursive AST.Expr -> IR.ExprIR
 lowerExpr expr = case expr of
-  AST.Var name         -> IR.IRVar name
-  AST.StrLit s         -> IR.IRStrLit s
-  AST.NumLit n         -> IR.IRNumLit n
-  AST.BoolLit b        -> IR.IRBoolLit b
-  AST.Add a b          -> IR.IRAdd (lowerExpr a) (lowerExpr b)
-  AST.Sub a b          -> IR.IRSub (lowerExpr a) (lowerExpr b)
-  AST.Mul a b          -> IR.IRMul (lowerExpr a) (lowerExpr b)
-  AST.Div a b          -> IR.IRDiv (lowerExpr a) (lowerExpr b)
-  AST.Neg e            -> IR.IRNeg (lowerExpr e)
-  AST.Not e            -> IR.IRNot (lowerExpr e)
-  AST.And a b          -> IR.IRAnd (lowerExpr a) (lowerExpr b)
-  AST.Or a b           -> IR.IROr  (lowerExpr a) (lowerExpr b)
-  AST.Equals a b       -> IR.IREquals (lowerExpr a) (lowerExpr b)
-  AST.GreaterThan a b  -> IR.IRGreaterThan (lowerExpr a) (lowerExpr b)
-  AST.LessThan a b     -> IR.IRLessThan (lowerExpr a) (lowerExpr b)
-  AST.CallExpr name es -> IR.IRCallExpr name (map lowerExpr es)
+  AST.Recursive (AST.Var name)         -> IR.IRVar name
+  AST.Recursive (AST.StrLit s)         -> IR.IRStrLit s
+  AST.Recursive (AST.NumLit n)         -> IR.IRNumLit n
+  AST.Recursive (AST.BoolLit b)        -> IR.IRBoolLit b
+  AST.Recursive (AST.Add a b)          -> IR.IRAdd (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.Sub a b)          -> IR.IRSub (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.Mul a b)          -> IR.IRMul (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.Div a b)          -> IR.IRDiv (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.Neg e)            -> IR.IRNeg (lowerExpr e)
+  AST.Recursive (AST.Not e)            -> IR.IRNot (lowerExpr e)
+  AST.Recursive (AST.And a b)          -> IR.IRAnd (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.Or a b)           -> IR.IROr  (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.Equals a b)       -> IR.IREquals (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.GreaterThan a b)  -> IR.IRGreaterThan (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.LessThan a b)     -> IR.IRLessThan (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.CallExpr name es) -> IR.IRCallExpr name (map lowerExpr es)
