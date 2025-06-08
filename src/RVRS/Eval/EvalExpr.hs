@@ -21,7 +21,7 @@ binOp op a b = (,) <$> evalIRExpr a <*> evalIRExpr b >>= \case
   _ -> throwError $ RuntimeError "Type error in arithmetic operation"
 
 evalIRExpr :: Recursive Expression -> EvalIR Value
-evalIRExpr Expression = case Expression of
+evalIRExpr expr = case expr of
   Recursive (NumLit n)  -> return $ VNum n
   Recursive (StrLit s)  -> return $ VStr s
   Recursive (BoolLit b) -> return $ VBool b
@@ -87,13 +87,13 @@ evalIRExpr Expression = case Expression of
 
 evalIRStmt :: StmtIR -> EvalIR (Maybe Value)
 evalIRStmt stmt = case stmt of
-  IREcho Expression -> do
-    val <- evalIRExpr Expression
+  IREcho expr -> do
+    val <- evalIRExpr expr
     liftIO $ putStrLn ("echo: " ++ show val)
     return Nothing
 
-  IRWhisper label Expression -> do
-    val <- evalIRExpr Expression
+  IRWhisper label expr -> do
+    val <- evalIRExpr expr
     liftIO $ putStrLn ("→ whisper: " ++ label ++ " = " ++ show val)
     return Nothing
 
@@ -103,14 +103,14 @@ evalIRStmt stmt = case stmt of
       Just (FlowIR _ params body) ->
         Nothing <$ do for args evalIRExpr >>= callBody body . Map.fromList . zip params
 
-  IRReturn Expression ->
-    Just <$> evalIRExpr Expression
+  IRReturn expr ->
+    Just <$> evalIRExpr expr
 
-  IRMouth Expression ->
-    Nothing <$ do evalIRExpr Expression >>= liftIO . putStrLn . ("mouth: " ++) . show
+  IRMouth expr ->
+    Nothing <$ do evalIRExpr expr >>= liftIO . putStrLn . ("mouth: " ++) . show
 
-  IRAssert Expression ->
-    evalIRExpr Expression >>= \case
+  IRAssert expr ->
+    evalIRExpr expr >>= \case
       VBool True  -> return Nothing
       VBool False -> throwError $ RuntimeError "Assertion failed"
       _           -> throwError $ RuntimeError "Assert expects boolean"
@@ -121,12 +121,12 @@ evalIRStmt stmt = case stmt of
       VBool False -> evalBody eBlock
       _ -> throwError $ RuntimeError "Condition must be boolean"
 
-  IRDelta name Expression _mType ->
-    Nothing <$ (evalIRExpr Expression >>= modify . Map.insert name)
+  IRDelta name expr _mType ->
+    Nothing <$ (evalIRExpr expr >>= modify . Map.insert name)
 
-  IRSource name Expression _mType ->
+  IRSource name expr _mType ->
     Map.lookup name <$> get >>= \case
-      Nothing -> Nothing <$ do evalIRExpr Expression >>= modify . Map.insert name
+      Nothing -> Nothing <$ do evalIRExpr expr >>= modify . Map.insert name
       Just _  -> throwError . RuntimeError $ "Variable '" ++ name ++ "' already defined"
 
 callBody :: [StmtIR] -> ValueEnv -> EvalIR (Maybe Value, ValueEnv)

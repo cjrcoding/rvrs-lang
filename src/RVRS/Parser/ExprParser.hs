@@ -8,7 +8,7 @@ import RVRS.Utils
 
 -- External libraries
 import Control.Monad (void)
-import Control.Monad.Combinators.Expression
+import Control.Monad.Combinators.Expr
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char

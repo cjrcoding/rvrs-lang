@@ -3,7 +3,7 @@ module RVRS.Pretty (prettyExpr) where
 import RVRS.AST
 
 prettyExpr :: Recursive Expression -> String
-prettyExpr Expression = case Expression of
+prettyExpr expr = case expr of
   Recursive (NumLit n) -> show n
   Recursive (BoolLit True) -> "truth"
   Recursive (BoolLit False) -> "void"

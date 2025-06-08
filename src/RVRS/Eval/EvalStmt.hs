@@ -20,13 +20,13 @@ isolate action =
 -- Statement evaluator
 evalIRStmt :: StmtIR -> EvalIR (Maybe Value)
 evalIRStmt stmt = case stmt of
-  IREcho Expression -> do
-    val <- evalIRExpr Expression
+  IREcho expr -> do
+    val <- evalIRExpr expr
     liftIO $ putStrLn ("echo: " ++ show val)
     return Nothing
 
-  IRWhisper label Expression -> do
-    val <- evalIRExpr Expression
+  IRWhisper label expr -> do
+    val <- evalIRExpr expr
     liftIO $ putStrLn ("→ whisper: " ++ label ++ " = " ++ show val)
     return Nothing
 
@@ -38,16 +38,16 @@ evalIRStmt stmt = case stmt of
       Just (FlowIR _ params body) ->
         Nothing <$ do for args evalIRExpr >>= lift . lift . runStateT (runReaderT (evalBody body) flowMap) . Map.fromList . zip params
 
-  IRReturn Expression ->
-    Just <$> evalIRExpr Expression
+  IRReturn expr ->
+    Just <$> evalIRExpr expr
 
-  IRMouth Expression -> do
-    val <- evalIRExpr Expression
+  IRMouth expr -> do
+    val <- evalIRExpr expr
     liftIO $ putStrLn ("mouth: " ++ show val)
     return Nothing
 
-  IRAssert Expression ->
-    evalIRExpr Expression >>= \case
+  IRAssert expr ->
+    evalIRExpr expr >>= \case
       VBool True  -> return Nothing
       VBool False -> throwError $ RuntimeError "Assertion failed"
       _           -> throwError $ RuntimeError "Assert expects boolean"
@@ -58,10 +58,10 @@ evalIRStmt stmt = case stmt of
       VBool False -> isolate (evalBody eBlock)
       _           -> throwError $ RuntimeError "Condition must be boolean"
 
-  IRDelta name Expression _mType ->
-    Nothing <$ do evalIRExpr Expression >>= modify . Map.insert name
+  IRDelta name expr _mType ->
+    Nothing <$ do evalIRExpr expr >>= modify . Map.insert name
 
-  IRSource name Expression _mType -> do
+  IRSource name expr _mType -> do
     Map.lookup name <$> get >>= \case
-      Nothing -> Nothing <$ do evalIRExpr Expression >>= modify . Map.insert name
+      Nothing -> Nothing <$ do evalIRExpr expr >>= modify . Map.insert name
       Just _  -> throwError $ RuntimeError ("Variable '" ++ name ++ "' already defined")
