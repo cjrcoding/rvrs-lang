@@ -28,125 +28,63 @@ statementParser = choice
   , try bareCallStmt
   ]
 
-
 -- Individual statement parsers
 
 whisperParser :: Parser Statement
-whisperParser = do
-  _ <- symbol "whisper"
-  expr <- exprParser
-  return $ Whisper expr
+whisperParser = symbol "whisper" *> do Whisper <$> exprParser
 
 assertParser :: Parser Statement
-assertParser = do
-  _ <- symbol "assert"
-  expr <- exprParser
-  return $ Assert expr
+assertParser = symbol "assert" *> do Assert <$> exprParser
 
 mouthParser :: Parser Statement
-mouthParser = do
-  _ <- symbol "mouth"
-  expr <- exprParser
-  return $ Mouth expr
+mouthParser = symbol "mouth" *> do Mouth <$> exprParser
 
 echoParser :: Parser Statement
-echoParser = do
-  _ <- symbol "echo"
-  expr <- exprParser
-  return $ Echo expr
+echoParser = symbol "echo" *> do Echo <$> exprParser
 
 speaksParser :: Parser Statement
-speaksParser = do
-  symbol "speaks"
-  expr <- exprParser
-  return $ Echo expr
-
+speaksParser = symbol "speaks" *> do Echo <$> exprParser
 
 sourceParser :: Parser Statement
-sourceParser = try typedSource <|> untypedSource
-
-typedSource :: Parser Statement
-typedSource = do
-  _ <- symbol "source"
-  var <- identifier
-  _ <- symbol ":"
-  typ <- typeParser
-  _ <- symbol "="
-  expr <- exprParser
-  return $ Source var (Just typ) expr
-
-untypedSource :: Parser Statement
-untypedSource = do
-  _ <- symbol "source"
-  var <- identifier
-  _ <- symbol "="
-  expr <- exprParser
-  return $ Source var Nothing expr
-
-
-
+sourceParser = Source
+  <$> do symbol "source" *> identifier
+  -- TODO: there is actually a better way to describe it
+  <*> do try (symbol ":" *> (Just <$> typeParser)) <|> pure Nothing
+  <*> do symbol "=" *> exprParser
 
 bareCallStmt :: Parser Statement
-bareCallStmt = do
-  name <- identifier
-  args <- between (symbol "(") (symbol ")") (exprParser `sepBy` symbol ",")
-  return $ Call name args
-
+bareCallStmt = Call
+  <$> identifier
+  <*> between (symbol "(") (symbol ")") (exprParser `sepBy` symbol ",")
 
 -- Delta parser supporting both typed and untyped declarations
-
 deltaParser :: Parser Statement
-deltaParser = try typedDelta <|> try equalsDelta
-
-typedDelta :: Parser Statement
-typedDelta = do
-  _ <- symbol "delta"
-  var <- identifier
-  _ <- symbol ":"
-  typ <- typeParser
-  _ <- symbol "="
-  expr <- exprParser
-  return $ Delta var (Just typ) expr
-
-equalsDelta :: Parser Statement
-equalsDelta = do
-  _ <- symbol "delta"
-  var <- identifier
-  _ <- symbol "="
-  expr <- exprParser
-  return $ Delta var Nothing expr
+deltaParser = Delta
+  <$> do symbol "delta" *> identifier
+  <*> do try (symbol ":" *> do Just <$> typeParser) <|> pure Nothing
+  <*> do symbol "=" *> exprParser
 
 pillarParser :: Parser Statement
-pillarParser = do
-  _ <- symbol "pillar"
-  var <- identifier
-  _ <- symbol "="
-  expr <- exprParser
-  return $ Pillar var expr
+pillarParser = Pillar
+  <$> do symbol "pillar" *> identifier
+  <*> do symbol "=" *> exprParser
 
 returnParser :: Parser Statement
-returnParser = do
-  _ <- symbol "return"
-  expr <- exprParser
-  return $ Return expr
+returnParser = Return <$> do symbol "return" *> exprParser
 
 branchParser :: Parser Statement
-branchParser = do
-  _ <- symbol "branch"
-  cond <- exprParser
-  thenBlock <- sc *> blockParser
-  elseBlock <- optional (try (sc *> symbol "else" *> sc *> blockParser))
-  return $ Branch cond thenBlock (maybe [] id elseBlock)
+branchParser = Branch
+  <$> do symbol "branch" *> exprParser
+  <*> do sc *> blockParser
+  <*> do maybe [] id <$> do optional . try $ sc *> symbol "else" *> sc *> blockParser
 
 blockParser :: Parser [Statement]
 blockParser = between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc))
 
 callStmt :: Parser Statement
-callStmt = do
-  _ <- symbol "call"
-  name <- identifier
-  args <- option [] (parens (exprParser `sepBy` symbol ","))
-  return $ Call name args
+callStmt = Call
+  <$> do symbol "call" *> identifier
+  <*> do option [] . parens $ exprParser `sepBy` symbol ","
 
 -- Shared utilities
 

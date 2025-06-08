@@ -24,15 +24,15 @@ exprParser = makeExprParser term operatorTable
 -- Operator precedence table
 operatorTable :: [[Operator Parser (Recursive Expr)]]
 operatorTable =
-  [ [ InfixL ((Recursive <$$> Mul) <$ symbol "*")
-    , InfixL ((Recursive <$$> Div) <$ symbol "/")
+  [ [ InfixL (Recursive <$$> Mul <$ symbol "*")
+    , InfixL (Recursive <$$> Div <$ symbol "/")
     ]
-  , [ InfixL ((Recursive <$$> Add) <$ symbol "+")
-    , InfixL ((Recursive <$$> Sub) <$ symbol "-")
+  , [ InfixL (Recursive <$$> Add <$ symbol "+")
+    , InfixL (Recursive <$$> Sub <$ symbol "-")
     ]
-  , [ InfixN ((Recursive <$$> Equals)      <$ symbol "==")
-    , InfixN ((Recursive <$$> GreaterThan) <$ symbol ">")
-    , InfixN ((Recursive <$$> LessThan)    <$ symbol "<")
+  , [ InfixN (Recursive <$$> Equals      <$ symbol "==")
+    , InfixN (Recursive <$$> GreaterThan <$ symbol ">")
+    , InfixN (Recursive <$$> LessThan    <$ symbol "<")
     ]
   , [ InfixL ((Recursive <$$> And) <$ symbol "and")
     , InfixL ((Recursive <$$> Or)  <$ symbol "or")
@@ -41,29 +41,23 @@ operatorTable =
 
 -- Terms in the expression grammar
 term :: Parser (Recursive Expr)
-term =
-      try funcCallExpr
-  <|> try (Recursive (BoolLit True) <$ symbol "truth")
-  <|> try (Recursive (BoolLit False) <$ symbol "void")
-  <|> try (Recursive . StrLit <$> stringLiteral)
-  <|> try parseNumber
-  <|> try (Recursive . Not <$> (symbol "not" *> term))
-  <|> try (Recursive . Neg <$> (symbol "-" *> term))
-  <|> try (parens exprParser)
-  <|> Recursive . Var <$> identifier
+term = do try $ funcCallExpr
+   <|> do try $ Recursive (BoolLit True) <$ symbol "truth"
+   <|> do try $ Recursive (BoolLit False) <$ symbol "void"
+   <|> do try $ Recursive . StrLit <$> stringLiteral
+   <|> do try $ parseNumber
+   <|> do try $ Recursive . Not <$> (symbol "not" *> term)
+   <|> do try $ Recursive . Neg <$> (symbol "-" *> term)
+   <|> do try $ parens exprParser
+   <|> Recursive . Var <$> identifier
 
 -- Parse numeric literals
 parseNumber :: Parser (Recursive Expr)
-parseNumber = do
-  num <- lexeme $ try L.float <|> (fromInteger <$> L.decimal)
-  return $ Recursive (NumLit num)
+parseNumber = Recursive <$> NumLit <$> do lexeme $ try L.float <|> fromInteger <$> L.decimal
 
 -- Function call expressions (e.g., fuse(2, 3))
 funcCallExpr :: Parser (Recursive Expr)
-funcCallExpr = do
-  funcName <- identifier
-  args <- parens (exprParser `sepBy` symbol ",")
-  return $ Recursive (CallExpr funcName args)
+funcCallExpr = Recursive <$$> CallExpr <$> identifier <*> parens (exprParser `sepBy` symbol ",")
 
 -- Utility parsers
 lexeme :: Parser a -> Parser a
