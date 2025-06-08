@@ -58,3 +58,47 @@ newtype Recursive f = Recursive { unfix :: f (Recursive f) }
 
 deriving instance (Eq (f (Recursive f))) => Eq (Recursive f)
 deriving instance (Show (f (Recursive f))) => Show (Recursive f)
+
+-- | Intermediate representation of a flow
+data FlowIR = FlowIR
+  { flowNameIR :: String
+  , flowArgsIR :: [String]
+  , flowBodyIR :: [StmtIR]
+  } deriving (Show, Eq)
+
+-- | Lowered statements (IR version of AST Statement)
+data StmtIR
+  = IRDelta String ExprIR (Maybe RVRSType)
+  | IRSource String ExprIR (Maybe RVRSType)
+  | IREcho ExprIR
+  | IRWhisper String ExprIR
+  | IRMouth ExprIR
+  | IRBranch ExprIR [StmtIR] [StmtIR]
+  | IRReturn ExprIR
+  | IRCallStmt String [ExprIR]  -- Top-level statement like: call foo(x, y)
+  | IRAssert ExprIR
+  deriving (Show, Eq)
+
+-- | Core IR expressions
+data ExprIR
+  = IRVar String
+  | IRStrLit String
+  | IRNumLit Double
+  | IRBoolLit Bool
+
+  -- Unary & binary ops
+  | IRAdd ExprIR ExprIR
+  | IRSub ExprIR ExprIR
+  | IRMul ExprIR ExprIR
+  | IRDiv ExprIR ExprIR
+  | IRNeg ExprIR
+  | IRNot ExprIR
+  | IRAnd ExprIR ExprIR
+  | IROr  ExprIR ExprIR
+  | IREquals ExprIR ExprIR
+  | IRGreaterThan ExprIR ExprIR
+  | IRLessThan ExprIR ExprIR
+
+  -- Function call within an expression: foo(x, y)
+  | IRCallExpr String [ExprIR]
+  deriving (Show, Eq)

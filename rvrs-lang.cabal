@@ -21,7 +21,6 @@ executable rvrs
     , RVRS.Eval.Types
     , RVRS.Pretty
     , RVRS.Value
-    , RVRS.IR
     , RVRS.Lower
     , RVRS.Env
     , RVRS.Utils
@@ -58,7 +57,6 @@ executable RunAll
     , RVRS.Eval.Types
     , RVRS.Pretty
     , RVRS.Value
-    , RVRS.IR
     , RVRS.Lower
     , RVRS.Env
     , RVRS.Utils
@@ -98,7 +96,6 @@ executable TestLower
     , RVRS.Eval.Types
     , RVRS.Pretty
     , RVRS.Value
-    , RVRS.IR
     , RVRS.Lower
     , RVRS.Env
     , RVRS.Utils
@@ -135,7 +132,6 @@ executable RunIRTests
     , RVRS.Eval.Types
     , RVRS.Pretty
     , RVRS.Value
-    , RVRS.IR
     , RVRS.Lower
     , RVRS.Env
     , RVRS.Utils

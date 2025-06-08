@@ -3,51 +3,50 @@
 module RVRS.Lower (lowerFlow, mergeAndLower) where
 
 import qualified RVRS.AST as AST
-import qualified RVRS.IR as IR
 import qualified Data.Map as M
 
 -- | Lower a list of flows into a FlowEnv (Map of flow names to FlowIRs)
-mergeAndLower :: [AST.Flow] -> M.Map String IR.FlowIR
+mergeAndLower :: [AST.Flow] -> M.Map String AST.FlowIR
 mergeAndLower flows =
-  let lowered = map lowerFlow flows
-      names = map AST.flowName flows
-  in M.fromList (zip names lowered)
+  M.fromList $ zip
+    (AST.flowName <$> flows) 
+    (lowerFlow <$> flows)
 
 -- | Convert a full Flow into IR
-lowerFlow :: AST.Flow -> IR.FlowIR
+lowerFlow :: AST.Flow -> AST.FlowIR
 lowerFlow (AST.Flow name args body) =
-  IR.FlowIR name (AST.argName <$> args) (lowerStmt <$> body)
+  AST.FlowIR name (AST.argName <$> args) (lowerStmt <$> body)
 
 -- | Lower an AST Statement into IR
-lowerStmt :: AST.Statement -> IR.StmtIR
+lowerStmt :: AST.Statement -> AST.StmtIR
 lowerStmt stmt = case stmt of
-  AST.Delta name mAnn expr     -> IR.IRDelta name (lowerExpr expr) mAnn
-  AST.Source name mAnn expr    -> IR.IRSource name (lowerExpr expr) mAnn
-  AST.Echo expr                -> IR.IREcho (lowerExpr expr)
-  AST.Whisper expr             -> IR.IRWhisper "unnamed" (lowerExpr expr)
-  AST.Mouth expr               -> IR.IRMouth (lowerExpr expr)
-  AST.Branch cond t f          -> IR.IRBranch (lowerExpr cond) (map lowerStmt t) (map lowerStmt f)
-  AST.Return expr              -> IR.IRReturn (lowerExpr expr)
-  AST.Call name args           -> IR.IRCallStmt name (map lowerExpr args)
-  AST.Assert expr              -> IR.IRAssert (lowerExpr expr)
-  AST.Pillar name expr         -> IR.IRWhisper name (lowerExpr expr)  -- fallback
+  AST.Delta name mAnn expr     -> AST.IRDelta name (lowerExpr expr) mAnn
+  AST.Source name mAnn expr    -> AST.IRSource name (lowerExpr expr) mAnn
+  AST.Echo expr                -> AST.IREcho (lowerExpr expr)
+  AST.Whisper expr             -> AST.IRWhisper "unnamed" (lowerExpr expr)
+  AST.Mouth expr               -> AST.IRMouth (lowerExpr expr)
+  AST.Branch cond t f          -> AST.IRBranch (lowerExpr cond) (map lowerStmt t) (map lowerStmt f)
+  AST.Return expr              -> AST.IRReturn (lowerExpr expr)
+  AST.Call name args           -> AST.IRCallStmt name (map lowerExpr args)
+  AST.Assert expr              -> AST.IRAssert (lowerExpr expr)
+  AST.Pillar name expr         -> AST.IRWhisper name (lowerExpr expr)  -- fallback
 
 -- | Lower an AST Expr into IR
-lowerExpr :: AST.Recursive AST.Expr -> IR.ExprIR
+lowerExpr :: AST.Recursive AST.Expr -> AST.ExprIR
 lowerExpr expr = case expr of
-  AST.Recursive (AST.Var name)         -> IR.IRVar name
-  AST.Recursive (AST.StrLit s)         -> IR.IRStrLit s
-  AST.Recursive (AST.NumLit n)         -> IR.IRNumLit n
-  AST.Recursive (AST.BoolLit b)        -> IR.IRBoolLit b
-  AST.Recursive (AST.Add a b)          -> IR.IRAdd (lowerExpr a) (lowerExpr b)
-  AST.Recursive (AST.Sub a b)          -> IR.IRSub (lowerExpr a) (lowerExpr b)
-  AST.Recursive (AST.Mul a b)          -> IR.IRMul (lowerExpr a) (lowerExpr b)
-  AST.Recursive (AST.Div a b)          -> IR.IRDiv (lowerExpr a) (lowerExpr b)
-  AST.Recursive (AST.Neg e)            -> IR.IRNeg (lowerExpr e)
-  AST.Recursive (AST.Not e)            -> IR.IRNot (lowerExpr e)
-  AST.Recursive (AST.And a b)          -> IR.IRAnd (lowerExpr a) (lowerExpr b)
-  AST.Recursive (AST.Or a b)           -> IR.IROr  (lowerExpr a) (lowerExpr b)
-  AST.Recursive (AST.Equals a b)       -> IR.IREquals (lowerExpr a) (lowerExpr b)
-  AST.Recursive (AST.GreaterThan a b)  -> IR.IRGreaterThan (lowerExpr a) (lowerExpr b)
-  AST.Recursive (AST.LessThan a b)     -> IR.IRLessThan (lowerExpr a) (lowerExpr b)
-  AST.Recursive (AST.CallExpr name es) -> IR.IRCallExpr name (map lowerExpr es)
+  AST.Recursive (AST.Var name)         -> AST.IRVar name
+  AST.Recursive (AST.StrLit s)         -> AST.IRStrLit s
+  AST.Recursive (AST.NumLit n)         -> AST.IRNumLit n
+  AST.Recursive (AST.BoolLit b)        -> AST.IRBoolLit b
+  AST.Recursive (AST.Add a b)          -> AST.IRAdd (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.Sub a b)          -> AST.IRSub (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.Mul a b)          -> AST.IRMul (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.Div a b)          -> AST.IRDiv (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.Neg e)            -> AST.IRNeg (lowerExpr e)
+  AST.Recursive (AST.Not e)            -> AST.IRNot (lowerExpr e)
+  AST.Recursive (AST.And a b)          -> AST.IRAnd (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.Or a b)           -> AST.IROr  (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.Equals a b)       -> AST.IREquals (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.GreaterThan a b)  -> AST.IRGreaterThan (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.LessThan a b)     -> AST.IRLessThan (lowerExpr a) (lowerExpr b)
+  AST.Recursive (AST.CallExpr name es) -> AST.IRCallExpr name (map lowerExpr es)

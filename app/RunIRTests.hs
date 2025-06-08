@@ -6,7 +6,6 @@ import RVRS.Lower (lowerFlow)
 import RVRS.Eval (evalIRFlow, EvalError)
 import RVRS.Value (Value(..))
 import qualified RVRS.AST as AST
-import qualified RVRS.IR as IR
 
 -- System / standard libraries
 import System.Directory (listDirectory)
@@ -49,7 +48,7 @@ runIRTest file = do
       return (if expectedFail then ExpectedFailCorrect else Failed)
     Right flows -> do
       let loweredFlows = map lowerFlow flows
-      let flowMap = Map.fromList [(IR.flowName f, f) | f <- loweredFlows]
+      let flowMap = Map.fromList [(AST.flowNameIR f, f) | f <- loweredFlows]
       case lookupMain loweredFlows of
         Nothing -> do
           putStrLn "❌ No 'main' flow found."
@@ -58,7 +57,7 @@ runIRTest file = do
           putStrLn "✅ Lowered IR:"
           print mainFlow
           putStrLn "🔁 Evaluation Output:"
-          result <- try (evalIRFlow flowMap (IR.flowName mainFlow) []) :: IO (Either SomeException (Either EvalError (Maybe Value)))
+          result <- try (evalIRFlow flowMap (AST.flowNameIR mainFlow) []) :: IO (Either SomeException (Either EvalError (Maybe Value)))
 
           case result of
             Left ex -> do
@@ -73,8 +72,8 @@ runIRTest file = do
                 Nothing -> putStrLn "✅ Flow completed without explicit return"
               return (if expectedFail then ExpectedFailMismatch else Passed)
 
-lookupMain :: [IR.FlowIR] -> Maybe IR.FlowIR
-lookupMain = find (\f -> IR.flowName f == "main")
+lookupMain :: [AST.FlowIR] -> Maybe AST.FlowIR
+lookupMain = find (\f -> AST.flowNameIR f == "main")
 
 summarize :: [TestResult] -> IO ()
 summarize results = do

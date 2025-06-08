@@ -1,6 +1,5 @@
 module RVRS.Eval.EvalFlow (evalIRFlow, runEvalIR, EvalError(..)) where
-
-import RVRS.IR
+import RVRS.AST (StmtIR (..), ExprIR (..), FlowIR (..))
 import RVRS.Utils
 import RVRS.Value (Value(..))
 import RVRS.Eval.EvalExpr (evalBody)

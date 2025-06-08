@@ -8,7 +8,7 @@ import Control.Monad.Except
 import Control.Monad.State
 import Control.Monad.Reader
 import qualified Data.Map as Map
-import RVRS.IR (FlowIR)
+import RVRS.AST (FlowIR)
 
 type Env     = Map.Map String Value
 type FlowEnv = Map.Map String FlowIR

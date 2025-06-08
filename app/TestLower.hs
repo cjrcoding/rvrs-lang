@@ -6,7 +6,7 @@ import RVRS.Lower (mergeAndLower)
 import RVRS.Eval (evalIRFlow)
 import RVRS.Value (Value(..))
 import qualified RVRS.AST as AST
-import qualified RVRS.IR as IR
+-- import qualified RVRS.IR as IR
 
 -- 📦 System / Standard Libraries
 import System.Environment (getArgs)

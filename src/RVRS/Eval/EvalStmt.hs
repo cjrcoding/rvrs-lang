@@ -1,9 +1,9 @@
 module RVRS.Eval.EvalStmt (evalIRStmt) where
 
-import RVRS.IR
 import RVRS.Value (Value(..))
 import RVRS.Eval.EvalExpr (evalIRExpr, evalBody)
 import RVRS.Eval.Types (EvalIR, EvalError(..))
+import RVRS.AST (StmtIR (..), ExprIR (..), FlowIR (..))
 
 import qualified Data.Map as Map
 import Control.Monad.Except
