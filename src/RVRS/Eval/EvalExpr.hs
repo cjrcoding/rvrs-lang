@@ -1,6 +1,6 @@
 module RVRS.Eval.EvalExpr (evalIRExpr, evalBody) where
 
-import RVRS.AST (ExprIR(..), StmtIR(..), FlowIR(..))
+import RVRS.AST (Recursive (..), Expr(..), StmtIR(..), FlowIR(..))
 import RVRS.Value (Value(..)) 
 import RVRS.Eval.Types (EvalIR, EvalError(..), FlowEnv)
 import RVRS.Env (ValueEnv)
@@ -15,65 +15,65 @@ import Data.Traversable
 
 -- Evaluate expressions
 
-binOp :: (Double -> Double -> Double) -> ExprIR -> ExprIR -> EvalIR Value
+binOp :: (Double -> Double -> Double) -> Recursive Expr -> Recursive Expr -> EvalIR Value
 binOp op a b = (,) <$> evalIRExpr a <*> evalIRExpr b >>= \case
   (VNum n1, VNum n2) -> return $ VNum (op n1 n2)
   _ -> throwError $ RuntimeError "Type error in arithmetic operation"
 
-evalIRExpr :: ExprIR -> EvalIR Value
+evalIRExpr :: Recursive Expr -> EvalIR Value
 evalIRExpr expr = case expr of
-  IRNumLit n  -> return $ VNum n
-  IRStrLit s  -> return $ VStr s
-  IRBoolLit b -> return $ VBool b
+  Recursive (NumLit n)  -> return $ VNum n
+  Recursive (StrLit s)  -> return $ VStr s
+  Recursive (BoolLit b) -> return $ VBool b
 
-  IRVar name ->
+  Recursive (Var name) ->
     Map.lookup name <$> get
       >>= maybe (throwError . RuntimeError $ "Unbound variable: " ++ name) pure
 
-  IRAdd a b -> binOp (+) a b
-  IRSub a b -> binOp (-) a b
-  IRMul a b -> binOp (*) a b
+  Recursive (Add a b) -> binOp (+) a b
+  Recursive (Sub a b) -> binOp (-) a b
+  Recursive (Mul a b) -> binOp (*) a b
 
-  IRDiv a b ->
+  Recursive (Div a b) ->
     (,) <$> evalIRExpr a <*> evalIRExpr b >>= \case
       (VNum _, VNum 0)   -> throwError $ RuntimeError "Division by zero"
       (VNum n1, VNum n2) -> return $ VNum (n1 / n2)
       _                  -> throwError $ RuntimeError "Type error in division"
 
-  IRNeg e ->
+  Recursive (Neg e) ->
     evalIRExpr e >>= \case
       VNum n -> return $ VNum (-n)
       _      -> throwError $ RuntimeError "Negation requires number"
 
-  IRNot e ->
+  Recursive (Not e) ->
     evalIRExpr e >>= \case
       VBool b -> return $ VBool (not b)
       _       -> throwError $ RuntimeError "Expected boolean in 'not'"
 
-  IREquals a b ->
+  Recursive (Equals a b) ->
     VBool <$> ((==) <$> evalIRExpr a <*> evalIRExpr b)
 
-  IRGreaterThan a b ->
+  Recursive (GreaterThan a b) ->
     (,) <$> evalIRExpr a <*> evalIRExpr b >>= \case
       (VNum n1, VNum n2) -> return $ VBool (n1 > n2)
       _ -> throwError $ RuntimeError "> requires numeric values"
 
-  IRLessThan a b ->
+  Recursive (LessThan a b) ->
     (,) <$> evalIRExpr a <*> evalIRExpr b >>= \case
       (VNum n1, VNum n2) -> return $ VBool (n1 < n2)
       _ -> throwError $ RuntimeError "< requires numeric values"
 
-  IRAnd a b ->
+  Recursive (And a b) ->
     (,) <$> evalIRExpr a <*> evalIRExpr b >>= \case
       (VBool b1, VBool b2) -> return $ VBool (b1 && b2)
       _ -> throwError $ RuntimeError "and requires booleans"
 
-  IROr a b ->
+  Recursive (Or a b) ->
     (,) <$> evalIRExpr a <*> evalIRExpr b >>= \case
       (VBool b1, VBool b2) -> return $ VBool (b1 || b2)
       _ -> throwError $ RuntimeError "or requires booleans"
 
-  IRCallExpr name args -> do
+  Recursive (CallExpr name args) -> do
     fsenv <- ask
     case Map.lookup name fsenv of
       Nothing -> throwError $ RuntimeError ("Unknown function: " ++ name)
