@@ -25,14 +25,14 @@ genStmt stmt = case stmt of
     ["}"]
 
 -- | Convert an expression into Aiken-compatible syntax
-genExpr :: Expr -> String
+genExpr :: Recursive Expr -> String
 genExpr expr = case expr of
-  Var x         -> x
-  StrLit s      -> show s
-  BoolLit True  -> "true"
-  BoolLit False -> "false"
-  Equals a b    -> genExpr a ++ " == " ++ genExpr b
-  
+  Recursive (Var x)         -> x
+  Recursive (StrLit s)      -> show s
+  Recursive (BoolLit True)  -> "true"
+  Recursive (BoolLit False) -> "false"
+  Recursive (Equals a b)    -> genExpr a ++ " == " ++ genExpr b
+
 
 -- | Render a function argument
 renderArg :: Argument -> String

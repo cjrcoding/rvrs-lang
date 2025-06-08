@@ -49,7 +49,7 @@ flow returnInsideBranch {
 }
 
 
--- 🧠 Expression, Logic, and Math
+-- 🧠 Expr, Logic, and Math
 
 flow expressionTest() {
   source x = 10 + 2 * 5 - 3 / 3
