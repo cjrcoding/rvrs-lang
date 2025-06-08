@@ -7,7 +7,7 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 import Control.Monad (void)
-import Control.Monad.Combinators.Expr
+import Control.Monad.Combinators.Expression
 import Data.Void
 import Data.Char (isAlphaNum)
 

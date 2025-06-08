@@ -20,13 +20,13 @@ lowerFlow (AST.Flow name args body) =
 -- | Lower an AST Statement into IR
 lowerStmt :: AST.Statement -> AST.StmtIR
 lowerStmt stmt = case stmt of
-  AST.Delta name mAnn expr     -> AST.IRDelta name expr mAnn
-  AST.Source name mAnn expr    -> AST.IRSource name expr mAnn
-  AST.Echo expr                -> AST.IREcho expr
-  AST.Whisper expr             -> AST.IRWhisper "unnamed" expr
-  AST.Mouth expr               -> AST.IRMouth expr
+  AST.Delta name mAnn Expression     -> AST.IRDelta name Expression mAnn
+  AST.Source name mAnn Expression    -> AST.IRSource name Expression mAnn
+  AST.Echo Expression                -> AST.IREcho Expression
+  AST.Whisper Expression             -> AST.IRWhisper "unnamed" Expression
+  AST.Mouth Expression               -> AST.IRMouth Expression
   AST.Branch cond t f          -> AST.IRBranch cond (map lowerStmt t) (map lowerStmt f)
-  AST.Return expr              -> AST.IRReturn expr
+  AST.Return Expression              -> AST.IRReturn Expression
   AST.Call name args           -> AST.IRCallStmt name args
-  AST.Assert expr              -> AST.IRAssert expr
-  AST.Pillar name expr         -> AST.IRWhisper name expr  -- fallback
+  AST.Assert Expression              -> AST.IRAssert Expression
+  AST.Pillar name Expression         -> AST.IRWhisper name Expression  -- fallback

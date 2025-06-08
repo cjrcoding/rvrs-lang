@@ -1,6 +1,6 @@
 module RVRS.Eval.EvalExpr (evalIRExpr, evalBody) where
 
-import RVRS.AST (Recursive (..), Expr(..), StmtIR(..), FlowIR(..))
+import RVRS.AST (Recursive (..), Expression(..), StmtIR(..), FlowIR(..))
 import RVRS.Value (Value(..)) 
 import RVRS.Eval.Types (EvalIR, EvalError(..), FlowEnv)
 import RVRS.Env (ValueEnv)
@@ -15,13 +15,13 @@ import Data.Traversable
 
 -- Evaluate expressions
 
-binOp :: (Double -> Double -> Double) -> Recursive Expr -> Recursive Expr -> EvalIR Value
+binOp :: (Double -> Double -> Double) -> Recursive Expression -> Recursive Expression -> EvalIR Value
 binOp op a b = (,) <$> evalIRExpr a <*> evalIRExpr b >>= \case
   (VNum n1, VNum n2) -> return $ VNum (op n1 n2)
   _ -> throwError $ RuntimeError "Type error in arithmetic operation"
 
-evalIRExpr :: Recursive Expr -> EvalIR Value
-evalIRExpr expr = case expr of
+evalIRExpr :: Recursive Expression -> EvalIR Value
+evalIRExpr Expression = case Expression of
   Recursive (NumLit n)  -> return $ VNum n
   Recursive (StrLit s)  -> return $ VStr s
   Recursive (BoolLit b) -> return $ VBool b
@@ -87,13 +87,13 @@ evalIRExpr expr = case expr of
 
 evalIRStmt :: StmtIR -> EvalIR (Maybe Value)
 evalIRStmt stmt = case stmt of
-  IREcho expr -> do
-    val <- evalIRExpr expr
+  IREcho Expression -> do
+    val <- evalIRExpr Expression
     liftIO $ putStrLn ("echo: " ++ show val)
     return Nothing
 
-  IRWhisper label expr -> do
-    val <- evalIRExpr expr
+  IRWhisper label Expression -> do
+    val <- evalIRExpr Expression
     liftIO $ putStrLn ("→ whisper: " ++ label ++ " = " ++ show val)
     return Nothing
 
@@ -103,14 +103,14 @@ evalIRStmt stmt = case stmt of
       Just (FlowIR _ params body) ->
         Nothing <$ do for args evalIRExpr >>= callBody body . Map.fromList . zip params
 
-  IRReturn expr ->
-    Just <$> evalIRExpr expr
+  IRReturn Expression ->
+    Just <$> evalIRExpr Expression
 
-  IRMouth expr ->
-    Nothing <$ do evalIRExpr expr >>= liftIO . putStrLn . ("mouth: " ++) . show
+  IRMouth Expression ->
+    Nothing <$ do evalIRExpr Expression >>= liftIO . putStrLn . ("mouth: " ++) . show
 
-  IRAssert expr ->
-    evalIRExpr expr >>= \case
+  IRAssert Expression ->
+    evalIRExpr Expression >>= \case
       VBool True  -> return Nothing
       VBool False -> throwError $ RuntimeError "Assertion failed"
       _           -> throwError $ RuntimeError "Assert expects boolean"
@@ -121,12 +121,12 @@ evalIRStmt stmt = case stmt of
       VBool False -> evalBody eBlock
       _ -> throwError $ RuntimeError "Condition must be boolean"
 
-  IRDelta name expr _mType ->
-    Nothing <$ (evalIRExpr expr >>= modify . Map.insert name)
+  IRDelta name Expression _mType ->
+    Nothing <$ (evalIRExpr Expression >>= modify . Map.insert name)
 
-  IRSource name expr _mType ->
+  IRSource name Expression _mType ->
     Map.lookup name <$> get >>= \case
-      Nothing -> Nothing <$ do evalIRExpr expr >>= modify . Map.insert name
+      Nothing -> Nothing <$ do evalIRExpr Expression >>= modify . Map.insert name
       Just _  -> throwError . RuntimeError $ "Variable '" ++ name ++ "' already defined"
 
 callBody :: [StmtIR] -> ValueEnv -> EvalIR (Maybe Value, ValueEnv)

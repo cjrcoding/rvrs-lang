@@ -1,4 +1,4 @@
--- src/RVRS/Parser/Expr.hs
+-- src/RVRS/Parser/Expression.hs
 
 module RVRS.Parser.ExprParser (exprParser) where
 
@@ -8,7 +8,7 @@ import RVRS.Utils
 
 -- External libraries
 import Control.Monad (void)
-import Control.Monad.Combinators.Expr
+import Control.Monad.Combinators.Expression
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
@@ -17,12 +17,12 @@ import qualified Text.Megaparsec.Char.Lexer as L
 
 type Parser = Parsec Void String
 
--- Expr entry point
-exprParser :: Parser (Recursive Expr)
+-- Expression entry point
+exprParser :: Parser (Recursive Expression)
 exprParser = makeExprParser term operatorTable
 
 -- Operator precedence table
-operatorTable :: [[Operator Parser (Recursive Expr)]]
+operatorTable :: [[Operator Parser (Recursive Expression)]]
 operatorTable =
   [ [ InfixL (Recursive <$$> Mul <$ symbol "*")
     , InfixL (Recursive <$$> Div <$ symbol "/")
@@ -40,7 +40,7 @@ operatorTable =
   ]
 
 -- Terms in the expression grammar
-term :: Parser (Recursive Expr)
+term :: Parser (Recursive Expression)
 term = do try $ funcCallExpr
    <|> do try $ Recursive (BoolLit True) <$ symbol "truth"
    <|> do try $ Recursive (BoolLit False) <$ symbol "void"
@@ -52,11 +52,11 @@ term = do try $ funcCallExpr
    <|> Recursive . Var <$> identifier
 
 -- Parse numeric literals
-parseNumber :: Parser (Recursive Expr)
+parseNumber :: Parser (Recursive Expression)
 parseNumber = Recursive <$> NumLit <$> do lexeme $ try L.float <|> fromInteger <$> L.decimal
 
 -- Function call expressions (e.g., fuse(2, 3))
-funcCallExpr :: Parser (Recursive Expr)
+funcCallExpr :: Parser (Recursive Expression)
 funcCallExpr = Recursive <$$> CallExpr <$> identifier <*> parens (exprParser `sepBy` symbol ",")
 
 -- Utility parsers

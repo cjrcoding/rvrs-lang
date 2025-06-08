@@ -22,20 +22,20 @@ data Argument = Argument
 
 -- | Statements inside a flow block
 data Statement
-  = Source String (Maybe RVRSType) (Recursive Expr)                 -- source x = ...
-  | Delta String (Maybe RVRSType) (Recursive Expr)
-  | Branch (Recursive Expr) [Statement] [Statement]-- branch cond { ... } else { ... }
-  | Mouth (Recursive Expr)                          -- mouth "..."
-  | Whisper (Recursive Expr)
-  | Echo (Recursive Expr)                           -- echo x
-  | Pillar String (Recursive Expr)  -- pillar NAME = ...
-  | Return (Recursive Expr)
-  | Call String [Recursive Expr]
-  | Assert (Recursive Expr)
+  = Source String (Maybe RVRSType) (Recursive Expression)                 -- source x = ...
+  | Delta String (Maybe RVRSType) (Recursive Expression)
+  | Branch (Recursive Expression) [Statement] [Statement]-- branch cond { ... } else { ... }
+  | Mouth (Recursive Expression)                          -- mouth "..."
+  | Whisper (Recursive Expression)
+  | Echo (Recursive Expression)                           -- echo x
+  | Pillar String (Recursive Expression)  -- pillar NAME = ...
+  | Return (Recursive Expression)
+  | Call String [Recursive Expression]
+  | Assert (Recursive Expression)
 
   deriving (Show, Eq)
 
-data Expr e
+data Expression e
   = Var String
   | StrLit String
   | BoolLit Bool
@@ -68,13 +68,13 @@ data FlowIR = FlowIR
 
 -- | Lowered statements (IR version of AST Statement)
 data StmtIR
-  = IRDelta String (Recursive Expr) (Maybe RVRSType)
-  | IRSource String (Recursive Expr) (Maybe RVRSType)
-  | IREcho (Recursive Expr)
-  | IRWhisper String (Recursive Expr)
-  | IRMouth (Recursive Expr)
-  | IRBranch (Recursive Expr) [StmtIR] [StmtIR]
-  | IRReturn (Recursive Expr)
-  | IRCallStmt String [Recursive Expr]  -- Top-level statement like: call foo(x, y)
-  | IRAssert (Recursive Expr)
+  = IRDelta String (Recursive Expression) (Maybe RVRSType)
+  | IRSource String (Recursive Expression) (Maybe RVRSType)
+  | IREcho (Recursive Expression)
+  | IRWhisper String (Recursive Expression)
+  | IRMouth (Recursive Expression)
+  | IRBranch (Recursive Expression) [StmtIR] [StmtIR]
+  | IRReturn (Recursive Expression)
+  | IRCallStmt String [Recursive Expression]  -- Top-level statement like: call foo(x, y)
+  | IRAssert (Recursive Expression)
   deriving (Show, Eq)
