@@ -25,6 +25,8 @@ executable rvrs
     , RVRS.Lower
     , RVRS.Env
     , RVRS.Utils
+    , RVRS.Typecheck.Check
+    , RVRS.Typecheck.Types
 
   build-depends:
       base >=4.14 && <5
@@ -36,7 +38,6 @@ executable rvrs
     , mtl
 
   default-language:    Haskell2010
-
   default-extensions:
     LambdaCase
 
@@ -62,6 +63,8 @@ executable RunAll
     , RVRS.Lower
     , RVRS.Env
     , RVRS.Utils
+    , RVRS.Typecheck.Check
+    , RVRS.Typecheck.Types
 
   build-depends:
       base >=4.14 && <5
@@ -76,7 +79,6 @@ executable RunAll
     , mtl
 
   default-language:    Haskell2010
-
   default-extensions:
     LambdaCase
 
@@ -102,6 +104,8 @@ executable TestLower
     , RVRS.Lower
     , RVRS.Env
     , RVRS.Utils
+    , RVRS.Typecheck.Check
+    , RVRS.Typecheck.Types
 
   build-depends:
       base >=4.14 && <5
@@ -113,7 +117,6 @@ executable TestLower
     , mtl
 
   default-language:    Haskell2010
-
   default-extensions:
     LambdaCase
 
@@ -139,6 +142,8 @@ executable RunIRTests
     , RVRS.Lower
     , RVRS.Env
     , RVRS.Utils
+    , RVRS.Typecheck.Check
+    , RVRS.Typecheck.Types
 
   build-depends:
       base >=4.14 && <5
@@ -149,9 +154,9 @@ executable RunIRTests
     , containers
     , directory
     , filepath
+    , process
     , mtl
 
   default-language:    Haskell2010
-
   default-extensions:
     LambdaCase
