@@ -11,13 +11,13 @@ generateAiken (Flow name args body) =
     ["}"]
 
 -- | Convert a statement into one or more Aiken lines
-genStmt :: Statement -> [String]
+genStmt :: Recursive Statement -> [String]
 genStmt stmt = case stmt of
-  Source var _ expr -> ["let " ++ var ++ " = " ++ genExpr expr]
-  Delta var _ expr -> ["let " ++ var ++ " = " ++ genExpr expr]
-  Mouth expr      -> ["trace " ++ show (genExpr expr)]
-  Echo expr       -> ["return " ++ genExpr expr]
-  Branch cond tBranch fBranch ->
+  Recursive (Source var _ expr) -> ["let " ++ var ++ " = " ++ genExpr expr]
+  Recursive (Delta var _ expr )-> ["let " ++ var ++ " = " ++ genExpr expr]
+  Recursive (Mouth expr) -> ["trace " ++ show (genExpr expr)]
+  Recursive (Echo expr) -> ["return " ++ genExpr expr]
+  Recursive (Branch cond tBranch fBranch) ->
     ["if " ++ genExpr cond ++ " {"] ++
     indent (concatMap genStmt tBranch) ++
     ["} else {"] ++
@@ -32,7 +32,6 @@ genExpr expr = case expr of
   Recursive (BoolLit True)  -> "true"
   Recursive (BoolLit False) -> "false"
   Recursive (Equals a b)    -> genExpr a ++ " == " ++ genExpr b
-
 
 -- | Render a function argument
 renderArg :: Argument -> String

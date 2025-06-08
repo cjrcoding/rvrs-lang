@@ -10,7 +10,7 @@ import RVRS.Parser.Type (RVRSType(..))
 data Flow = Flow
   { flowName :: String           -- ^ The flow's name (e.g. "main", "add")
   , flowArgs :: [Argument]       -- ^ Named ritual arguments, optionally typed
-  , flowBody :: [Statement]      -- ^ The ritual body (statements)
+  , flowBody :: [Recursive Statement]      -- ^ The ritual body (statements)
   } deriving (Show, Eq)
 
 -- | A named argument to a flow, e.g., `x: Number`
@@ -21,10 +21,10 @@ data Argument = Argument
 
 
 -- | Statements inside a flow block
-data Statement
+data Statement e
   = Source String (Maybe RVRSType) (Recursive Expression)                 -- source x = ...
   | Delta String (Maybe RVRSType) (Recursive Expression)
-  | Branch (Recursive Expression) [Statement] [Statement]-- branch cond { ... } else { ... }
+  | Branch (Recursive Expression) [e] [e]-- branch cond { ... } else { ... }
   | Mouth (Recursive Expression)                          -- mouth "..."
   | Whisper (Recursive Expression)
   | Echo (Recursive Expression)                           -- echo x

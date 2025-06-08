@@ -1,6 +1,7 @@
 module RVRS.Parser.StmtParser (statementParser, blockParser) where
 
 import RVRS.AST
+import RVRS.Utils
 import RVRS.Parser.ExprParser (exprParser)
 import RVRS.Parser.Type (typeParser)
 import Text.Megaparsec
@@ -30,59 +31,59 @@ statementParser = choice
 
 -- Individual statement parsers
 
-whisperParser :: Parser Statement
-whisperParser = symbol "whisper" *> do Whisper <$> exprParser
+whisperParser :: Parser (Recursive Statement)
+whisperParser = symbol "whisper" *> do Recursive <$> Whisper <$> exprParser
 
-assertParser :: Parser Statement
-assertParser = symbol "assert" *> do Assert <$> exprParser
+assertParser :: Parser (Recursive Statement)
+assertParser = symbol "assert" *> do Recursive <$> Assert <$> exprParser
 
-mouthParser :: Parser Statement
-mouthParser = symbol "mouth" *> do Mouth <$> exprParser
+mouthParser :: Parser (Recursive Statement)
+mouthParser = symbol "mouth" *> do Recursive <$> Mouth <$> exprParser
 
-echoParser :: Parser Statement
-echoParser = symbol "echo" *> do Echo <$> exprParser
+echoParser :: Parser (Recursive Statement)
+echoParser = symbol "echo" *> do Recursive <$> Echo <$> exprParser
 
-speaksParser :: Parser Statement
-speaksParser = symbol "speaks" *> do Echo <$> exprParser
+speaksParser :: Parser (Recursive Statement)
+speaksParser = symbol "speaks" *> do Recursive <$> Echo <$> exprParser
 
-sourceParser :: Parser Statement
-sourceParser = Source
+sourceParser :: Parser (Recursive Statement)
+sourceParser = Recursive <$$$> Source
   <$> do symbol "source" *> identifier
   -- TODO: there is actually a better way to describe it
   <*> do try (symbol ":" *> (Just <$> typeParser)) <|> pure Nothing
   <*> do symbol "=" *> exprParser
 
-bareCallStmt :: Parser Statement
-bareCallStmt = Call
+bareCallStmt :: Parser (Recursive Statement)
+bareCallStmt = Recursive <$$> Call
   <$> identifier
   <*> between (symbol "(") (symbol ")") (exprParser `sepBy` symbol ",")
 
 -- Delta parser supporting both typed and untyped declarations
-deltaParser :: Parser Statement
-deltaParser = Delta
+deltaParser :: Parser (Recursive Statement)
+deltaParser = Recursive <$$$> Delta
   <$> do symbol "delta" *> identifier
   <*> do try (symbol ":" *> do Just <$> typeParser) <|> pure Nothing
   <*> do symbol "=" *> exprParser
 
-pillarParser :: Parser Statement
-pillarParser = Pillar
+pillarParser :: Parser (Recursive Statement)
+pillarParser = Recursive <$$> Pillar
   <$> do symbol "pillar" *> identifier
   <*> do symbol "=" *> exprParser
 
-returnParser :: Parser Statement
-returnParser = Return <$> do symbol "return" *> exprParser
+returnParser :: Parser (Recursive Statement)
+returnParser = Recursive <$> Return <$> do symbol "return" *> exprParser
 
-branchParser :: Parser Statement
-branchParser = Branch
+branchParser :: Parser (Recursive Statement)
+branchParser = Recursive <$$$> Branch
   <$> do symbol "branch" *> exprParser
   <*> do sc *> blockParser
   <*> do maybe [] id <$> do optional . try $ sc *> symbol "else" *> sc *> blockParser
 
-blockParser :: Parser [Statement]
+blockParser :: Parser [Recursive Statement]
 blockParser = between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc))
 
-callStmt :: Parser Statement
-callStmt = Call
+callStmt :: Parser (Recursive Statement)
+callStmt = Recursive <$$> Call
   <$> do symbol "call" *> identifier
   <*> do option [] . parens $ exprParser `sepBy` symbol ","
 
