@@ -1,4 +1,4 @@
-module RVRS.Eval.EvalExpr (evalIRExpr) where
+module RVRS.Eval.EvalExpr (evalIRExpr, evalBody) where
 
 import RVRS.IR (ExprIR(..), StmtIR(..), FlowIR(..))
 import RVRS.Value (Value(..)) 
@@ -101,13 +101,13 @@ evalIRStmt stmt = case stmt of
     Map.lookup name <$> ask >>= \case
       Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
       Just (FlowIR _ params body) ->
-        Nothing <$ (for args evalIRExpr >>= callBody body . Map.fromList . zip params)
+        Nothing <$ do for args evalIRExpr >>= callBody body . Map.fromList . zip params
 
   IRReturn expr ->
     Just <$> evalIRExpr expr
 
   IRMouth expr ->
-    Nothing <$ (evalIRExpr expr >>= liftIO . putStrLn . ("mouth: " ++) . show)
+    Nothing <$ do evalIRExpr expr >>= liftIO . putStrLn . ("mouth: " ++) . show
 
   IRAssert expr ->
     evalIRExpr expr >>= \case
@@ -126,7 +126,7 @@ evalIRStmt stmt = case stmt of
 
   IRSource name expr _mType ->
     Map.lookup name <$> get >>= \case
-      Nothing -> Nothing <$ (evalIRExpr expr >>= modify . Map.insert name)
+      Nothing -> Nothing <$ do evalIRExpr expr >>= modify . Map.insert name
       Just _  -> throwError . RuntimeError $ "Variable '" ++ name ++ "' already defined"
 
 callBody :: [StmtIR] -> ValueEnv -> EvalIR (Maybe Value, ValueEnv)

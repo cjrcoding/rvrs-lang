@@ -49,3 +49,21 @@ data ExprIR
   -- Function call within an expression: foo(x, y)
   | IRCallExpr String [ExprIR]
   deriving (Show, Eq)
+
+-- data Expr
+  -- = Var String                          -- x
+  -- | StrLit String                       -- "hello"
+  -- | BoolLit Bool                        -- true, false
+  -- | Equals Expr Expr                    -- a == b
+  -- | GreaterThan Expr Expr              -- a > b
+  -- | LessThan Expr Expr                 -- a < b
+  -- | Add Expr Expr
+  -- | Sub Expr Expr
+  -- | Mul Expr Expr
+  -- | Div Expr Expr
+  -- | NumLit Double
+  -- | Not Expr     
+  -- | And Expr Expr   
+  -- | Or Expr Expr 
+  -- | CallExpr String [Expr]   
+  -- | Neg Expr 

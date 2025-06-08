@@ -62,7 +62,7 @@ These are poetic or expressive tools that may evolve post-v1:
 | `veil`      | Optional or hidden logic             | `Maybe` / planned     |
 | `tide`      | Iterate over a sequence              | `for` / planned       |
 | `stream`    | Represents a flowing list            | `List` / placeholder  |
-| `chant`     | Symbolic transformation              | Expression macro?     |
+| `chant`     | Symbolic transformation              | Expr macro?     |
 | `glyph`     | User-defined symbolic type           | `type` / long-term    |
 | `ritual`    | Named reusable block/module          | Planned               |
 

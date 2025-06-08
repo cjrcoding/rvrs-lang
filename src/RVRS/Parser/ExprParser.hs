@@ -1,9 +1,10 @@
--- src/RVRS/Parser/Expression.hs
+-- src/RVRS/Parser/Expr.hs
 
 module RVRS.Parser.ExprParser (exprParser) where
 
 -- Internal modules
 import RVRS.AST
+import RVRS.Utils
 
 -- External libraries
 import Control.Monad (void)
@@ -16,53 +17,53 @@ import qualified Text.Megaparsec.Char.Lexer as L
 
 type Parser = Parsec Void String
 
--- Expression entry point
-exprParser :: Parser Expr
+-- Expr entry point
+exprParser :: Parser (Recursive Expr)
 exprParser = makeExprParser term operatorTable
 
 -- Operator precedence table
-operatorTable :: [[Operator Parser Expr]]
+operatorTable :: [[Operator Parser (Recursive Expr)]]
 operatorTable =
-  [ [ InfixL (Mul <$ symbol "*")
-    , InfixL (Div <$ symbol "/")
+  [ [ InfixL ((Recursive <$$> Mul) <$ symbol "*")
+    , InfixL ((Recursive <$$> Div) <$ symbol "/")
     ]
-  , [ InfixL (Add <$ symbol "+")
-    , InfixL (Sub <$ symbol "-")
+  , [ InfixL ((Recursive <$$> Add) <$ symbol "+")
+    , InfixL ((Recursive <$$> Sub) <$ symbol "-")
     ]
-  , [ InfixN (Equals      <$ symbol "==")
-    , InfixN (GreaterThan <$ symbol ">")
-    , InfixN (LessThan    <$ symbol "<")
+  , [ InfixN ((Recursive <$$> Equals)      <$ symbol "==")
+    , InfixN ((Recursive <$$> GreaterThan) <$ symbol ">")
+    , InfixN ((Recursive <$$> LessThan)    <$ symbol "<")
     ]
-  , [ InfixL (And <$ symbol "and")
-    , InfixL (Or  <$ symbol "or")
+  , [ InfixL ((Recursive <$$> And) <$ symbol "and")
+    , InfixL ((Recursive <$$> Or)  <$ symbol "or")
     ]
   ]
 
 -- Terms in the expression grammar
-term :: Parser Expr
+term :: Parser (Recursive Expr)
 term =
       try funcCallExpr
-  <|> try (BoolLit True  <$ symbol "truth")
-  <|> try (BoolLit False <$ symbol "void")
-  <|> try (StrLit <$> stringLiteral)
+  <|> try (Recursive (BoolLit True) <$ symbol "truth")
+  <|> try (Recursive (BoolLit False) <$ symbol "void")
+  <|> try (Recursive . StrLit <$> stringLiteral)
   <|> try parseNumber
-  <|> try (Not <$> (symbol "not" *> term))
-  <|> try (Neg <$> (symbol "-" *> term))
+  <|> try (Recursive . Not <$> (symbol "not" *> term))
+  <|> try (Recursive . Neg <$> (symbol "-" *> term))
   <|> try (parens exprParser)
-  <|> Var <$> identifier
+  <|> Recursive . Var <$> identifier
 
 -- Parse numeric literals
-parseNumber :: Parser Expr
+parseNumber :: Parser (Recursive Expr)
 parseNumber = do
   num <- lexeme $ try L.float <|> (fromInteger <$> L.decimal)
-  return $ NumLit num
+  return $ Recursive (NumLit num)
 
 -- Function call expressions (e.g., fuse(2, 3))
-funcCallExpr :: Parser Expr
+funcCallExpr :: Parser (Recursive Expr)
 funcCallExpr = do
   funcName <- identifier
   args <- parens (exprParser `sepBy` symbol ",")
-  return $ CallExpr funcName args
+  return $ Recursive (CallExpr funcName args)
 
 -- Utility parsers
 lexeme :: Parser a -> Parser a

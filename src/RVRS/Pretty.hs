@@ -2,23 +2,23 @@ module RVRS.Pretty (prettyExpr) where
 
 import RVRS.AST
 
-prettyExpr :: Expr -> String
+prettyExpr :: Recursive Expr -> String
 prettyExpr expr = case expr of
-  NumLit n     -> show n
-  BoolLit True -> "truth"
-  BoolLit False -> "void"
-  StrLit s     -> show s
-  Var name     -> name
+  Recursive (NumLit n) -> show n
+  Recursive (BoolLit True) -> "truth"
+  Recursive (BoolLit False) -> "void"
+  Recursive (StrLit s) -> show s
+  Recursive (Var name) -> name
 
-  Add e1 e2    -> "(" ++ prettyExpr e1 ++ " + " ++ prettyExpr e2 ++ ")"
-  Sub e1 e2    -> "(" ++ prettyExpr e1 ++ " - " ++ prettyExpr e2 ++ ")"
-  Mul e1 e2    -> "(" ++ prettyExpr e1 ++ " * " ++ prettyExpr e2 ++ ")"
-  Div e1 e2    -> "(" ++ prettyExpr e1 ++ " / " ++ prettyExpr e2 ++ ")"
+  -- Recursive (Add e1 e2) -> "(" ++ prettyExpr (Recursive e1) ++ " + " ++ prettyExpr (Recursive e2) ++ ")"
+  -- Recursive (Sub e1 e2) -> "(" ++ prettyExpr (Recursive e1) ++ " - " ++ prettyExpr (Recursive e2) ++ ")"
+  -- Recursive (Mul e1 e2) -> "(" ++ prettyExpr (Recursive e1) ++ " * " ++ prettyExpr (Recursive e2) ++ ")"
+  -- Recursive (Div e1 e2) -> "(" ++ prettyExpr (Recursive e1) ++ " / " ++ prettyExpr (Recursive e2) ++ ")"
 
-  Equals e1 e2 -> "(" ++ prettyExpr e1 ++ " == " ++ prettyExpr e2 ++ ")"
-  And e1 e2    -> "(" ++ prettyExpr e1 ++ " and " ++ prettyExpr e2 ++ ")"
-  Or e1 e2     -> "(" ++ prettyExpr e1 ++ " or " ++ prettyExpr e2 ++ ")"
-  Not e        -> "(not " ++ prettyExpr e ++ ")"
-  Neg e        -> "(-" ++ prettyExpr e ++ ")"
+  -- Recursive (Equals e1 e2) -> "(" ++ prettyExpr (Recursive e1) ++ " == " ++ prettyExpr (Recursive e2) ++ ")"
+  -- Recursive (And e1 e2) -> "(" ++ prettyExpr (Recursive e1) ++ " and " ++ prettyExpr (Recursive e2) ++ ")"
+  -- Recursive (Or e1 e2) -> "(" ++ prettyExpr (Recursive e1) ++ " or " ++ prettyExpr (Recursive e2) ++ ")"
+  -- Recursive (Not e) -> "(not " ++ prettyExpr (Recursive e) ++ ")"
+  -- Recursive (Neg e) -> "(-" ++ prettyExpr (Recursive e) ++ ")"
 
-  CallExpr name args -> "call " ++ name ++ "(" ++ unwords (map prettyExpr args) ++ ")"
+  -- Recursive (CallExpr name args) -> "call " ++ name ++ "(" ++ unwords (prettyExpr . Recursive <$> args) ++ ")"

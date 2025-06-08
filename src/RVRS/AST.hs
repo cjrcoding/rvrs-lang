@@ -1,5 +1,6 @@
--- src/RVRS/AST.hs
-
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE QuantifiedConstraints #-}
+{-# LANGUAGE UndecidableInstances #-}
 module RVRS.AST where
 
 import RVRS.Parser.Type (RVRSType(..))
@@ -21,41 +22,39 @@ data Argument = Argument
 
 -- | Statements inside a flow block
 data Statement
-  = Source String (Maybe RVRSType) Expr                 -- source x = ...
-  | Delta String (Maybe RVRSType) Expr
-  | Branch Expr [Statement] [Statement]-- branch cond { ... } else { ... }
-  | Mouth Expr                          -- mouth "..."
-  | Whisper Expr
-  | Echo Expr                           -- echo x
-  | Pillar String Expr  -- pillar NAME = ...
-  | Return Expr
-  | Call String [Expr]
-  | Assert Expr
+  = Source String (Maybe RVRSType) (Recursive Expr)                 -- source x = ...
+  | Delta String (Maybe RVRSType) (Recursive Expr)
+  | Branch (Recursive Expr) [Statement] [Statement]-- branch cond { ... } else { ... }
+  | Mouth (Recursive Expr)                          -- mouth "..."
+  | Whisper (Recursive Expr)
+  | Echo (Recursive Expr)                           -- echo x
+  | Pillar String (Recursive Expr)  -- pillar NAME = ...
+  | Return (Recursive Expr)
+  | Call String [Recursive Expr]
+  | Assert (Recursive Expr)
 
   deriving (Show, Eq)
 
-
-data Expr
-  = Var String                          -- x
-  | StrLit String                       -- "hello"
-  | BoolLit Bool                        -- true, false
-  | Equals Expr Expr                    -- a == b
-  | GreaterThan Expr Expr              -- a > b
-  | LessThan Expr Expr                 -- a < b
-  | Add Expr Expr
-  | Sub Expr Expr
-  | Mul Expr Expr
-  | Div Expr Expr
+data Expr e
+  = Var String
+  | StrLit String
+  | BoolLit Bool
+  | Equals e e
+  | GreaterThan e e
+  | LessThan e e
+  | Add e e
+  | Sub e e
+  | Mul e e
+  | Div e e
   | NumLit Double
-  | Not Expr     
-  | And Expr Expr   
-  | Or Expr Expr 
-  | CallExpr String [Expr]   
-  | Neg Expr 
-  
-  
-  
+  | Not e
+  | And e e
+  | Or e e
+  | CallExpr String [e]
+  | Neg e
   deriving (Show, Eq)
 
+newtype Recursive f = Recursive { unfix :: f (Recursive f) }
 
-  
+deriving instance (Eq (f (Recursive f))) => Eq (Recursive f)
+deriving instance (Show (f (Recursive f))) => Show (Recursive f)
