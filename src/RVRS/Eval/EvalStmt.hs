@@ -1,7 +1,7 @@
 module RVRS.Eval.EvalStmt (evalIRStmt) where
 
 import RVRS.Value (Value(..))
-import RVRS.Eval.EvalExpr (evalIRExpr, evalBody)
+import RVRS.Eval.EvalExpr (evalExpr, evalBody)
 import RVRS.Eval.Types (EvalIR, EvalError(..))
 import RVRS.AST (StmtIR (..), FlowIR (..))
 
@@ -21,12 +21,12 @@ isolate action =
 evalIRStmt :: StmtIR -> EvalIR (Maybe Value)
 evalIRStmt stmt = case stmt of
   IREcho expr -> do
-    val <- evalIRExpr expr
+    val <- evalExpr expr
     liftIO $ putStrLn ("echo: " ++ show val)
     return Nothing
 
   IRWhisper label expr -> do
-    val <- evalIRExpr expr
+    val <- evalExpr expr
     liftIO $ putStrLn ("→ whisper: " ++ label ++ " = " ++ show val)
     return Nothing
 
@@ -36,32 +36,32 @@ evalIRStmt stmt = case stmt of
     case Map.lookup name flowMap of
       Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
       Just (FlowIR _ params body) ->
-        Nothing <$ do for args evalIRExpr >>= lift . lift . runStateT (runReaderT (evalBody body) flowMap) . Map.fromList . zip params
+        Nothing <$ do for args evalExpr >>= lift . lift . runStateT (runReaderT (evalBody body) flowMap) . Map.fromList . zip params
 
   IRReturn expr ->
-    Just <$> evalIRExpr expr
+    Just <$> evalExpr expr
 
   IRMouth expr -> do
-    val <- evalIRExpr expr
+    val <- evalExpr expr
     liftIO $ putStrLn ("mouth: " ++ show val)
     return Nothing
 
   IRAssert expr ->
-    evalIRExpr expr >>= \case
+    evalExpr expr >>= \case
       VBool True  -> return Nothing
       VBool False -> throwError $ RuntimeError "Assertion failed"
       _           -> throwError $ RuntimeError "Assert expects boolean"
 
   IRBranch cond tBlock eBlock ->
-    evalIRExpr cond >>= \case
+    evalExpr cond >>= \case
       VBool True  -> isolate (evalBody tBlock)
       VBool False -> isolate (evalBody eBlock)
       _           -> throwError $ RuntimeError "Condition must be boolean"
 
   IRDelta name expr _mType ->
-    Nothing <$ do evalIRExpr expr >>= modify . Map.insert name
+    Nothing <$ do evalExpr expr >>= modify . Map.insert name
 
   IRSource name expr _mType -> do
     Map.lookup name <$> get >>= \case
-      Nothing -> Nothing <$ do evalIRExpr expr >>= modify . Map.insert name
+      Nothing -> Nothing <$ do evalExpr expr >>= modify . Map.insert name
       Just _  -> throwError $ RuntimeError ("Variable '" ++ name ++ "' already defined")
