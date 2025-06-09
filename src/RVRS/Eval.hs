@@ -64,18 +64,16 @@ isolate :: EvalIR a -> EvalIR a
 isolate action =
   fst <$> do lift . lift =<< runStateT <$> runReaderT action <$> ask <*> get
 
+
+display :: Show a => String -> a -> EvalIR ()
+display label value = liftIO . putStrLn $ label ++ ": " ++ show value
+
 -- Statement evaluator
 evalStmt :: Recursive Statement -> EvalIR (Maybe Value)
 evalStmt stmt = case stmt of
-  Recursive (Echo expr) -> do
-    val <- evalExpr expr
-    liftIO $ putStrLn ("echo: " ++ show val)
-    return Nothing
-
-  Recursive (Whisper expr) -> do
-    val <- evalExpr expr
-    liftIO $ putStrLn ("→ whisper: " ++ " = " ++ show val)
-    return Nothing
+  Recursive (Echo expr) -> Nothing <$ do evalExpr expr >>= display "echo"
+  Recursive (Whisper expr) -> Nothing <$ do evalExpr expr >>= display "→ whisper: "
+  Recursive (Mouth expr) -> Nothing <$ do evalExpr expr >>= display "mouth: "
 
   -- ✅ Correct: discard subflow return value
   Recursive (Call name args) -> do
@@ -87,11 +85,6 @@ evalStmt stmt = case stmt of
 
   Recursive (Return expr) ->
     Just <$> evalExpr expr
-
-  Recursive (Mouth expr) -> do
-    val <- evalExpr expr
-    liftIO $ putStrLn ("mouth: " ++ show val)
-    return Nothing
 
   Recursive (Assert expr) ->
     evalExpr expr >>= \case
