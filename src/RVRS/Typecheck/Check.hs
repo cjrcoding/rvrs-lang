@@ -5,12 +5,12 @@ import RVRS.Typecheck.Types
 import qualified Data.Map as Map
 
 -- Infer the type of an expression
-typeOfExpr :: TypeEnv -> Expr a -> Either TypeError RVRS_Type
-typeOfExpr _ (NumLit _) = Right TNum
-typeOfExpr _ (StrLit _) = Right TStr
-typeOfExpr _ (BoolLit _) = Right TBool
-typeOfExpr env (Var name) =
+typeOfExpr :: TypeEnv -> Recursive Expression -> Either TypeError RVRS_Type
+typeOfExpr _ (Recursive (NumLit _)) = Right TNum
+typeOfExpr _ (Recursive (StrLit _)) = Right TStr
+typeOfExpr _ (Recursive (BoolLit _)) = Right TBool
+typeOfExpr env (Recursive (Var name)) =
   case Map.lookup name env of
     Just ty -> Right ty
-    Nothing -> Left (UnboundVariable name)
-typeOfExpr _ other = Left (UnsupportedExpr (show other))
+    Nothing -> Left (UnknownVariable name)
+typeOfExpr _ other = Left (UnsupportedOp (show other))
