@@ -1,4 +1,4 @@
-module RVRS.Eval.EvalStmt (evalIRStmt) where
+module RVRS.Eval.EvalStmt (evalStmt) where
 
 import RVRS.Value (Value(..))
 import RVRS.Eval.EvalExpr (evalExpr, evalBody)
@@ -18,8 +18,8 @@ isolate action =
   fst <$> do lift . lift =<< runStateT <$> runReaderT action <$> ask <*> get
 
 -- Statement evaluator
-evalIRStmt :: Recursive Statement -> EvalIR (Maybe Value)
-evalIRStmt stmt = case stmt of
+evalStmt :: Recursive Statement -> EvalIR (Maybe Value)
+evalStmt stmt = case stmt of
   Recursive (Echo expr) -> do
     val <- evalExpr expr
     liftIO $ putStrLn ("echo: " ++ show val)

@@ -85,8 +85,8 @@ evalExpr expr = case expr of
 
 -- Statement evaluator
 
-evalIRStmt :: Recursive Statement -> EvalIR (Maybe Value)
-evalIRStmt stmt = case stmt of
+evalStmt :: Recursive Statement -> EvalIR (Maybe Value)
+evalStmt stmt = case stmt of
   Recursive (Echo expr) -> do
     val <- evalExpr expr
     liftIO $ putStrLn ("echo: " ++ show val)
@@ -135,4 +135,4 @@ callBody body callEnv = runReaderT (evalBody body) <$> ask >>= lift . lift . fli
 -- Flow body evaluator used in both CallExpr and CallStmt
 evalBody :: [Recursive Statement] -> EvalIR (Maybe Value)
 evalBody [] = return Nothing
-evalBody (stmt:rest) = evalIRStmt stmt >>= maybe (evalBody rest) (pure . Just)
+evalBody (stmt:rest) = evalStmt stmt >>= maybe (evalBody rest) (pure . Just)

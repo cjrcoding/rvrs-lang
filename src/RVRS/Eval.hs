@@ -1,7 +1,7 @@
 -- src/RVRS/Eval.hs
 module RVRS.Eval (
   evalExpr,
-  evalIRStmt,
+  evalStmt,
   evalBody,
   evalIRFlow,
   runEvalIR,
@@ -9,5 +9,5 @@ module RVRS.Eval (
 ) where
 
 import RVRS.Eval.EvalExpr (evalExpr, evalBody)
-import RVRS.Eval.EvalStmt (evalIRStmt)
+import RVRS.Eval.EvalStmt (evalStmt)
 import RVRS.Eval.EvalFlow (evalIRFlow, runEvalIR, EvalError(..))
