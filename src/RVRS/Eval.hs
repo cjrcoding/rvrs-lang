@@ -15,8 +15,8 @@ import Data.Traversable
 import Control.Monad.Except
 import Control.Monad.State
 import Control.Monad.Reader
+import GHC.IsList (fromList)
 import System.IO (readFile)
-import qualified Data.Map as Map
 
 import Ya (Recursive (..), unwrap)
 
@@ -102,11 +102,11 @@ evalStmt stmt = case unwrap stmt of
       _           -> throwError $ RuntimeError "Condition must be boolean"
 
   Delta name _mType expr ->
-    Nothing <$ do evalExpr expr >>= modify . Map.insert name
+    Nothing <$ do evalExpr expr >>= modify . insert name
 
   Source name _mType expr -> do
     Map.lookup name <$> get >>= \case
-      Nothing -> Nothing <$ do evalExpr expr >>= modify . Map.insert name
+      Nothing -> Nothing <$ do evalExpr expr >>= modify . insert name
       Just _  -> throwError $ RuntimeError ("Variable '" ++ name ++ "' already defined")
 
 binOp :: (Double -> Double -> Double) -> Recursive Expression -> Recursive Expression -> EvalIR Value
