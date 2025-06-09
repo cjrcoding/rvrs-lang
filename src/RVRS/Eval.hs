@@ -8,6 +8,8 @@ module RVRS.Eval (
   EvalError(..)
 ) where
 
+import Data.Map (Map, insert, union)
+import qualified Data.Map as Map (lookup)
 import Data.Maybe
 import Data.Traversable
 import Control.Monad.Except
@@ -25,8 +27,8 @@ import RVRS.Value
 import RVRS.Parser
 import RVRS.Lower
 
-type Env     = Map.Map String Value
-type FlowEnv = Map.Map String FlowIR
+type Env     = Map String Value
+type FlowEnv = Map String FlowIR
 
 type EvalIR a = ReaderT FlowEnv (StateT ValueEnv (ExceptT EvalError IO)) a
 
@@ -36,23 +38,23 @@ data EvalError
   deriving (Show, Eq)
 
 -- Load stdlib and merge
-loadAndMergeStdlib :: IO (Map.Map String FlowIR)
+loadAndMergeStdlib :: IO (Map String FlowIR)
 loadAndMergeStdlib = parseRVRS <$> readFile "stdlib/stdlib.rvrs" >>= \case
   Left err -> error $ "Stdlib parse error:\n" ++ show err
-  Right flows -> return $ Map.fromList $ (,) <$> flowName <*> lowerFlow <$> flows
+  Right flows -> return . fromList $ (,) <$> flowName <*> lowerFlow <$> flows
 
 -- Runner
-runEvalIR :: Map.Map String FlowIR -> Map.Map String Value -> EvalIR a -> IO (Either EvalError (a, Map.Map String Value))
+runEvalIR :: Map String FlowIR -> Map String Value -> EvalIR a -> IO (Either EvalError (a, Map String Value))
 runEvalIR flows env action =
   runExceptT (runStateT (runReaderT action flows) env)
 
 -- Flow evaluation
-evalIRFlow :: Map.Map String FlowIR -> String -> [Value] -> IO (Either EvalError (Maybe Value))
+evalIRFlow :: Map String FlowIR -> String -> [Value] -> IO (Either EvalError (Maybe Value))
 evalIRFlow userFlows entryName args = do
-  fullFlowMap <- Map.union userFlows <$> loadAndMergeStdlib
+  fullFlowMap <- union userFlows <$> loadAndMergeStdlib
   case Map.lookup entryName fullFlowMap of
     Just (FlowIR _ params body) -> do
-      let initialEnv = Map.fromList (zip params args)
+      let initialEnv = fromList (zip params args)
       fst <$$> do runEvalIR fullFlowMap initialEnv $ catchError (evalBody body) handleReturn
     Nothing -> return $ Left . RuntimeError $ "No flow named '" ++ entryName ++ "' found."
 
@@ -82,7 +84,7 @@ evalStmt stmt = case unwrap stmt of
     case Map.lookup name flowMap of
       Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
       Just (FlowIR _ params body) ->
-        Nothing <$ do for args evalExpr >>= lift . lift . runStateT (runReaderT (evalBody body) flowMap) . Map.fromList . zip params
+        Nothing <$ do for args evalExpr >>= lift . lift . runStateT (runReaderT (evalBody body) flowMap) . fromList . zip params
 
   Return expr ->
     Just <$> evalExpr expr
@@ -173,7 +175,7 @@ evalExpr expr = case unwrap expr of
         argVals <- for args evalExpr
         if length paramNames /= length argVals
           then throwError $ RuntimeError ("Arity mismatch calling: " ++ name)
-          else fromMaybe VVoid . fst <$> do callBody body . Map.fromList $ zip paramNames argVals
+          else fromMaybe VVoid . fst <$> do callBody body . fromList $ zip paramNames argVals
 
 callBody :: [Recursive Statement] -> ValueEnv -> EvalIR (Maybe Value, ValueEnv)
 callBody body callEnv = runReaderT (evalBody body) <$> ask >>= lift . lift . flip runStateT callEnv
