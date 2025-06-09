@@ -8,7 +8,6 @@ module RVRS.Eval (
   EvalError(..)
 ) where
 
-import Ya (Recursive (..))
 import Data.Maybe
 import Data.Traversable
 import Control.Monad.Except
@@ -16,6 +15,8 @@ import Control.Monad.State
 import Control.Monad.Reader
 import System.IO (readFile)
 import qualified Data.Map as Map
+
+import Ya (Recursive (..), unwrap)
 
 import RVRS.AST
 import RVRS.Env
@@ -70,38 +71,38 @@ display label value = liftIO . putStrLn $ label ++ ": " ++ show value
 
 -- Statement evaluator
 evalStmt :: Recursive Statement -> EvalIR (Maybe Value)
-evalStmt stmt = case stmt of
-  Recursive (Echo expr) -> Nothing <$ do evalExpr expr >>= display "echo"
-  Recursive (Whisper expr) -> Nothing <$ do evalExpr expr >>= display "→ whisper: "
-  Recursive (Mouth expr) -> Nothing <$ do evalExpr expr >>= display "mouth: "
+evalStmt stmt = case unwrap stmt of
+  Echo expr -> Nothing <$ do evalExpr expr >>= display "echo"
+  Whisper expr -> Nothing <$ do evalExpr expr >>= display "→ whisper: "
+  Mouth expr -> Nothing <$ do evalExpr expr >>= display "mouth: "
 
   -- ✅ Correct: discard subflow return value
-  Recursive (Call name args) -> do
+  Call name args -> do
     flowMap <- ask
     case Map.lookup name flowMap of
       Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
       Just (FlowIR _ params body) ->
         Nothing <$ do for args evalExpr >>= lift . lift . runStateT (runReaderT (evalBody body) flowMap) . Map.fromList . zip params
 
-  Recursive (Return expr) ->
+  Return expr ->
     Just <$> evalExpr expr
 
-  Recursive (Assert expr) ->
+  Assert expr ->
     evalExpr expr >>= \case
       VBool True  -> return Nothing
       VBool False -> throwError $ RuntimeError "Assertion failed"
       _           -> throwError $ RuntimeError "Assert expects boolean"
 
-  Recursive (Branch cond tBlock eBlock) ->
+  Branch cond tBlock eBlock ->
     evalExpr cond >>= \case
       VBool True  -> isolate (evalBody tBlock)
       VBool False -> isolate (evalBody eBlock)
       _           -> throwError $ RuntimeError "Condition must be boolean"
 
-  Recursive (Delta name _mType expr) ->
+  Delta name _mType expr ->
     Nothing <$ do evalExpr expr >>= modify . Map.insert name
 
-  Recursive (Source name _mType expr) -> do
+  Source name _mType expr -> do
     Map.lookup name <$> get >>= \case
       Nothing -> Nothing <$ do evalExpr expr >>= modify . Map.insert name
       Just _  -> throwError $ RuntimeError ("Variable '" ++ name ++ "' already defined")
@@ -112,59 +113,59 @@ binOp op a b = (,) <$> evalExpr a <*> evalExpr b >>= \case
   _ -> throwError $ RuntimeError "Type error in arithmetic operation"
 
 evalExpr :: Recursive Expression -> EvalIR Value
-evalExpr expr = case expr of
-  Recursive (NumLit n)  -> return $ VNum n
-  Recursive (StrLit s)  -> return $ VStr s
-  Recursive (BoolLit b) -> return $ VBool b
+evalExpr expr = case unwrap expr of
+  NumLit n  -> return $ VNum n
+  StrLit s  -> return $ VStr s
+  BoolLit b -> return $ VBool b
 
-  Recursive (Var name) ->
+  Var name ->
     Map.lookup name <$> get
       >>= maybe (throwError . RuntimeError $ "Unbound variable: " ++ name) pure
 
-  Recursive (Add a b) -> binOp (+) a b
-  Recursive (Sub a b) -> binOp (-) a b
-  Recursive (Mul a b) -> binOp (*) a b
+  Add a b -> binOp (+) a b
+  Sub a b -> binOp (-) a b
+  Mul a b -> binOp (*) a b
 
-  Recursive (Div a b) ->
+  Div a b ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
       (VNum _, VNum 0)   -> throwError $ RuntimeError "Division by zero"
       (VNum n1, VNum n2) -> return $ VNum (n1 / n2)
       _                  -> throwError $ RuntimeError "Type error in division"
 
-  Recursive (Neg e) ->
+  Neg e ->
     evalExpr e >>= \case
       VNum n -> return $ VNum (-n)
       _      -> throwError $ RuntimeError "Negation requires number"
 
-  Recursive (Not e) ->
+  Not e ->
     evalExpr e >>= \case
       VBool b -> return $ VBool (not b)
       _       -> throwError $ RuntimeError "Expected boolean in 'not'"
 
-  Recursive (Equals a b) ->
+  Equals a b ->
     VBool <$> ((==) <$> evalExpr a <*> evalExpr b)
 
-  Recursive (GreaterThan a b) ->
+  GreaterThan a b ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
       (VNum n1, VNum n2) -> return $ VBool (n1 > n2)
       _ -> throwError $ RuntimeError "> requires numeric values"
 
-  Recursive (LessThan a b) ->
+  LessThan a b ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
       (VNum n1, VNum n2) -> return $ VBool (n1 < n2)
       _ -> throwError $ RuntimeError "< requires numeric values"
 
-  Recursive (And a b) ->
+  And a b ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
       (VBool b1, VBool b2) -> return $ VBool (b1 && b2)
       _ -> throwError $ RuntimeError "and requires booleans"
 
-  Recursive (Or a b) ->
+  Or a b ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
       (VBool b1, VBool b2) -> return $ VBool (b1 || b2)
       _ -> throwError $ RuntimeError "or requires booleans"
 
-  Recursive (CallExpr name args) -> do
+  CallExpr name args -> do
     fsenv <- ask
     case Map.lookup name fsenv of
       Nothing -> throwError $ RuntimeError ("Unknown function: " ++ name)

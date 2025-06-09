@@ -1,6 +1,6 @@
 module RVRS.Typecheck.Check where
 
-import Ya (Recursive (..))
+import Ya (Recursive (..), unwrap)
 import qualified Data.Map as Map
 
 import RVRS.AST
@@ -8,11 +8,11 @@ import RVRS.Typecheck.Types
 
 -- Infer the type of an expression
 typeOfExpr :: TypeEnv -> Recursive Expression -> Either TypeError RVRS_Type
-typeOfExpr _ (Recursive (NumLit _)) = Right TNum
-typeOfExpr _ (Recursive (StrLit _)) = Right TStr
-typeOfExpr _ (Recursive (BoolLit _)) = Right TBool
-typeOfExpr env (Recursive (Var name)) =
-  case Map.lookup name env of
+typeOfExpr env expr = case unwrap expr of
+  NumLit _ -> Right TNum
+  StrLit _ -> Right TStr
+  BoolLit _ -> Right TBool
+  Var name -> case Map.lookup name env of
     Just ty -> Right ty
-    Nothing -> Left (UnknownVariable name)
-typeOfExpr _ other = Left (UnsupportedOp (show other))
+    Nothing -> Left $ UnknownVariable name
+  other -> Left . UnsupportedOp $ show other
