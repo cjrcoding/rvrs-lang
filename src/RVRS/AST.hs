@@ -10,7 +10,7 @@ import RVRS.Parser.Type (RVRSType(..))
 data Flow = Flow
   { flowName :: String           -- ^ The flow's name (e.g. "main", "add")
   , flowArgs :: [Argument]       -- ^ Named ritual arguments, optionally typed
-  , flowBody :: [Statement]      -- ^ The ritual body (statements)
+  , flowBody :: [Recursive Statement]      -- ^ The ritual body (statements)
   } deriving (Show, Eq)
 
 -- | A named argument to a flow, e.g., `x: Number`
@@ -21,21 +21,21 @@ data Argument = Argument
 
 
 -- | Statements inside a flow block
-data Statement
-  = Source String (Maybe RVRSType) (Recursive Expr)                 -- source x = ...
-  | Delta String (Maybe RVRSType) (Recursive Expr)
-  | Branch (Recursive Expr) [Statement] [Statement]-- branch cond { ... } else { ... }
-  | Mouth (Recursive Expr)                          -- mouth "..."
-  | Whisper (Recursive Expr)
-  | Echo (Recursive Expr)                           -- echo x
-  | Pillar String (Recursive Expr)  -- pillar NAME = ...
-  | Return (Recursive Expr)
-  | Call String [Recursive Expr]
-  | Assert (Recursive Expr)
+data Statement e
+  = Source String (Maybe RVRSType) (Recursive Expression)                 -- source x = ...
+  | Delta String (Maybe RVRSType) (Recursive Expression)
+  | Branch (Recursive Expression) [e] [e]-- branch cond { ... } else { ... }
+  | Mouth (Recursive Expression)                          -- mouth "..."
+  | Whisper (Recursive Expression)
+  | Echo (Recursive Expression)                           -- echo x
+  | Pillar String (Recursive Expression)  -- pillar NAME = ...
+  | Return (Recursive Expression)
+  | Call String [Recursive Expression]
+  | Assert (Recursive Expression)
 
   deriving (Show, Eq)
 
-data Expr e
+data Expression e
   = Var String
   | StrLit String
   | BoolLit Bool
@@ -58,3 +58,10 @@ newtype Recursive f = Recursive { unfix :: f (Recursive f) }
 
 deriving instance (Eq (f (Recursive f))) => Eq (Recursive f)
 deriving instance (Show (f (Recursive f))) => Show (Recursive f)
+
+-- | Intermediate representation of a flow
+data FlowIR = FlowIR
+  { flowNameIR :: String
+  , flowArgsIR :: [String]
+  , flowBodyIR :: [Recursive Statement]
+  } deriving (Show, Eq)
