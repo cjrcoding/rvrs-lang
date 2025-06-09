@@ -22,6 +22,7 @@ executable rvrs
     , RVRS.Utils
     , RVRS.Typecheck.Check
     , RVRS.Typecheck.Types
+    , Ya.Conversion
     , Ya.Instances
 
   build-depends:
@@ -37,6 +38,7 @@ executable rvrs
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
+    PatternSynonyms
     StandaloneDeriving
     QuantifiedConstraints
 
@@ -59,6 +61,7 @@ executable RunAll
     , RVRS.Utils
     , RVRS.Typecheck.Check
     , RVRS.Typecheck.Types
+    , Ya.Conversion
     , Ya.Instances
 
   build-depends:
@@ -77,6 +80,7 @@ executable RunAll
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
+    PatternSynonyms
     StandaloneDeriving
     QuantifiedConstraints
 
@@ -99,6 +103,7 @@ executable TestLower
     , RVRS.Utils
     , RVRS.Typecheck.Check
     , RVRS.Typecheck.Types
+    , Ya.Conversion
     , Ya.Instances
 
   build-depends:
@@ -114,6 +119,7 @@ executable TestLower
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
+    PatternSynonyms
     StandaloneDeriving
     QuantifiedConstraints
 
@@ -136,6 +142,7 @@ executable RunIRTests
     , RVRS.Utils
     , RVRS.Typecheck.Check
     , RVRS.Typecheck.Types
+    , Ya.Conversion
     , Ya.Instances
 
   build-depends:
@@ -154,5 +161,6 @@ executable RunIRTests
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
+    PatternSynonyms
     StandaloneDeriving
     QuantifiedConstraints
