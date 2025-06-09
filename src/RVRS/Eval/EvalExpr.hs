@@ -1,6 +1,6 @@
 module RVRS.Eval.EvalExpr (evalExpr, evalBody) where
 
-import RVRS.AST (Recursive (..), Expression(..), StmtIR(..), FlowIR(..))
+import RVRS.AST (Recursive (..), Expression(..), Statement(..), FlowIR(..))
 import RVRS.Value (Value(..)) 
 import RVRS.Eval.Types (EvalIR, EvalError(..), FlowEnv)
 import RVRS.Env (ValueEnv)
@@ -85,54 +85,54 @@ evalExpr expr = case expr of
 
 -- Statement evaluator
 
-evalIRStmt :: StmtIR -> EvalIR (Maybe Value)
+evalIRStmt :: Recursive Statement -> EvalIR (Maybe Value)
 evalIRStmt stmt = case stmt of
-  IREcho expr -> do
+  Recursive (Echo expr) -> do
     val <- evalExpr expr
     liftIO $ putStrLn ("echo: " ++ show val)
     return Nothing
 
-  IRWhisper label expr -> do
+  Recursive (Whisper expr) -> do
     val <- evalExpr expr
-    liftIO $ putStrLn ("→ whisper: " ++ label ++ " = " ++ show val)
+    liftIO $ putStrLn ("→ whisper: " ++ " = " ++ show val)
     return Nothing
 
-  IRCallStmt name args -> do
+  Recursive (Call name args) -> do
     Map.lookup name <$> ask >>= \case
       Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
       Just (FlowIR _ params body) ->
         Nothing <$ do for args evalExpr >>= callBody body . Map.fromList . zip params
 
-  IRReturn expr ->
+  Recursive (Return expr) ->
     Just <$> evalExpr expr
 
-  IRMouth expr ->
+  Recursive (Mouth expr) ->
     Nothing <$ do evalExpr expr >>= liftIO . putStrLn . ("mouth: " ++) . show
 
-  IRAssert expr ->
+  Recursive (Assert expr) ->
     evalExpr expr >>= \case
       VBool True  -> return Nothing
       VBool False -> throwError $ RuntimeError "Assertion failed"
       _           -> throwError $ RuntimeError "Assert expects boolean"
 
-  IRBranch cond tBlock eBlock ->
+  Recursive (Branch cond tBlock eBlock) ->
     evalExpr cond >>= \case
       VBool True  -> evalBody tBlock
       VBool False -> evalBody eBlock
       _ -> throwError $ RuntimeError "Condition must be boolean"
 
-  IRDelta name expr _mType ->
+  Recursive (Delta name _mType expr) ->
     Nothing <$ (evalExpr expr >>= modify . Map.insert name)
 
-  IRSource name expr _mType ->
+  Recursive (Source name _mType expr) ->
     Map.lookup name <$> get >>= \case
       Nothing -> Nothing <$ do evalExpr expr >>= modify . Map.insert name
       Just _  -> throwError . RuntimeError $ "Variable '" ++ name ++ "' already defined"
 
-callBody :: [StmtIR] -> ValueEnv -> EvalIR (Maybe Value, ValueEnv)
+callBody :: [Recursive Statement] -> ValueEnv -> EvalIR (Maybe Value, ValueEnv)
 callBody body callEnv = runReaderT (evalBody body) <$> ask >>= lift . lift . flip runStateT callEnv
 
 -- Flow body evaluator used in both CallExpr and CallStmt
-evalBody :: [StmtIR] -> EvalIR (Maybe Value)
+evalBody :: [Recursive Statement] -> EvalIR (Maybe Value)
 evalBody [] = return Nothing
 evalBody (stmt:rest) = evalIRStmt stmt >>= maybe (evalBody rest) (pure . Just)

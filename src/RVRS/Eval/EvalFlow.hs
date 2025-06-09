@@ -1,5 +1,5 @@
 module RVRS.Eval.EvalFlow (evalIRFlow, runEvalIR, EvalError(..)) where
-import RVRS.AST (StmtIR (..), FlowIR (..))
+import RVRS.AST (FlowIR (..))
 import RVRS.Utils
 import RVRS.Value (Value(..))
 import RVRS.Eval.EvalExpr (evalBody)
@@ -35,5 +35,5 @@ evalIRFlow userFlows entryName args = do
     Nothing -> return $ Left . RuntimeError $ "No flow named '" ++ entryName ++ "' found."
 
 handleReturn :: EvalError -> EvalIR (Maybe Value)
-handleReturn (Return v) = return (Just v)
+handleReturn (ReturnValue v) = return (Just v)
 handleReturn err        = throwError err

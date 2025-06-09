@@ -63,18 +63,5 @@ deriving instance (Show (f (Recursive f))) => Show (Recursive f)
 data FlowIR = FlowIR
   { flowNameIR :: String
   , flowArgsIR :: [String]
-  , flowBodyIR :: [StmtIR]
+  , flowBodyIR :: [Recursive Statement]
   } deriving (Show, Eq)
-
--- | Lowered statements (IR version of AST Statement)
-data StmtIR
-  = IRDelta String (Recursive Expression) (Maybe RVRSType)
-  | IRSource String (Recursive Expression) (Maybe RVRSType)
-  | IREcho (Recursive Expression)
-  | IRWhisper String (Recursive Expression)
-  | IRMouth (Recursive Expression)
-  | IRBranch (Recursive Expression) [StmtIR] [StmtIR]
-  | IRReturn (Recursive Expression)
-  | IRCallStmt String [Recursive Expression]  -- Top-level statement like: call foo(x, y)
-  | IRAssert (Recursive Expression)
-  deriving (Show, Eq)

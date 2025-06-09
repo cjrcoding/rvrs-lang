@@ -18,5 +18,5 @@ type EvalIR a = ReaderT FlowEnv (StateT ValueEnv (ExceptT EvalError IO)) a
 
 data EvalError
   = RuntimeError String
-  | Return Value
+  | ReturnValue Value
   deriving (Show, Eq)
