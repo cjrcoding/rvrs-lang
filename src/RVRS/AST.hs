@@ -1,10 +1,9 @@
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE QuantifiedConstraints #-}
-{-# LANGUAGE UndecidableInstances #-}
 module RVRS.AST where
 
-import RVRS.Parser.Type (RVRSType(..))
+import Ya (Recursive (..))
 
+import RVRS.Parser.Type (RVRSType(..))
+import Ya.Instances ()
 
 -- | Represents a named flow of ritual logic
 data Flow = Flow
@@ -53,11 +52,6 @@ data Expression e
   | CallExpr String [e]
   | Neg e
   deriving (Show, Eq)
-
-newtype Recursive f = Recursive { unfix :: f (Recursive f) }
-
-deriving instance (Eq (f (Recursive f))) => Eq (Recursive f)
-deriving instance (Show (f (Recursive f))) => Show (Recursive f)
 
 -- | Intermediate representation of a flow
 data FlowIR = FlowIR

@@ -8,6 +8,7 @@ module RVRS.Eval (
   EvalError(..)
 ) where
 
+import Ya (Recursive (..))
 import Data.Maybe
 import Data.Traversable
 import Control.Monad.Except

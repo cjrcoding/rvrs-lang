@@ -22,6 +22,7 @@ executable rvrs
     , RVRS.Utils
     , RVRS.Typecheck.Check
     , RVRS.Typecheck.Types
+    , Ya.Instances
 
   build-depends:
       base >=4.14 && <5
@@ -31,10 +32,13 @@ executable rvrs
     , parser-combinators
     , containers
     , mtl
+    , ya
 
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
+    StandaloneDeriving
+    QuantifiedConstraints
 
 -- === Executable: RunAll ===
 executable RunAll
@@ -55,6 +59,7 @@ executable RunAll
     , RVRS.Utils
     , RVRS.Typecheck.Check
     , RVRS.Typecheck.Types
+    , Ya.Instances
 
   build-depends:
       base >=4.14 && <5
@@ -67,10 +72,13 @@ executable RunAll
     , filepath
     , process
     , mtl
+    , ya
 
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
+    StandaloneDeriving
+    QuantifiedConstraints
 
 -- === Executable: TestLower ===
 executable TestLower
@@ -91,6 +99,7 @@ executable TestLower
     , RVRS.Utils
     , RVRS.Typecheck.Check
     , RVRS.Typecheck.Types
+    , Ya.Instances
 
   build-depends:
       base >=4.14 && <5
@@ -100,10 +109,13 @@ executable TestLower
     , parser-combinators
     , containers
     , mtl
+    , ya
 
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
+    StandaloneDeriving
+    QuantifiedConstraints
 
 -- === Executable: RunIRTests ===
 executable RunIRTests
@@ -124,6 +136,7 @@ executable RunIRTests
     , RVRS.Utils
     , RVRS.Typecheck.Check
     , RVRS.Typecheck.Types
+    , Ya.Instances
 
   build-depends:
       base >=4.14 && <5
@@ -136,7 +149,10 @@ executable RunIRTests
     , filepath
     , process
     , mtl
+    , ya
 
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
+    StandaloneDeriving
+    QuantifiedConstraints

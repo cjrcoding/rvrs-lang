@@ -1,5 +1,7 @@
 module RVRS.Codegen (generateAiken, prettyPrintFlow) where
 
+import Ya (Recursive (..))
+
 import RVRS.AST
 
 -- | Convert an entire flow into Aiken-style code

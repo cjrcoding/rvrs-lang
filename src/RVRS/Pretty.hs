@@ -1,5 +1,7 @@
 module RVRS.Pretty (prettyExpr) where
 
+import Ya (Recursive (..))
+
 import RVRS.AST
 
 prettyExpr :: Recursive Expression -> String

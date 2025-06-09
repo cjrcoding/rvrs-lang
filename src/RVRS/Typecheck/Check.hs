@@ -1,8 +1,10 @@
 module RVRS.Typecheck.Check where
 
+import Ya (Recursive (..))
+import qualified Data.Map as Map
+
 import RVRS.AST
 import RVRS.Typecheck.Types
-import qualified Data.Map as Map
 
 -- Infer the type of an expression
 typeOfExpr :: TypeEnv -> Recursive Expression -> Either TypeError RVRS_Type
