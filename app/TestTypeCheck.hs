@@ -3,10 +3,10 @@ module Main where
 import Test.HUnit
 import qualified Data.Map as Map
 
-import RVRS.Typecheck.Check (typeofExpr)
+import RVRS.Typecheck.Check (typeOfExpr)
 import RVRS.Typecheck.Types
 import RVRS.AST
-import RVRS.AST (Recursive(..)) 
+import Ya (Recursive(..)) 
 
 
 -- Define a test environment with some known vars
@@ -42,31 +42,31 @@ notExpr = Recursive . Not
 -- Define the actual tests
 tests :: Test
 tests = TestList
-  [ "Num literal" ~: typeofExpr testEnv (num 42) ~?= Right TNum
-  , "Bool literal" ~: typeofExpr testEnv (bool True) ~?= Right TBool
-  , "Str literal" ~: typeofExpr testEnv (str "hello") ~?= Right TStr
+  [ "Num literal" ~: typeOfExpr testEnv (num 42) ~?= Right TNum
+  , "Bool literal" ~: typeOfExpr testEnv (bool True) ~?= Right TBool
+  , "Str literal" ~: typeOfExpr testEnv (str "hello") ~?= Right TStr
 
-  , "Known variable" ~: typeofExpr testEnv (var "x") ~?= Right TNum
-  , "Unknown variable" ~: typeofExpr testEnv (var "z") ~?= Left (UnknownVariable "z")
+  , "Known variable" ~: typeOfExpr testEnv (var "x") ~?= Right TNum
+  , "Unknown variable" ~: typeOfExpr testEnv (var "z") ~?= Left (UnknownVariable "z")
 
-  , "Valid addition" ~: typeofExpr testEnv (add (num 5) (num 7)) ~?= Right TNum
+  , "Valid addition" ~: typeOfExpr testEnv (add (num 5) (num 7)) ~?= Right TNum
 
   , "Invalid addition" ~: TestCase $
-      case typeofExpr testEnv (add (num 5) (bool True)) of
+      case typeOfExpr testEnv (add (num 5) (bool True)) of
         Left (TypeMismatch _ _) -> return ()
         _ -> assertFailure "Expected TypeMismatch"
 
-  , "Equals matching types" ~: typeofExpr testEnv (equals (num 1) (num 1)) ~?= Right TBool
+  , "Equals matching types" ~: typeOfExpr testEnv (equals (num 1) (num 1)) ~?= Right TBool
 
   , "Equals mismatched types" ~: TestCase $
-      case typeofExpr testEnv (equals (str "hi") (bool False)) of
+      case typeOfExpr testEnv (equals (str "hi") (bool False)) of
         Left (TypeMismatch _ _) -> return ()
         _ -> assertFailure "Expected TypeMismatch"
 
-  , "Not on Bool" ~: typeofExpr testEnv (notExpr (bool False)) ~?= Right TBool
+  , "Not on Bool" ~: typeOfExpr testEnv (notExpr (bool False)) ~?= Right TBool
 
   , "Not on Num" ~: TestCase $
-      case typeofExpr testEnv (notExpr (num 0)) of
+      case typeOfExpr testEnv (notExpr (num 0)) of
         Left (TypeMismatch _ _) -> return ()
         _ -> assertFailure "Expected TypeMismatch"
   ]

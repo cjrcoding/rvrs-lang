@@ -1,9 +1,6 @@
 module RVRS.Parser.StmtParser (statementParser, blockParser) where
 
-import RVRS.AST
-import RVRS.Utils
-import RVRS.Parser.ExprParser (exprParser)
-import RVRS.Parser.Type (typeParser)
+import Ya (Recursive (..))
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
@@ -11,6 +8,11 @@ import Control.Monad (void)
 import Control.Monad.Combinators.Expr
 import Data.Void
 import Data.Char (isAlphaNum)
+
+import RVRS.AST
+import RVRS.Utils
+import RVRS.Parser.ExprParser (exprParser)
+import RVRS.Parser.Type (typeParser)
 
 type Parser = Parsec Void String
 
