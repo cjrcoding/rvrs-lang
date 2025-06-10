@@ -1,5 +1,7 @@
 module RVRS.Codegen (generateAiken, prettyPrintFlow) where
 
+import Ya (Recursive (..), unwrap)
+
 import RVRS.AST
 
 -- | Convert an entire flow into Aiken-style code
@@ -12,12 +14,12 @@ generateAiken (Flow name args body) =
 
 -- | Convert a statement into one or more Aiken lines
 genStmt :: Recursive Statement -> [String]
-genStmt stmt = case stmt of
-  Recursive (Source var _ expr) -> ["let " ++ var ++ " = " ++ genExpr expr]
-  Recursive (Delta var _ expr )-> ["let " ++ var ++ " = " ++ genExpr expr]
-  Recursive (Mouth expr) -> ["trace " ++ show (genExpr expr)]
-  Recursive (Echo expr) -> ["return " ++ genExpr expr]
-  Recursive (Branch cond tBranch fBranch) ->
+genStmt stmt = case unwrap stmt of
+  Source var _ expr -> ["let " ++ var ++ " = " ++ genExpr expr]
+  Delta var _ expr -> ["let " ++ var ++ " = " ++ genExpr expr]
+  Mouth expr -> ["trace " ++ show (genExpr expr)]
+  Echo expr -> ["return " ++ genExpr expr]
+  Branch cond tBranch fBranch ->
     ["if " ++ genExpr cond ++ " {"] ++
     indent (concatMap genStmt tBranch) ++
     ["} else {"] ++
@@ -26,12 +28,12 @@ genStmt stmt = case stmt of
 
 -- | Convert an expression into Aiken-compatible syntax
 genExpr :: Recursive Expression -> String
-genExpr expr = case expr of
-  Recursive (Var x)         -> x
-  Recursive (StrLit s)      -> show s
-  Recursive (BoolLit True)  -> "true"
-  Recursive (BoolLit False) -> "false"
-  Recursive (Equals a b)    -> genExpr a ++ " == " ++ genExpr b
+genExpr expr = case unwrap expr of
+  Var x         -> x
+  StrLit s      -> show s
+  BoolLit True  -> "true"
+  BoolLit False -> "false"
+  Equals a b    -> genExpr a ++ " == " ++ genExpr b
 
 -- | Render a function argument
 renderArg :: Argument -> String
