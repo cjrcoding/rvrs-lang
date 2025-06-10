@@ -140,3 +140,27 @@ executable RunIRTests
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
+
+-- === Executable: TestTypeCheck ===
+executable TestTypeCheck
+  main-is:             TestTypeCheck.hs
+  hs-source-dirs:      app, src
+  other-modules:
+      RVRS.AST
+    , RVRS.Typecheck.Check
+    , RVRS.Typecheck.Types
+    , RVRS.Parser.Type
+
+  build-depends:
+      base >=4.14 && <5
+    , text
+    , containers
+    , megaparsec
+    , prettyprinter
+    , parser-combinators
+    , mtl
+    , HUnit
+
+  default-language:    Haskell2010
+  default-extensions:
+    LambdaCase
