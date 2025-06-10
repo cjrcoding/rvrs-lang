@@ -2,11 +2,7 @@
 
 module RVRS.Parser.ExprParser (exprParser) where
 
--- Internal modules
-import RVRS.AST
-import RVRS.Utils
-
--- External libraries
+import Ya (Recursive (..))
 import Control.Monad (void)
 import Control.Monad.Combinators.Expr
 import Data.Void
@@ -14,6 +10,8 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 
+import RVRS.AST
+import RVRS.Utils
 
 type Parser = Parsec Void String
 
