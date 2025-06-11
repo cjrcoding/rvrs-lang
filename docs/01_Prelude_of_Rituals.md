@@ -4,6 +4,8 @@ Welcome to the **Prelude of Rituals**, the standard library of flows for the RVR
 
 They are written in pure RVRS, lowered to IR, and merged into the evaluation environment. This allows user flows to call them as if they were native constructs.
 
+As of v0.9.0, these rituals are typechecked and executed in the same environment as user-defined flows.
+
 ---
 
 ## 🌊 Core Ritual Flows
@@ -56,9 +58,15 @@ RVRS embraces a symbolic naming convention. Many flows use poetic or metaphorica
 
 > ✨ These rituals are more than tools—they are **symbols**.
 
+- They are also idioms. Examples of how to write expressive, idiomatic RVRS.
+
+- See the [Style Guide](08_styleguide.md) for more on tone and structure.
+
 ---
 
 ## 🧪 Usage Example
+
+These flows are directly invocable in any user-defined RVRS program:
 
 ```rvrs
 flow main {
@@ -81,14 +89,20 @@ flow main {
 - Loaded via parser and lowered to IR using `lowerFlow`
 - Merged into the global `FlowEnv` during evaluation
 - Flows defined here are testable via `RunIRTests`
+- Flows defined here are validated by both the typechecker and evaluator.
+- They are tested via `RunIRTests`, and merged automatically when `evalIRFlow` runs.
 
 ---
 
 ## 🌱 Next Steps
 
-- Expand with additional rituals (e.g., `cleanse`, `align`, `multiply`, `greater_than`)
+- Expand with additional rituals (e.g., `cleanse`, `align`, `multiply`, `greater_than`, `echo_if`)
 - Begin annotating types for stricter validation
 - Add control structures, utility flows, and symbolic patterns for contracts
+
+
+🌟 Want to contribute a new ritual? See [07_contributions.md](07_contributions.md) and submit a symbolic flow.
+
 
 ---
 
