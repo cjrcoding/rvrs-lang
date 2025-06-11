@@ -19,7 +19,7 @@ _See `docs/module-map.md` and `tests/README.md` for details._
 
 ---
 
-##  How to Contribute
+## How to Contribute
 
 ### 1. Set Up the Project
 
@@ -56,9 +56,11 @@ All behavioral changes should include or update one or more test cases.
 ```bash
 cabal run RunAll
 cabal run rvrs tests/path/to/test.rvrs
+cabal run RunIRTests
+cabal run TestTypeCheck
 ```
 
-> ** Testing Policy for Contributors**
+> **Testing Policy for Contributors**  
 >
 > All behavioral changes should include or update one or more tests.  
 > This includes:
@@ -131,5 +133,3 @@ When reporting a bug or proposing a feature, please include:
 - Use descriptive names and comments  
 - Small, self-contained PRs are preferred  
 - Respect the balance of symbolism and structure in RVRS  
-
----

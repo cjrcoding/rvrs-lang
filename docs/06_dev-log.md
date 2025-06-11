@@ -1,6 +1,59 @@
 # RVRS Developer Log
 ---
 
+## 🗓️ 2025-06-11 — Type Enforcement Expands (v0.9.0-dev in Progress)
+
+### ✅ Summary  
+- Extended type enforcement with:
+  - Expression-level type inference for binary ops (`+`, `-`, `*`, `/`, `==`, etc.)
+  - Support for `Recursive` wrapping using `Ya` integration
+- Added new type-checking runner: `TestTypeCheck.hs`
+  - Covers direct expression tests for `typeOfExpr`
+- Confirmed runtime handling of:
+  - Type mismatches
+  - Unbound variables
+  - Assertion failures
+- Tests now fully span: source, IR, and expression-level checks
+
+📊 Test Totals:
+- ✅ Passed: 39
+- ⚠️ Expected Failures: 5
+- ❌ Unexpected Failures: 0
+- 🧪 Total Tests: 45
+
+📂 Coverage:
+- `RunAll`: 33 tests (core + poetic + edge)
+- `RunIRTests`: 5 tests (IR-level behavior)
+- `TestTypeCheck`: 11 unit tests
+
+### 🧠 Key Features Progressing Toward v1.0
+- ✅ Binary op type enforcement via `typeOfExpr`
+- ✅ Type environment tracking using `TypeEnv`
+- ✅ Expression error reporting with `TypeMismatch`
+- 🚧 Flow-level return type validation
+- 🚧 Branch condition type enforcement (`Bool` only)
+- 🚧 Flow argument arity/type checking
+
+### 🧭 What’s Next
+- [ ] Validate all `branch` condition types to ensure `Bool`
+- [ ] Enforce return type alignment in flow declarations
+- [ ] Add multi-arg flow tests with arity mismatches
+- [ ] Improve `TypeMismatch` and `ReturnMismatch` messages
+- [ ] Consider stricter `source` validation (no rebinds)
+
+### 🧹 Repo State
+- Branch: `type-enforce-dev`  
+- Mainline: stable at `v0.8.7`  
+- New files:
+  - `TestTypeCheck.hs` (expression-level test runner)
+- Modified:
+  - `RVRS/Typecheck/Check.hs` for binary op logic
+  - `Ya` integrated for recursion unwrapping
+
+> *“As the river widens, so does its depth. The types are now part of the current.”*
+
+---
+
 ## 🗓️ 2025-05-22 — Type Enforcement Begins (v0.8.0-dev in Progress)
 
 ### ✅ Summary  
