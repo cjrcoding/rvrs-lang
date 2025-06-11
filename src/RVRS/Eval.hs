@@ -10,11 +10,11 @@ module RVRS.Eval (
 
 import Data.Map (Map, insert, union)
 import qualified Data.Map as Map (lookup)
-import Data.Maybe
-import Data.Traversable
-import Control.Monad.Except
-import Control.Monad.State
-import Control.Monad.Reader
+import Data.Maybe (maybe, fromMaybe)
+import Data.Traversable (for)
+import Control.Monad.Except (ExceptT, runExceptT, throwError, catchError)
+import Control.Monad.State (StateT, runStateT, get, modify, liftIO)
+import Control.Monad.Reader (ReaderT, runReaderT, ask, lift)
 import GHC.IsList (fromList)
 import System.IO (readFile)
 
