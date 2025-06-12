@@ -3,6 +3,43 @@ name:                rvrs-lang
 version:             0.1.0.0
 build-type:          Simple
 
+-- === Library: rvrs-lang ===
+library
+  exposed-modules:
+      RVRS.AST
+    , RVRS.Typecheck.Check
+    , RVRS.Typecheck.Types
+  other-modules:
+      RVRS.Codegen
+    , RVRS.Parser
+    , RVRS.Parser.ExprParser
+    , RVRS.Parser.StmtParser
+    , RVRS.Parser.Type
+    , RVRS.Eval
+    , RVRS.Pretty
+    , RVRS.Value
+    , RVRS.Lower
+    , RVRS.Env
+    , RVRS.Utils
+    , Ya.Conversion
+    , Ya.Instances
+  hs-source-dirs:      src
+  build-depends:
+      base >=4.14 && <5
+    , containers
+    , ya
+    , megaparsec
+    , text
+    , prettyprinter
+    , parser-combinators
+    , mtl
+  default-language:    Haskell2010
+  default-extensions:
+    StandaloneDeriving
+    LambdaCase
+
+
+
 -- === Executable: rvrs ===
 executable rvrs
   main-is:             Main.hs
@@ -185,3 +222,23 @@ executable TestTypeCheck
   default-extensions:
     LambdaCase
     , StandaloneDeriving
+
+-- === Executable: TestTypeCheckNegative ===
+executable testtypechecknegative
+  main-is:             TestTypeCheckNegative.hs
+  hs-source-dirs:      app, src
+  other-modules:
+      RVRS.AST
+    , RVRS.Parser.Type
+    , RVRS.Typecheck.Check
+    , RVRS.Typecheck.Types
+    , Ya.Instances
+  build-depends:
+      base >=4.14 && <5
+    , containers
+    , HUnit
+    , ya
+    , megaparsec
+  default-language:    Haskell2010
+  default-extensions:
+    StandaloneDeriving
