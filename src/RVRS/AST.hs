@@ -31,7 +31,6 @@ data Statement e
   | Return (Recursive Expression)
   | Call String [Recursive Expression]
   | Assert (Recursive Expression)
-
   deriving (Show, Eq)
 
 data Expression e

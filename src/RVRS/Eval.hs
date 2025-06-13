@@ -18,7 +18,7 @@ import Control.Monad.Reader
 import GHC.IsList (fromList)
 import System.IO (readFile)
 
-import Ya (Recursive (..), is, unwrap, ho, la, li)
+import Ya (Recursive (..), is, unwrap, ho, ha, hv__, la, li)
 
 import RVRS.AST
 import RVRS.Env
@@ -91,14 +91,14 @@ evalStmt stmt = case unwrap stmt of
 
   Assert expr ->
     evalExpr expr >>= \case
-      VBool True  -> return Nothing
-      VBool False -> throwError $ RuntimeError "Assertion failed"
+      VPrim (Bool True)  -> return Nothing
+      VPrim (Bool False) -> throwError $ RuntimeError "Assertion failed"
       _           -> throwError $ RuntimeError "Assert expects boolean"
 
   Branch cond tBlock eBlock ->
     evalExpr cond >>= \case
-      VBool True  -> isolate (evalBody tBlock)
-      VBool False -> isolate (evalBody eBlock)
+      VPrim (Bool True)  -> isolate (evalBody tBlock)
+      VPrim (Bool False) -> isolate (evalBody eBlock)
       _           -> throwError $ RuntimeError "Condition must be boolean"
 
   Delta name _mType expr ->
@@ -111,12 +111,12 @@ evalStmt stmt = case unwrap stmt of
 
 binOp :: (Double -> Double -> Double) -> Recursive Expression -> Recursive Expression -> EvalIR Value
 binOp op a b = (,) <$> evalExpr a <*> evalExpr b >>= \case
-  (VNum n1, VNum n2) -> return $ VNum (op n1 n2)
+  (VPrim (Double n1), VPrim (Double n2)) -> return $ VPrim . Double $ op n1 n2
   _ -> throwError $ RuntimeError "Type error in arithmetic operation"
 
 evalExpr :: Recursive Expression -> EvalIR Value
 evalExpr expr = case unwrap expr of
-  Lit x -> return (is @String `ho` VStr `la` is @Double `ho` VNum `la` is @Bool `ho` VBool `li` x)
+  Lit x -> return `ha` VPrim `hv__` is @String `ho` String `la` is @Double `ho` Double `la` is @Bool `ho` Bool `li` x
 
   Var name ->
     Map.lookup name <$> get
@@ -128,41 +128,41 @@ evalExpr expr = case unwrap expr of
 
   Div a b ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VNum _, VNum 0)   -> throwError $ RuntimeError "Division by zero"
-      (VNum n1, VNum n2) -> return $ VNum (n1 / n2)
+      (VPrim (Double _), VPrim (Double 0))  -> throwError $ RuntimeError "Division by zero"
+      (VPrim (Double n1), VPrim (Double n2)) -> return . VPrim . Double $ n1 / n2
       _                  -> throwError $ RuntimeError "Type error in division"
 
   Neg e ->
     evalExpr e >>= \case
-      VNum n -> return $ VNum (-n)
+      VPrim (Double n) -> return . VPrim $ Double (-n)
       _      -> throwError $ RuntimeError "Negation requires number"
 
   Not e ->
     evalExpr e >>= \case
-      VBool b -> return $ VBool (not b)
+      VPrim (Bool b) -> return . VPrim . Bool $ not b
       _       -> throwError $ RuntimeError "Expected boolean in 'not'"
 
   Equals a b ->
-    VBool <$> ((==) <$> evalExpr a <*> evalExpr b)
+    VPrim . Bool <$> ((==) <$> evalExpr a <*> evalExpr b)
 
   GreaterThan a b ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VNum n1, VNum n2) -> return $ VBool (n1 > n2)
+      (VPrim (Double n1), VPrim (Double n2)) -> return . VPrim . Bool $ n1 > n2
       _ -> throwError $ RuntimeError "> requires numeric values"
 
   LessThan a b ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VNum n1, VNum n2) -> return $ VBool (n1 < n2)
+      (VPrim (Double n1), VPrim (Double n2)) -> return . VPrim . Bool $ n1 < n2
       _ -> throwError $ RuntimeError "< requires numeric values"
 
   And a b ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VBool b1, VBool b2) -> return $ VBool (b1 && b2)
+      (VPrim (Bool b1), VPrim (Bool b2)) -> return . VPrim . Bool $ b1 && b2
       _ -> throwError $ RuntimeError "and requires booleans"
 
   Or a b ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VBool b1, VBool b2) -> return $ VBool (b1 || b2)
+      (VPrim (Bool b1), VPrim (Bool b2)) -> return . VPrim . Bool $ b1 || b2
       _ -> throwError $ RuntimeError "or requires booleans"
 
   CallExpr name args -> do
