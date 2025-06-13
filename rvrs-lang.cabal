@@ -33,6 +33,7 @@ library
     , prettyprinter
     , parser-combinators
     , mtl
+    , ya-world
   default-language:    Haskell2010
   default-extensions:
     StandaloneDeriving
@@ -71,12 +72,16 @@ executable rvrs
     , containers
     , mtl
     , ya
+    , ya-world
 
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
-    , StandaloneDeriving
-    , PatternSynonyms
+    PatternSynonyms
+    StandaloneDeriving
+    QuantifiedConstraints
+    TypeApplications
+    TypeOperators
 
 -- === Executable: RunAll ===
 executable RunAll
@@ -112,11 +117,16 @@ executable RunAll
     , process
     , mtl
     , ya
+    , ya-world
 
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
-    , StandaloneDeriving
+    PatternSynonyms
+    StandaloneDeriving
+    QuantifiedConstraints
+    TypeApplications
+    TypeOperators
 
 -- === Executable: TestLower ===
 executable TestLower
@@ -149,11 +159,16 @@ executable TestLower
     , containers
     , mtl
     , ya
+    , ya-world
 
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
-    , StandaloneDeriving
+    PatternSynonyms
+    StandaloneDeriving
+    QuantifiedConstraints
+    TypeApplications
+    TypeOperators
 
 -- === Executable: RunIRTests ===
 executable RunIRTests
@@ -189,11 +204,16 @@ executable RunIRTests
     , process
     , mtl
     , ya
+    , ya-world
 
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
-    , StandaloneDeriving
+    PatternSynonyms
+    StandaloneDeriving
+    QuantifiedConstraints
+    TypeApplications
+    TypeOperators
 
 -- === Executable: TestTypeCheck ===
 executable TestTypeCheck
@@ -217,11 +237,16 @@ executable TestTypeCheck
     , mtl
     , HUnit
     , ya
+    , ya-world
 
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
-    , StandaloneDeriving
+    PatternSynonyms
+    StandaloneDeriving
+    QuantifiedConstraints
+    TypeApplications
+    TypeOperators
 
 -- === Executable: TestTypeCheckNegative ===
 executable testtypechecknegative
@@ -242,3 +267,4 @@ executable testtypechecknegative
   default-language:    Haskell2010
   default-extensions:
     StandaloneDeriving
+
