@@ -18,7 +18,7 @@ import Control.Monad.Reader
 import GHC.IsList (fromList)
 import System.IO (readFile)
 
-import Ya (Recursive (..), unwrap)
+import Ya (Recursive (..), is, unwrap, ho, la, li)
 
 import RVRS.AST
 import RVRS.Env
@@ -116,9 +116,7 @@ binOp op a b = (,) <$> evalExpr a <*> evalExpr b >>= \case
 
 evalExpr :: Recursive Expression -> EvalIR Value
 evalExpr expr = case unwrap expr of
-  NumLit n  -> return $ VNum n
-  StrLit s  -> return $ VStr s
-  BoolLit b -> return $ VBool b
+  Lit x -> return (is @String `ho` VStr `la` is @Double `ho` VNum `la` is @Bool `ho` VBool `li` x)
 
   Var name ->
     Map.lookup name <$> get

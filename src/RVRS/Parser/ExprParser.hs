@@ -40,9 +40,9 @@ operatorTable =
 -- Terms in the expression grammar
 term :: Parser (Recursive Expression)
 term = do try $ funcCallExpr
-   <|> do try $ Recursive (BoolLit True) <$ symbol "truth"
-   <|> do try $ Recursive (BoolLit False) <$ symbol "void"
-   <|> do try $ Recursive . StrLit <$> stringLiteral
+   <|> do try $ Recursive (Lit $ Bool True) <$ symbol "truth"
+   <|> do try $ Recursive (Lit $ Bool False) <$ symbol "void"
+   <|> do try $ Recursive . Lit . String <$> stringLiteral
    <|> do try $ parseNumber
    <|> do try $ Recursive . Not <$> (symbol "not" *> term)
    <|> do try $ Recursive . Neg <$> (symbol "-" *> term)
@@ -51,7 +51,7 @@ term = do try $ funcCallExpr
 
 -- Parse numeric literals
 parseNumber :: Parser (Recursive Expression)
-parseNumber = Recursive <$> NumLit <$> do lexeme $ try L.float <|> fromInteger <$> L.decimal
+parseNumber = Recursive . Lit <$> Double <$> do lexeme $ try L.float <|> fromInteger <$> L.decimal
 
 -- Function call expressions (e.g., fuse(2, 3))
 funcCallExpr :: Parser (Recursive Expression)

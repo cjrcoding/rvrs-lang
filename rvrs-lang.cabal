@@ -35,8 +35,12 @@ library
     , mtl
   default-language:    Haskell2010
   default-extensions:
+    ScopedTypeVariables
     StandaloneDeriving
+    PatternSynonyms
     LambdaCase
+    TypeApplications
+    TypeOperators
 
 
 
@@ -75,8 +79,11 @@ executable rvrs
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
-    , StandaloneDeriving
-    , PatternSynonyms
+    ScopedTypeVariables
+    StandaloneDeriving
+    PatternSynonyms
+    TypeApplications
+    TypeOperators
 
 -- === Executable: RunAll ===
 executable RunAll
@@ -116,7 +123,11 @@ executable RunAll
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
-    , StandaloneDeriving
+    ScopedTypeVariables
+    StandaloneDeriving
+    PatternSynonyms
+    TypeApplications
+    TypeOperators
 
 -- === Executable: TestLower ===
 executable TestLower
@@ -153,7 +164,11 @@ executable TestLower
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
-    , StandaloneDeriving
+    ScopedTypeVariables
+    StandaloneDeriving
+    PatternSynonyms
+    TypeApplications
+    TypeOperators
 
 -- === Executable: RunIRTests ===
 executable RunIRTests
@@ -193,7 +208,11 @@ executable RunIRTests
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
-    , StandaloneDeriving
+    ScopedTypeVariables
+    StandaloneDeriving
+    PatternSynonyms
+    TypeApplications
+    TypeOperators
 
 -- === Executable: TestTypeCheck ===
 executable TestTypeCheck
@@ -221,7 +240,11 @@ executable TestTypeCheck
   default-language:    Haskell2010
   default-extensions:
     LambdaCase
-    , StandaloneDeriving
+    ScopedTypeVariables
+    StandaloneDeriving
+    PatternSynonyms
+    TypeApplications
+    TypeOperators
 
 -- === Executable: TestTypeCheckNegative ===
 executable testtypechecknegative
@@ -241,4 +264,8 @@ executable testtypechecknegative
     , megaparsec
   default-language:    Haskell2010
   default-extensions:
+    ScopedTypeVariables
     StandaloneDeriving
+    PatternSynonyms
+    TypeApplications
+    TypeOperators
