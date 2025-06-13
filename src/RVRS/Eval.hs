@@ -1,5 +1,10 @@
 -- src/RVRS/Eval.hs
 {-# LANGUAGE EmptyCase #-}
+{-# LANGUAGE ExplicitNamespaces #-}
+{-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE TypeOperators #-}
+
+
 module RVRS.Eval (
   evalExpr,
   evalStmt,
