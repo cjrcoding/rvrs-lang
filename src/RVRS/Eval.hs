@@ -19,7 +19,8 @@ import Control.Monad.Reader (ReaderT, runReaderT, ask, lift)
 import GHC.IsList (fromList)
 import System.IO (readFile)
 
-import Ya (T'I, JNT, AR__, Given, Error, State, Recursive (..), List, Nonempty, unwrap, ha, hv, hv_, yi, yo, yok)
+import Ya (type T'I, type JNT, type AR, type AR__, type Given, pattern Unit, pattern Given, pattern Run, pattern Only, pattern None, pattern Error, pattern State, pattern Event, pattern Old, type Error, type State, type Recursive (..), type List, type Nonempty, intro, unwrap, ha, ha__, ho, hu, hv, hv_, hv__, la, is, yi, yo, yok, yok_, yuk_)
+import qualified Ya as Y
 import Ya.World (World, pattern World)
 import Ya.Conversion (may)
 
@@ -199,6 +200,10 @@ evalStmt' stmt = case unwrap stmt of
 
 evalExpr' :: Recursive Expression `AR__` Engine Value
 evalExpr' expr = case unwrap expr of
-  -- NumLit n -> intro `hv` VNum n
-  -- StrLit s -> intro `hv` VStr s
-  -- BoolLit b -> intro `hv` VBool b
+  NumLit n -> intro `hv` VNum n
+  StrLit s -> intro `hv` VStr s
+  BoolLit b -> intro `hv` VBool b
+  -- Var name -> intro `hv` Unit
+  --  `yuk_` Run `hv__` Old `ha` State `ha` Event `hv` Y.get `yo` Map.lookup name `ho` may
+  --  `yok_` Run `ha__` None `hu` Error (RuntimeError $ "Unbound variable: " ++ name) `la` intro
+  --  `yok_` Run `ha__` intro @Engine @(AR)
