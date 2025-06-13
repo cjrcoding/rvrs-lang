@@ -1,6 +1,6 @@
 module RVRS.AST where
 
-import Ya (Recursive (..))
+import Ya (S, Object (This, That), Recursive (..))
 
 import RVRS.Parser.Type (RVRSType(..))
 import Ya.Instances ()
@@ -31,13 +31,11 @@ data Statement e
   | Return (Recursive Expression)
   | Call String [Recursive Expression]
   | Assert (Recursive Expression)
-
   deriving (Show, Eq)
 
 data Expression e
   = Var String
-  | StrLit String
-  | BoolLit Bool
+  | Lit Primitive
   | Equals e e
   | GreaterThan e e
   | LessThan e e
@@ -45,13 +43,18 @@ data Expression e
   | Sub e e
   | Mul e e
   | Div e e
-  | NumLit Double
   | Not e
   | And e e
   | Or e e
   | CallExpr String [e]
   | Neg e
   deriving (Show, Eq)
+
+type Primitive = String `S` Double `S` Bool
+
+pattern String x = This (This x) :: Primitive
+pattern Double x = This (That x) :: Primitive
+pattern Bool x = That x :: Primitive
 
 -- | Intermediate representation of a flow
 data FlowIR = FlowIR

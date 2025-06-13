@@ -18,13 +18,13 @@ testEnv = Map.fromList
 
 -- Helpers
 num :: Double -> Recursive Expression
-num = Recursive . NumLit
+num = Recursive . Lit . Double
 
 bool :: Bool -> Recursive Expression
-bool = Recursive . BoolLit
+bool = Recursive . Lit . Bool
 
 str :: String -> Recursive Expression
-str = Recursive . StrLit
+str = Recursive . Lit . String
 
 var :: String -> Recursive Expression
 var = Recursive . Var

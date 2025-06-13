@@ -1,15 +1,13 @@
 module RVRS.Typecheck.Check where
 
-import Ya (Recursive (..), unwrap)
+import Ya (Recursive (..), is, unwrap, ha__, hu, la, li)
 import RVRS.AST
 import RVRS.Typecheck.Types
 import qualified Data.Map as Map
 
 typeOfExpr :: TypeEnv -> Recursive Expression -> Either TypeError RVRS_Type
 typeOfExpr env expr = case unwrap expr of
-  NumLit _ -> Right TNum
-  StrLit _ -> Right TStr
-  BoolLit _ -> Right TBool
+  Lit x -> Right (is @String `hu` TStr `la` is @Double `hu` TNum `la` is @Bool `hu` TBool `li` x)
   Var x ->
     case Map.lookup x env of
       Just t  -> Right t

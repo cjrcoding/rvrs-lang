@@ -24,10 +24,17 @@ import Control.Monad.Reader (ReaderT, runReaderT, ask, lift)
 import GHC.IsList (fromList)
 import System.IO (readFile)
 
-import Ya (type T'I, type JNT, type AR, type AR__, type Given, pattern Unit, pattern Given, pattern Run, pattern Only, pattern None, pattern Error, pattern State, pattern Event, pattern Old, type Error, type State, type Recursive (..), type List, type Nonempty, intro, unwrap, ha, ha__, ho, hu, hv, hv_, hv__, la, is, yi, yo, yok, yok_, yuk_)
+import Ya (
+    type T'I, type JNT, type AR, type AR__, type Given,
+    type Error, type State, type Recursive (..), type List, type Nonempty,
+    pattern Unit, pattern Given, pattern Run, pattern Only, pattern None,
+    pattern Error, pattern State, pattern Event, pattern Old,
+    intro, unwrap, ha, ha__, ho, hu, hv, hv_, hv__, la, is, li, yi, yo, yok, yok_, yuk_
+    )
 import qualified Ya as Y
 import Ya.World (World, pattern World)
 import Ya.Conversion (may)
+
 
 import RVRS.AST
 import RVRS.Env
@@ -98,14 +105,14 @@ evalStmt stmt = case unwrap stmt of
 
   Assert expr ->
     evalExpr expr >>= \case
-      VBool True  -> return Nothing
-      VBool False -> throwError $ RuntimeError "Assertion failed"
+      VPrim (Bool True)  -> return Nothing
+      VPrim (Bool False) -> throwError $ RuntimeError "Assertion failed"
       _           -> throwError $ RuntimeError "Assert expects boolean"
 
   Branch cond tBlock eBlock ->
     evalExpr cond >>= \case
-      VBool True  -> isolate (evalBody tBlock)
-      VBool False -> isolate (evalBody eBlock)
+      VPrim (Bool True)  -> isolate (evalBody tBlock)
+      VPrim (Bool False) -> isolate (evalBody eBlock)
       _           -> throwError $ RuntimeError "Condition must be boolean"
 
   Delta name _mType expr ->
@@ -118,14 +125,12 @@ evalStmt stmt = case unwrap stmt of
 
 binOp :: (Double -> Double -> Double) -> Recursive Expression -> Recursive Expression -> EvalIR Value
 binOp op a b = (,) <$> evalExpr a <*> evalExpr b >>= \case
-  (VNum n1, VNum n2) -> return $ VNum (op n1 n2)
+  (VPrim (Double n1), VPrim (Double n2)) -> return $ VPrim . Double $ op n1 n2
   _ -> throwError $ RuntimeError "Type error in arithmetic operation"
 
 evalExpr :: Recursive Expression -> EvalIR Value
 evalExpr expr = case unwrap expr of
-  NumLit n  -> return $ VNum n
-  StrLit s  -> return $ VStr s
-  BoolLit b -> return $ VBool b
+  Lit x -> return `ha` VPrim `hv__` is @String `ho` String `la` is @Double `ho` Double `la` is @Bool `ho` Bool `li` x
 
   Var name ->
     Map.lookup name <$> get
@@ -137,41 +142,41 @@ evalExpr expr = case unwrap expr of
 
   Div a b ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VNum _, VNum 0)   -> throwError $ RuntimeError "Division by zero"
-      (VNum n1, VNum n2) -> return $ VNum (n1 / n2)
+      (VPrim (Double _), VPrim (Double 0))  -> throwError $ RuntimeError "Division by zero"
+      (VPrim (Double n1), VPrim (Double n2)) -> return . VPrim . Double $ n1 / n2
       _                  -> throwError $ RuntimeError "Type error in division"
 
   Neg e ->
     evalExpr e >>= \case
-      VNum n -> return $ VNum (-n)
+      VPrim (Double n) -> return . VPrim $ Double (-n)
       _      -> throwError $ RuntimeError "Negation requires number"
 
   Not e ->
     evalExpr e >>= \case
-      VBool b -> return $ VBool (not b)
+      VPrim (Bool b) -> return . VPrim . Bool $ not b
       _       -> throwError $ RuntimeError "Expected boolean in 'not'"
 
   Equals a b ->
-    VBool <$> ((==) <$> evalExpr a <*> evalExpr b)
+    VPrim . Bool <$> ((==) <$> evalExpr a <*> evalExpr b)
 
   GreaterThan a b ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VNum n1, VNum n2) -> return $ VBool (n1 > n2)
+      (VPrim (Double n1), VPrim (Double n2)) -> return . VPrim . Bool $ n1 > n2
       _ -> throwError $ RuntimeError "> requires numeric values"
 
   LessThan a b ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VNum n1, VNum n2) -> return $ VBool (n1 < n2)
+      (VPrim (Double n1), VPrim (Double n2)) -> return . VPrim . Bool $ n1 < n2
       _ -> throwError $ RuntimeError "< requires numeric values"
 
   And a b ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VBool b1, VBool b2) -> return $ VBool (b1 && b2)
+      (VPrim (Bool b1), VPrim (Bool b2)) -> return . VPrim . Bool $ b1 && b2
       _ -> throwError $ RuntimeError "and requires booleans"
 
   Or a b ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VBool b1, VBool b2) -> return $ VBool (b1 || b2)
+      (VPrim (Bool b1), VPrim (Bool b2)) -> return . VPrim . Bool $ b1 || b2
       _ -> throwError $ RuntimeError "or requires booleans"
 
   CallExpr name args -> do
@@ -203,11 +208,11 @@ evalStmt' stmt = case unwrap stmt of
   -- Whisper expr -> Nothing <$ do evalExpr expr >>= display "→ whisper: "
   -- Mouth expr -> Nothing <$ do evalExpr expr >>= display "mouth: "
 
-evalExpr' :: Recursive Expression `AR__` Engine Value
-evalExpr' expr = case unwrap expr of
-  NumLit n -> intro `hv` VNum n
-  StrLit s -> intro `hv` VStr s
-  BoolLit b -> intro `hv` VBool b
+-- evalExpr' expr = case unwrap expr of
+--   NumLit n -> intro `hv` VNum n
+--   StrLit s -> intro `hv` VStr s
+--   BoolLit b -> intro `hv` VBool b
+
   -- Var name -> intro `hv` Unit
   --  `yuk_` Run `hv__` Old `ha` State `ha` Event `hv` Y.get `yo` Map.lookup name `ho` may
   --  `yok_` Run `ha__` None `hu` Error (RuntimeError $ "Unbound variable: " ++ name) `la` intro
