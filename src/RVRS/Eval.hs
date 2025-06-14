@@ -130,56 +130,56 @@ binOp op a b = (,) <$> evalExpr a <*> evalExpr b >>= \case
 
 evalExpr :: Recursive Expression -> EvalIR Value
 evalExpr expr = case unwrap expr of
-  Lit x -> return `ha` VPrim `hv__` is @String `ho` String `la` is @Double `ho` Double `la` is @Bool `ho` Bool `li` x
+  Literal x -> return `ha` VPrim `hv__` is @String `ho` String `la` is @Double `ho` Double `la` is @Bool `ho` Bool `li` x
 
-  Var name ->
+  Variable name ->
     Map.lookup name <$> get
       >>= maybe (throwError `ha` RuntimeError $ "Unbound variable: " ++ name) pure
 
-  Add a b -> binOp (+) a b
-  Sub a b -> binOp (-) a b
-  Mul a b -> binOp (*) a b
+  Operator (Binary (Add a b)) -> binOp (+) a b
+  Operator (Binary (Sub a b)) -> binOp (-) a b
+  Operator (Binary (Mul a b)) -> binOp (*) a b
 
-  Div a b ->
+  Operator (Binary (Div a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
       (VPrim (Double _), VPrim (Double 0))  -> throwError $ RuntimeError "Division by zero"
       (VPrim (Double n1), VPrim (Double n2)) -> return . VPrim . Double $ n1 / n2
       _                  -> throwError $ RuntimeError "Type error in division"
 
-  Neg e ->
+  Operator (Unary (Neg e)) ->
     evalExpr e >>= \case
       VPrim (Double n) -> return . VPrim $ Double (-n)
       _      -> throwError $ RuntimeError "Negation requires number"
 
-  Not e ->
+  Operator (Unary (Not e)) ->
     evalExpr e >>= \case
       VPrim (Bool b) -> return . VPrim . Bool $ not b
       _       -> throwError $ RuntimeError "Expected boolean in 'not'"
 
-  Equals a b ->
+  Operator (Binary (Equals a b)) ->
     VPrim . Bool <$> ((==) <$> evalExpr a <*> evalExpr b)
 
-  GreaterThan a b ->
+  Operator (Binary (Greater a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
       (VPrim (Double n1), VPrim (Double n2)) -> return . VPrim . Bool $ n1 > n2
       _ -> throwError $ RuntimeError "> requires numeric values"
 
-  LessThan a b ->
+  Operator (Binary (Less a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
       (VPrim (Double n1), VPrim (Double n2)) -> return . VPrim . Bool $ n1 < n2
       _ -> throwError $ RuntimeError "< requires numeric values"
 
-  And a b ->
+  Operator (Binary (And a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
       (VPrim (Bool b1), VPrim (Bool b2)) -> return . VPrim . Bool $ b1 && b2
       _ -> throwError $ RuntimeError "and requires booleans"
 
-  Or a b ->
+  Operator (Binary (Or a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
       (VPrim (Bool b1), VPrim (Bool b2)) -> return . VPrim . Bool $ b1 || b2
       _ -> throwError $ RuntimeError "or requires booleans"
 
-  CallExpr name args -> do
+  Calling name args -> do
     fsenv <- ask
     case Map.lookup name fsenv of
       Nothing -> throwError $ RuntimeError ("Unknown function: " ++ name)
@@ -192,7 +192,7 @@ evalExpr expr = case unwrap expr of
 callBody :: [Recursive Statement] -> ValueEnv -> EvalIR (Maybe Value, ValueEnv)
 callBody body callEnv = runReaderT (evalBody body) <$> ask >>= lift `ha` lift `ha` flip runStateT callEnv
 
--- Flow body evaluator used in both CallExpr and CallStmt
+-- Flow body evaluator used in both Calling and CallStmt
 evalBody :: [Recursive Statement] -> EvalIR (Maybe Value)
 evalBody [] = return Nothing
 evalBody (stmt:rest) = evalStmt stmt >>= maybe (evalBody rest) (pure `ha` Just)
@@ -213,7 +213,7 @@ evalStmt' stmt = case unwrap stmt of
 --   StrLit s -> intro `hv` VStr s
 --   BoolLit b -> intro `hv` VBool b
 
-  -- Var name -> intro `hv` Unit
+  -- Variable name -> intro `hv` Unit
   --  `yuk_` Run `hv__` Old `ha` State `ha` Event `hv` Y.get `yo` Map.lookup name `ho` may
   --  `yok_` Run `ha__` None `hu` Error (RuntimeError $ "Unbound variable: " ++ name) `la` intro
   --  `yok_` Run `ha__` intro @Engine @(AR)
