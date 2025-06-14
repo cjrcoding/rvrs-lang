@@ -26,9 +26,6 @@ data Binding
 -- | Convert a runtime Value to its corresponding RVRSType
 valueToType :: Value -> RVRSType
 valueToType (VPrim x) = is @String `hu` TypeStr `la` is @Double `hu` TypeNum `la` is @Bool `hu` TypeBool `li` x
-valueToType (VPrim (Double _)) = TypeNum
-valueToType (VPrim (String _)) = TypeStr
-valueToType (VPrim (Bool _)) = TypeBool
 valueToType VVoid      = TypeAny
 valueToType (VError _) = TypeAny
 valueToType VUnit      = TypeAny
