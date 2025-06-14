@@ -22,18 +22,18 @@ exprParser = makeExprParser term operatorTable
 -- Operator precedence table
 operatorTable :: [[Operator Parser (Recursive Expression)]]
 operatorTable =
-  [ [ InfixL (Recursive <$$> Mul <$ symbol "*")
-    , InfixL (Recursive <$$> Div <$ symbol "/")
+  [ [ InfixL (Recursive . Operator . Binary <$$> Mul <$ symbol "*")
+    , InfixL (Recursive . Operator . Binary <$$> Div <$ symbol "/")
     ]
-  , [ InfixL (Recursive <$$> Add <$ symbol "+")
-    , InfixL (Recursive <$$> Sub <$ symbol "-")
+  , [ InfixL (Recursive . Operator . Binary <$$> Add <$ symbol "+")
+    , InfixL (Recursive . Operator . Binary <$$> Sub <$ symbol "-")
     ]
-  , [ InfixN (Recursive <$$> Equals      <$ symbol "==")
-    , InfixN (Recursive <$$> GreaterThan <$ symbol ">")
-    , InfixN (Recursive <$$> LessThan    <$ symbol "<")
+  , [ InfixN (Recursive . Operator . Binary <$$> Equals      <$ symbol "==")
+    , InfixN (Recursive . Operator . Binary <$$> Greater <$ symbol ">")
+    , InfixN (Recursive . Operator . Binary <$$> Less    <$ symbol "<")
     ]
-  , [ InfixL ((Recursive <$$> And) <$ symbol "and")
-    , InfixL ((Recursive <$$> Or)  <$ symbol "or")
+  , [ InfixL ((Recursive . Operator . Binary <$$> And) <$ symbol "and")
+    , InfixL ((Recursive . Operator . Binary <$$> Or)  <$ symbol "or")
     ]
   ]
 
@@ -44,8 +44,8 @@ term = do try $ funcCallExpr
    <|> do try $ Recursive (Lit $ Bool False) <$ symbol "void"
    <|> do try $ Recursive . Lit . String <$> stringLiteral
    <|> do try $ parseNumber
-   <|> do try $ Recursive . Not <$> (symbol "not" *> term)
-   <|> do try $ Recursive . Neg <$> (symbol "-" *> term)
+   <|> do try $ Recursive . Operator . Unary . Not <$> (symbol "not" *> term)
+   <|> do try $ Recursive . Operator . Unary . Neg <$> (symbol "-" *> term)
    <|> do try $ parens exprParser
    <|> Recursive . Var <$> identifier
 

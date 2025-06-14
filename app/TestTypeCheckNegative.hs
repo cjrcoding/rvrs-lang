@@ -30,10 +30,10 @@ var :: String -> Recursive Expression
 var = Recursive . Var
 
 add :: Recursive Expression -> Recursive Expression -> Recursive Expression
-add a b = Recursive (Add a b)
+add a b = Recursive (Operator (Binary (Add a b)))
 
 eq :: Recursive Expression -> Recursive Expression -> Recursive Expression
-eq a b = Recursive (Equals a b)
+eq a b = Recursive (Operator (Binary (Equals a b)))
 
 -- Negative test cases (expected to fail)
 testBadAddBoolNum :: Test

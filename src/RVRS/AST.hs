@@ -1,6 +1,6 @@
 module RVRS.AST where
 
-import Ya (S, Object (This, That), Recursive (..))
+import Ya (P, S, Object (This, That), Recursive (..))
 
 import RVRS.Parser.Type (RVRSType(..))
 import Ya.Instances ()
@@ -36,19 +36,31 @@ data Statement e
 data Expression e
   = Var String
   | Lit Primitive
-  | Equals e e
-  | GreaterThan e e
-  | LessThan e e
+  | Operator (Operation e)
+  | CallExpr String [e]
+  deriving (Show, Eq)
+
+data Unary e
+  = Neg e
+  | Not e
+  deriving (Show, Eq)
+
+data Binary e
+  = Equals e e
+  | Greater e e
+  | Less e e
   | Add e e
   | Sub e e
   | Mul e e
   | Div e e
-  | Not e
   | And e e
   | Or e e
-  | CallExpr String [e]
-  | Neg e
   deriving (Show, Eq)
+ 
+pattern Unary x = This x :: Operation e
+pattern Binary x = That x :: Operation e
+
+type Operation e = Unary e `S` Binary e
 
 type Primitive = String `S` Double `S` Bool
 

@@ -31,13 +31,13 @@ var :: String -> Recursive Expression
 var = Recursive . Var
 
 add :: Recursive Expression -> Recursive Expression -> Recursive Expression
-add a b = Recursive (Add a b)
+add a b = Recursive (Operator (Binary (Add a b)))
 
 equals :: Recursive Expression -> Recursive Expression -> Recursive Expression
-equals a b = Recursive (Equals a b)
+equals a b = Recursive (Operator (Binary (Equals a b)))
 
 notExpr :: Recursive Expression -> Recursive Expression
-notExpr = Recursive . Not
+notExpr = Recursive . Operator . Unary . Not
 
 -- Define the actual tests
 tests :: Test
