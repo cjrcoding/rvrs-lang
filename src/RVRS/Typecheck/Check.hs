@@ -7,8 +7,8 @@ import qualified Data.Map as Map
 
 typeOfExpr :: TypeEnv -> Recursive Expression -> Either TypeError RVRS_Type
 typeOfExpr env expr = case unwrap expr of
-  Lit x -> Right (is @String `hu` TStr `la` is @Double `hu` TNum `la` is @Bool `hu` TBool `li` x)
-  Var x ->
+  Literal x -> Right (is @String `hu` TStr `la` is @Double `hu` TNum `la` is @Bool `hu` TBool `li` x)
+  Variable x ->
     case Map.lookup x env of
       Just t  -> Right t
       Nothing -> Left $ UnknownVariable x

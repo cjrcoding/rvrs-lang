@@ -32,8 +32,8 @@ genStmt stmt = case unwrap stmt of
 -- | Convert an expression into Aiken-compatible syntax
 genExpr :: Recursive Expression -> String
 genExpr expr = case unwrap expr of
-  Var x         -> x
-  Lit x   -> genLit x
+  Variable x -> x
+  Literal x -> genLit x
   Operator (Binary (Equals a b)) -> genExpr a ++ " == " ++ genExpr b
 
 genLit = is @String `ho` show `la` is @Double `ho` show `la` is @Bool `ho` bool "false" "true"

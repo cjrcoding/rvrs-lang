@@ -130,9 +130,9 @@ binOp op a b = (,) <$> evalExpr a <*> evalExpr b >>= \case
 
 evalExpr :: Recursive Expression -> EvalIR Value
 evalExpr expr = case unwrap expr of
-  Lit x -> return `ha` VPrim `hv__` is @String `ho` String `la` is @Double `ho` Double `la` is @Bool `ho` Bool `li` x
+  Literal x -> return `ha` VPrim `hv__` is @String `ho` String `la` is @Double `ho` Double `la` is @Bool `ho` Bool `li` x
 
-  Var name ->
+  Variable name ->
     Map.lookup name <$> get
       >>= maybe (throwError `ha` RuntimeError $ "Unbound variable: " ++ name) pure
 
@@ -179,7 +179,7 @@ evalExpr expr = case unwrap expr of
       (VPrim (Bool b1), VPrim (Bool b2)) -> return . VPrim . Bool $ b1 || b2
       _ -> throwError $ RuntimeError "or requires booleans"
 
-  CallExpr name args -> do
+  Calling name args -> do
     fsenv <- ask
     case Map.lookup name fsenv of
       Nothing -> throwError $ RuntimeError ("Unknown function: " ++ name)
@@ -192,7 +192,7 @@ evalExpr expr = case unwrap expr of
 callBody :: [Recursive Statement] -> ValueEnv -> EvalIR (Maybe Value, ValueEnv)
 callBody body callEnv = runReaderT (evalBody body) <$> ask >>= lift `ha` lift `ha` flip runStateT callEnv
 
--- Flow body evaluator used in both CallExpr and CallStmt
+-- Flow body evaluator used in both Calling and CallStmt
 evalBody :: [Recursive Statement] -> EvalIR (Maybe Value)
 evalBody [] = return Nothing
 evalBody (stmt:rest) = evalStmt stmt >>= maybe (evalBody rest) (pure `ha` Just)
@@ -213,7 +213,7 @@ evalStmt' stmt = case unwrap stmt of
 --   StrLit s -> intro `hv` VStr s
 --   BoolLit b -> intro `hv` VBool b
 
-  -- Var name -> intro `hv` Unit
+  -- Variable name -> intro `hv` Unit
   --  `yuk_` Run `hv__` Old `ha` State `ha` Event `hv` Y.get `yo` Map.lookup name `ho` may
   --  `yok_` Run `ha__` None `hu` Error (RuntimeError $ "Unbound variable: " ++ name) `la` intro
   --  `yok_` Run `ha__` intro @Engine @(AR)

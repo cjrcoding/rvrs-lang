@@ -34,11 +34,17 @@ data Statement e
   deriving (Show, Eq)
 
 data Expression e
-  = Var String
-  | Lit Primitive
+  = Variable String
   | Operator (Operation e)
-  | CallExpr String [e]
+  | Calling String [e]
+  | Literal Primitive
   deriving (Show, Eq)
+
+type Primitive = String `S` Double `S` Bool
+
+pattern String x = This (This x) :: Primitive
+pattern Double x = This (That x) :: Primitive
+pattern Bool x = That x :: Primitive
 
 data Unary e
   = Neg e
@@ -61,12 +67,6 @@ pattern Unary x = This x :: Operation e
 pattern Binary x = That x :: Operation e
 
 type Operation e = Unary e `S` Binary e
-
-type Primitive = String `S` Double `S` Bool
-
-pattern String x = This (This x) :: Primitive
-pattern Double x = This (That x) :: Primitive
-pattern Bool x = That x :: Primitive
 
 -- | Intermediate representation of a flow
 data FlowIR = FlowIR

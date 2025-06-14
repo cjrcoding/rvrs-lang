@@ -40,22 +40,22 @@ operatorTable =
 -- Terms in the expression grammar
 term :: Parser (Recursive Expression)
 term = do try $ funcCallExpr
-   <|> do try $ Recursive (Lit $ Bool True) <$ symbol "truth"
-   <|> do try $ Recursive (Lit $ Bool False) <$ symbol "void"
-   <|> do try $ Recursive . Lit . String <$> stringLiteral
+   <|> do try $ Recursive (Literal $ Bool True) <$ symbol "truth"
+   <|> do try $ Recursive (Literal $ Bool False) <$ symbol "void"
+   <|> do try $ Recursive . Literal . String <$> stringLiteral
    <|> do try $ parseNumber
    <|> do try $ Recursive . Operator . Unary . Not <$> (symbol "not" *> term)
    <|> do try $ Recursive . Operator . Unary . Neg <$> (symbol "-" *> term)
    <|> do try $ parens exprParser
-   <|> Recursive . Var <$> identifier
+   <|> Recursive . Variable <$> identifier
 
 -- Parse numeric literals
 parseNumber :: Parser (Recursive Expression)
-parseNumber = Recursive . Lit <$> Double <$> do lexeme $ try L.float <|> fromInteger <$> L.decimal
+parseNumber = Recursive . Literal <$> Double <$> do lexeme $ try L.float <|> fromInteger <$> L.decimal
 
 -- Function call expressions (e.g., fuse(2, 3))
 funcCallExpr :: Parser (Recursive Expression)
-funcCallExpr = Recursive <$$> CallExpr <$> identifier <*> parens (exprParser `sepBy` symbol ",")
+funcCallExpr = Recursive <$$> Calling <$> identifier <*> parens (exprParser `sepBy` symbol ",")
 
 -- Utility parsers
 lexeme :: Parser a -> Parser a
