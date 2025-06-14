@@ -6,7 +6,7 @@ import qualified Data.Map as Map
 import RVRS.Typecheck.Check (typeOfExpr)
 import RVRS.Typecheck.Types
 import RVRS.AST
-import Ya (Recursive(..)) 
+import Ya (Recursive(..), ha, ho, ho'ho)
 
 
 -- Define a test environment with some known vars
@@ -19,25 +19,25 @@ testEnv = Map.fromList
 
 -- Helper to build expressions
 num :: Double -> Recursive Expression
-num = Recursive . Literal . Double
+num = Double `ho` Literal `ho` Recursive
 
 bool :: Bool -> Recursive Expression
-bool = Recursive . Literal . Bool
+bool = Bool `ho` Literal `ho` Recursive
 
 str :: String -> Recursive Expression
-str = Recursive . Literal . String
+str = String `ho` Literal `ho` Recursive
 
 var :: String -> Recursive Expression
-var = Recursive . Variable
+var = Variable `ho` Recursive
 
 add :: Recursive Expression -> Recursive Expression -> Recursive Expression
-add a b = Recursive (Operator (Binary (Add a b)))
+add = Add `ho'ho` Binary `ho'ho` Operator `ho'ho` Recursive
 
 equals :: Recursive Expression -> Recursive Expression -> Recursive Expression
-equals a b = Recursive (Operator (Binary (Equals a b)))
+equals = Equals `ho'ho` Binary `ho'ho` Operator `ho'ho` Recursive
 
 notExpr :: Recursive Expression -> Recursive Expression
-notExpr = Recursive . Operator . Unary . Not
+notExpr = Not `ho` Unary `ho` Operator `ho` Recursive
 
 -- Define the actual tests
 tests :: Test
