@@ -3,17 +3,18 @@ module Main where
 import Test.HUnit
 import qualified Data.Map as Map
 
+import Ya (Recursive(..), pattern Unit)
+
 import RVRS.Typecheck.Check (typeOfExpr)
 import RVRS.Typecheck.Types
 import RVRS.AST
-import Ya (Recursive(..))
 
 -- Simple type environment
 testEnv :: TypeEnv
 testEnv = Map.fromList
-  [ ("x", TNum)
-  , ("y", TBool)
-  , ("msg", TStr)
+  [ ("x", Double Unit)
+  , ("y", Bool Unit)
+  , ("msg", String Unit)
   ]
 
 -- Helpers

@@ -2,10 +2,9 @@
 
 module RVRS.Value (Binding(..), valueToType, formatVal) where
 
-import Ya (is, ho, hu, la, li)
+import Ya (is, ho, hu, la, li, pattern Unit)
 
-import RVRS.AST (type Value)
-import RVRS.Parser.Type (RVRSType(..))
+import RVRS.AST (type Value, type Typed, pattern String, pattern Double, pattern Bool)
 
 -- | Variable bindings (mutable or immutable)
 data Binding
@@ -14,8 +13,8 @@ data Binding
   deriving (Show, Eq)
 
 -- | Convert a runtime Value to its corresponding RVRSType
-valueToType :: Value -> RVRSType
-valueToType = is @String `hu` TypeStr `la` is @Double `hu` TypeNum `la` is @Bool `hu` TypeBool
+valueToType :: Value -> Typed
+valueToType = is @String `hu` String Unit `la` is @Double `hu` Double Unit `la` is @Bool `hu` Bool Unit
 
 -- | Format Value into a human-readable string
 formatVal :: Value -> String

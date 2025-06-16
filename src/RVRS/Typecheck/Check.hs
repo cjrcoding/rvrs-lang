@@ -1,52 +1,53 @@
 module RVRS.Typecheck.Check where
 
-import Ya (Recursive (..), is, unwrap, ha__, hu, la, li)
+import Ya (Recursive (..), pattern Unit, is, unwrap, ha__, hu, la, li)
 import RVRS.AST
+import RVRS.Value
 import RVRS.Typecheck.Types
 import qualified Data.Map as Map
 
-typeOfExpr :: TypeEnv -> Recursive Expression -> Either TypeError RVRS_Type
+typeOfExpr :: TypeEnv -> Recursive Expression -> Either TypeError Typed
 typeOfExpr env expr = case unwrap expr of
-  Lit x -> Right (is @String `hu` TStr `la` is @Double `hu` TNum `la` is @Bool `hu` TBool `li` x)
+  Lit x -> Right (valueToType x)
   Var x ->
     case Map.lookup x env of
       Just t  -> Right t
       Nothing -> Left $ UnknownVariable x
 
-  Add a b -> checkBinary env TNum TNum a b
-  Sub a b -> checkBinary env TNum TNum a b
-  Mul a b -> checkBinary env TNum TNum a b
-  Div a b -> checkBinary env TNum TNum a b
+  Add a b -> checkBinary env (Double Unit) (Double Unit) a b
+  Sub a b -> checkBinary env (Double Unit) (Double Unit) a b
+  Mul a b -> checkBinary env (Double Unit) (Double Unit) a b
+  Div a b -> checkBinary env (Double Unit) (Double Unit) a b
 
   Equals a b -> do
     t1 <- typeOfExpr env a
     t2 <- typeOfExpr env b
     case t1 == t2 of
-      True  -> Right TBool
+      True  -> Right (Bool Unit)
       False -> Left $ TypeMismatch t1 t2
 
-  And a b -> checkBinary env TBool TBool a b
-  Or a b  -> checkBinary env TBool TBool a b
+  And a b -> checkBinary env (Bool Unit) (Bool Unit) a b
+  Or a b  -> checkBinary env (Bool Unit) (Bool Unit) a b
 
   Not e -> do
     t <- typeOfExpr env e
     case t of
-      TBool -> Right TBool
-      _     -> Left $ TypeMismatch t TBool
+      Bool Unit -> Right (Bool Unit)
+      _     -> Left $ TypeMismatch t (Bool Unit)
 
   Neg e -> do
     t <- typeOfExpr env e
     case t of
-      TNum -> Right TNum
-      _    -> Left $ TypeMismatch t TNum
+      Double Unit -> Right (Double Unit)
+      _    -> Left $ TypeMismatch t (Double Unit)
 
-  GreaterThan a b -> checkBinary env TNum TBool a b
-  LessThan a b    -> checkBinary env TNum TBool a b
+  GreaterThan a b -> checkBinary env (Double Unit) (Bool Unit) a b
+  LessThan a b    -> checkBinary env (Double Unit) (Bool Unit) a b
 
   other -> Left $ UnsupportedOp (show other)
 
 
-checkBinary :: TypeEnv -> RVRS_Type -> RVRS_Type -> Recursive Expression -> Recursive Expression -> Either TypeError RVRS_Type
+checkBinary :: TypeEnv -> Typed -> Typed -> Recursive Expression -> Recursive Expression -> Either TypeError Typed
 checkBinary env expected retType a b = do
   t1 <- typeOfExpr env a
   t2 <- typeOfExpr env b

@@ -2,17 +2,12 @@ module RVRS.Typecheck.Types where
 
 import qualified Data.Map as Map
 
-data RVRS_Type
-  = TNum
-  | TStr
-  | TBool
-  | TUnknown
-  deriving (Show, Eq)
+import RVRS.AST (type Typed)
 
-type TypeEnv = Map.Map String RVRS_Type
+type TypeEnv = Map.Map String Typed
 
 data TypeError
-  = TypeMismatch RVRS_Type RVRS_Type
+  = TypeMismatch Typed Typed
   | UnknownVariable String
   | UnsupportedOp String
   deriving (Show, Eq)

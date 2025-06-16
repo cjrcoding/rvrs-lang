@@ -2,7 +2,6 @@ module RVRS.AST where
 
 import Ya (S, Object (This, That), Recursive (..), type Unit)
 
-import RVRS.Parser.Type (RVRSType(..))
 import Ya.Instances ()
 
 -- | Represents a named flow of ritual logic
@@ -18,11 +17,10 @@ data Argument = Argument
   , argType :: String            -- ^ Placeholder for the type (optional for now)
   } deriving (Show, Eq)
 
-
 -- | Statements inside a flow block
 data Statement e
-  = Source String (Maybe RVRSType) (Recursive Expression)                 -- source x = ...
-  | Delta String (Maybe RVRSType) (Recursive Expression)
+  = Source String (Maybe Typed) (Recursive Expression)                 -- source x = ...
+  | Delta String (Maybe Typed) (Recursive Expression)
   | Branch (Recursive Expression) [e] [e]-- branch cond { ... } else { ... }
   | Mouth (Recursive Expression)                          -- mouth "..."
   | Whisper (Recursive Expression)
