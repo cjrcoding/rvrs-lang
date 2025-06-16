@@ -4,7 +4,6 @@ module Main where
 import RVRS.Parser (parseRVRS)
 import RVRS.Lower (mergeAndLower)
 import RVRS.Eval (evalIRFlow)
-import RVRS.Value (Value(..))
 import qualified RVRS.AST as AST
 -- import qualified RVRS.IR as IR
 

@@ -5,7 +5,7 @@ module RVRS.Env
   ) where
 
 import qualified Data.Map as Map
-import RVRS.Value (Value)
+import RVRS.AST (Value)
 
 -- TEMPORARY: define here until TypeCheck exists
 data RVRSValueType = VNum | VStr | VBool
