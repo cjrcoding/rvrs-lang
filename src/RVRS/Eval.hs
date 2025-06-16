@@ -19,17 +19,19 @@ import qualified Data.Map as Map (lookup)
 import Data.Maybe (maybe, fromMaybe)
 import Data.Traversable (for)
 import Control.Monad.Except (ExceptT, runExceptT, throwError, catchError)
-import Control.Monad.State (StateT, runStateT, get, modify, liftIO)
+import Control.Monad.State (StateT, runStateT, modify, liftIO)
+import qualified Control.Monad.State as T (get)
 import Control.Monad.Reader (ReaderT, runReaderT, ask, lift)
 import GHC.IsList (fromList)
 import System.IO (readFile)
 
-import Ya (
-    type T'I, type JNT, type AR, type AR__, type Given,
-    type Error, type State, type Recursive (..), type List, type Nonempty,
-    pattern Unit, pattern Given, pattern Run, pattern Only, pattern None,
-    pattern Error, pattern State, pattern Event, pattern Old,
-    intro, unwrap, ha, ha__, ho, hu, hv, hv_, hv__, la, is, li, yi, yo, yok, yok_, yuk_
+import Ya
+    ( type T'I, type JNT, type AR, type AR__, type Given, type Error, type State, type Recursive (..), type List, type Nonempty, type Optional, type Unit, Object (..)
+    , pattern Unit, pattern Given, pattern Try, pattern Run, pattern Only, pattern Ok, pattern Some, pattern None, pattern Error, pattern Forth, pattern State, pattern Event, pattern Continue, pattern Interrupt, pattern Old, pattern New
+    , is, intro, to, unwrap, get
+    , ha, ha__, ha____, ho, ho___'yok, hu, hv, hv_, hv__
+    , la, li, lu'yp
+    , yi, yo, yo__, yok, yok_, yuk_, yokl__
     )
 import qualified Ya as Y
 import Ya.World (World, pattern World)
@@ -80,7 +82,7 @@ handleReturn err        = throwError err
 -- Isolate scope for branches
 isolate :: EvalIR a -> EvalIR a
 isolate action =
-  fst <$> do lift `ha` lift =<< runStateT <$> runReaderT action <$> ask <*> get
+  fst <$> do lift `ha` lift =<< runStateT <$> runReaderT action <$> ask <*> T.get
 
 display :: Show a => String -> a -> EvalIR ()
 display label value = liftIO `ha` putStrLn $ label ++ ": " ++ show value
@@ -119,7 +121,7 @@ evalStmt stmt = case unwrap stmt of
     Nothing <$ do evalExpr expr >>= modify `ha` insert name
 
   Source name _mType expr -> do
-    Map.lookup name <$> get >>= \case
+    Map.lookup name <$> T.get >>= \case
       Nothing -> Nothing <$ do evalExpr expr >>= modify `ha` insert name
       Just _  -> throwError $ RuntimeError ("Variable '" ++ name ++ "' already defined")
 
@@ -133,7 +135,7 @@ evalExpr expr = case unwrap expr of
   Lit x -> return `ha` VPrim `hv__` is @String `ho` String `la` is @Double `ho` Double `la` is @Bool `ho` Bool `li` x
 
   Var name ->
-    Map.lookup name <$> get
+    Map.lookup name <$> T.get
       >>= maybe (throwError `ha` RuntimeError $ "Unbound variable: " ++ name) pure
 
   Add a b -> binOp (+) a b
@@ -197,23 +199,21 @@ evalBody :: [Recursive Statement] -> EvalIR (Maybe Value)
 evalBody [] = return Nothing
 evalBody (stmt:rest) = evalStmt stmt >>= maybe (evalBody rest) (pure `ha` Just)
 
--- evalBody' stmts = fromList @(Nonempty List `T'I` Recursive Statement) stmts
- -- `yokl`Forth `ha` Try `ha`Maybe `ha` not `ha` may `ha` evalStmt
-
 type Engine = Given FlowEnv `JNT` State ValueEnv `JNT` Error EvalError `JNT` World
 
-evalStmt' :: Recursive Statement `AR__` Engine `T'I` Maybe Value
-evalStmt' stmt = case unwrap stmt of
-  -- Echo expr -> Nothing <$ do evalExpr expr >>= display "echo"
-  -- Whisper expr -> Nothing <$ do evalExpr expr >>= display "→ whisper: "
-  -- Mouth expr -> Nothing <$ do evalExpr expr >>= display "mouth: "
+statement :: Recursive Statement `AR__` Engine `T'I` Optional Value
+statement x = case unwrap x of
+ Return e -> expression e `yo` Some
 
--- evalExpr' expr = case unwrap expr of
---   NumLit n -> intro `hv` VNum n
---   StrLit s -> intro `hv` VStr s
---   BoolLit b -> intro `hv` VBool b
+expression :: Recursive Expression `AR__` Engine `T'I` Value
+expression x = case unwrap x of
+ Lit x -> intro @Engine `ha` VPrim `hv` x
+ Var name -> intro @Engine `hv` Unit
+  `yuk_` Old `hv__` State `ha` Event `hv` get `yo` Map.lookup name `ho` to @Optional
+  `yok_` Try `ha__` None `hu` Error (RuntimeError $ "Unbound variable: " ++ name) `la` Ok
+ Equals a b -> expression a `lu'yp` Run `hv` expression b
+  `yo` (\(These a' b') -> VPrim `ha` Bool `hv` (a' == b'))
 
-  -- Var name -> intro `hv` Unit
-  --  `yuk_` Run `hv__` Old `ha` State `ha` Event `hv` Y.get `yo` Map.lookup name `ho` may
-  --  `yok_` Run `ha__` None `hu` Error (RuntimeError $ "Unbound variable: " ++ name) `la` intro
-  --  `yok_` Run `ha__` intro @Engine @(AR)
+-- evalBody stmts = stmts `yokl` Forth `ha` Run `ha` evaluate
+
+-- evaluate x = statement x `yok_` Try `ha__` Continue `la` Interrupt `ha` ReturnValue
