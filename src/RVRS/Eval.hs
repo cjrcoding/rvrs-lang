@@ -25,18 +25,8 @@ import Control.Monad.Reader (ReaderT, runReaderT, ask, lift)
 import GHC.IsList (fromList)
 import System.IO (readFile)
 
-import Ya
-    ( type T'I, type JNT, type AR, type AR__, type Given, type Error, type State, type Recursive (..), type List, type Nonempty, type Optional, type Unit, Object (..)
-    , pattern Unit, pattern Given, pattern Try, pattern Run, pattern Only, pattern Ok, pattern Some, pattern None, pattern Error, pattern Forth, pattern State, pattern Event, pattern Continue, pattern Interrupt, pattern Old, pattern New
-    , is, intro, to, unwrap, get
-    , ha, ha__, ha____, ho, ho___'yok, hu, hv, hv_, hv__
-    , la, li, lu'yp
-    , yi, yo, yo__, yok, yok_, yuk_, yokl__
-    )
-import qualified Ya as Y
+import Ya (type T'I, type Recursive (..), is, unwrap, ha, ho, ho___'yok, hu, hv, hv__, la, li, yo, yok)
 import Ya.World (World, pattern World)
-import Ya.Conversion (may)
-
 
 import RVRS.AST
 import RVRS.Env
@@ -198,22 +188,3 @@ callBody body callEnv = runReaderT (evalBody body) <$> ask >>= lift `ha` lift `h
 evalBody :: [Recursive Statement] -> EvalIR (Maybe Value)
 evalBody [] = return Nothing
 evalBody (stmt:rest) = evalStmt stmt >>= maybe (evalBody rest) (pure `ha` Just)
-
-type Engine = Given FlowEnv `JNT` State ValueEnv `JNT` Error EvalError `JNT` World
-
-statement :: Recursive Statement `AR__` Engine `T'I` Optional Value
-statement x = case unwrap x of
- Return e -> expression e `yo` Some
-
-expression :: Recursive Expression `AR__` Engine `T'I` Value
-expression x = case unwrap x of
- Lit x -> intro @Engine `ha` VPrim `hv` x
- Var name -> intro @Engine `hv` Unit
-  `yuk_` Old `hv__` State `ha` Event `hv` get `yo` Map.lookup name `ho` to @Optional
-  `yok_` Try `ha__` None `hu` Error (RuntimeError $ "Unbound variable: " ++ name) `la` Ok
- Equals a b -> expression a `lu'yp` Run `hv` expression b
-  `yo` (\(These a' b') -> VPrim `ha` Bool `hv` (a' == b'))
-
--- evalBody stmts = stmts `yokl` Forth `ha` Run `ha` evaluate
-
--- evaluate x = statement x `yok_` Try `ha__` Continue `la` Interrupt `ha` ReturnValue
