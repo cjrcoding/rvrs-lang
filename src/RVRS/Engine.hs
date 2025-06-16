@@ -10,21 +10,29 @@ import Ya
 import Ya.World
 
 import RVRS.AST
-import RVRS.Env
 import RVRS.Utils
 import RVRS.Value
 import RVRS.Parser
 import RVRS.Lower
 
-type Env = Map String Value
-type FlowEnv = Map String FlowIR
+type Bindings = Map String Value
 
-data EvalError
-  = RuntimeError String
-  | ReturnValue Value
-  -- deriving (Show, Eq)
+type Flowings = Map String FlowIR
 
-type Engine = Given FlowEnv `JNT` State ValueEnv `JNT` Error EvalError `JNT` World
+type Stops = Error
+
+type Reason = Runtime `S` Value
+
+pattern Runtime e = This e :: Reason
+pattern Returns e = That e :: Reason
+
+type Runtime = Primitive `S` String `S` String
+
+pattern Require e = This (This e)
+pattern Unknown e = This (That e)
+pattern Unbound e = That e
+
+type Engine = Given Flowings `JNT` State Bindings `JNT` Stops Reason `JNT` World
 
 statement :: Recursive Statement `AR__` Engine `T'I` Optional Value
 statement x = case unwrap x of
@@ -35,7 +43,8 @@ expression x = case unwrap x of
  Lit x -> intro @Engine `ha` VPrim `hv` x
  Var name -> intro @Engine `hv` Unit
   `yuk_` Old `hv__` State `ha` Event `hv` get `yo` Map.lookup name `ho` to @Optional
-  `yok_` Try `ha__` None `hu` Error (RuntimeError ("Unbound variable: " ++ name)) `la` Ok
+  `yok_` Try `ha__` None `hu_` Error `ha` Runtime `hv` Unbound name `la` Ok
+
  -- Equals a b -> expression a `lu'yp` Run `hv` expression b
  --  `yo` (\(These a' b') -> VPrim `ha` Bool `hv` (a' == b'))
 
