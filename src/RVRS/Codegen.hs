@@ -2,7 +2,7 @@ module RVRS.Codegen (generateAiken, prettyPrintFlow) where
 
 import Data.Bool (bool)
 
-import Ya (Recursive (..), is, unwrap, ho, hu, la, li)
+import Ya (Object (..), Recursive (..), is, unwrap, ho, hu, la, li)
 import qualified Ya as Y
 
 import RVRS.AST
@@ -32,14 +32,9 @@ genStmt stmt = case unwrap stmt of
 -- | Convert an expression into Aiken-compatible syntax
 genExpr :: Recursive Expression -> String
 genExpr expr = case unwrap expr of
-  Var x         -> x
-  Lit x   -> genLit x
-  -- StrLit s      -> show s
-  -- BoolLit True  -> "true"
-  -- BoolLit False -> "false"
-  Equals a b    -> genExpr a ++ " == " ++ genExpr b
-
-genLit = is @String `ho` show `la` is @Double `ho` show `la` is @Bool `ho` bool "false" "true"
+  Variable x -> x
+  Literal x -> is @String `ho` show `la` is @Double `ho` show `la` is @Bool `ho` bool "false" "true"
+  Operator (Binary (Equals a b)) -> genExpr a ++ " == " ++ genExpr b
 
 -- | Render a function argument
 renderArg :: Argument -> String
