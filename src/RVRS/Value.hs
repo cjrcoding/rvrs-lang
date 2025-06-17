@@ -1,21 +1,10 @@
 -- src/RVRS/Value.hs
 
-module RVRS.Value (Value(..), Binding(..), valueToType, formatVal) where
+module RVRS.Value (Binding(..), valueToType, formatVal) where
 
-import Ya (is, ho, hu, la, li)
+import Ya (is, ho, hu, la, li, pattern Unit)
 
-import RVRS.AST (Primitive, pattern String, pattern Double, pattern Bool)
-import RVRS.Parser.Type (RVRSType(..))
-
--- | Values produced during RVRS evaluation
--- This is the unified Value type used across the interpreter
--- including expression evaluation and type enforcement.
-data Value
-  = VPrim Primitive
-  | VError String
-  | VVoid
-  | VUnit
-  deriving (Eq, Show)
+import RVRS.AST (type Value, type Typed, pattern String, pattern Double, pattern Bool)
 
 -- | Variable bindings (mutable or immutable)
 data Binding
@@ -24,15 +13,9 @@ data Binding
   deriving (Show, Eq)
 
 -- | Convert a runtime Value to its corresponding RVRSType
-valueToType :: Value -> RVRSType
-valueToType (VPrim x) = is @String `hu` TypeStr `la` is @Double `hu` TypeNum `la` is @Bool `hu` TypeBool `li` x
-valueToType VVoid      = TypeAny
-valueToType (VError _) = TypeAny
-valueToType VUnit      = TypeAny
+valueToType :: Value -> Typed
+valueToType = is @String `hu` String Unit `la` is @Double `hu` Double Unit `la` is @Bool `hu` Bool Unit
 
 -- | Format Value into a human-readable string
 formatVal :: Value -> String
-formatVal (VPrim x) = is @String `la` is @Double `ho` show `la` is @Bool `ho` show `li` x
-formatVal VUnit     = "unit"
-formatVal VVoid     = "void"
-formatVal (VError e)= "error: " ++ e
+formatVal = is @String `la` is @Double `ho` show `la` is @Bool `ho` show

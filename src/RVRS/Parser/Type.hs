@@ -1,25 +1,21 @@
-module RVRS.Parser.Type (RVRSType(..), typeParser) where
+module RVRS.Parser.Type (typeParser) where
 
 import Data.Void
+import Data.Functor (($>))
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 
--- TODO: add TypeUnit
--- The core type tags used for annotations
-data RVRSType
-  = TypeNum
-  | TypeStr
-  | TypeBool
-  | TypeAny   -- Optional catch-all
-  deriving (Eq, Show)
+import Ya (pattern Unit)
+
+import RVRS.AST (type Typed, pattern Double, pattern String, pattern Bool)
 
 -- Parser for these types (used in annotations)
-typeParser :: Parsec Void String RVRSType
+typeParser :: Parsec Void String Typed
 typeParser = choice
-  [ symbol "Num"  >> return TypeNum
-  , symbol "Str"  >> return TypeStr
-  , symbol "Bool" >> return TypeBool
+  [ symbol "Num"  $> Double Unit
+  , symbol "Str"  $> String Unit
+  , symbol "Bool" $> Bool Unit
   ]
 
 -- Local symbol parser

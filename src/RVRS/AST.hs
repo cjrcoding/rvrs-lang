@@ -1,8 +1,7 @@
 module RVRS.AST where
 
-import Ya (P, S, Object (This, That), Recursive (..))
+import Ya (P, S, Object (This, That), Recursive (..), type Unit)
 
-import RVRS.Parser.Type (RVRSType(..))
 import Ya.Instances ()
 
 -- | Represents a named flow of ritual logic
@@ -18,11 +17,10 @@ data Argument = Argument
   , argType :: String            -- ^ Placeholder for the type (optional for now)
   } deriving (Show, Eq)
 
-
 -- | Statements inside a flow block
 data Statement e
-  = Source String (Maybe RVRSType) (Recursive Expression)                 -- source x = ...
-  | Delta String (Maybe RVRSType) (Recursive Expression)
+  = Source String (Maybe Typed) (Recursive Expression)                 -- source x = ...
+  | Delta String (Maybe Typed) (Recursive Expression)
   | Branch (Recursive Expression) [e] [e]-- branch cond { ... } else { ... }
   | Mouth (Recursive Expression)                          -- mouth "..."
   | Whisper (Recursive Expression)
@@ -37,14 +35,18 @@ data Expression e
   = Variable String
   | Operator (Operation e)
   | Calling String [e]
-  | Literal Primitive
+  | Literal Value
   deriving (Show, Eq)
 
-type Primitive = String `S` Double `S` Bool
+type Primitive string double bool = string `S` double `S` bool
 
-pattern String x = This (This x) :: Primitive
-pattern Double x = This (That x) :: Primitive
-pattern Bool x = That x :: Primitive
+pattern String x = This (This x) :: Primitive string double bool
+pattern Double x = This (That x) :: Primitive string double bool
+pattern Bool x = That x :: Primitive string double bool
+
+type Value = Primitive String Double Bool
+
+type Typed = Primitive Unit Unit Unit
 
 data Unary e
   = Neg e

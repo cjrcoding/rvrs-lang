@@ -1,18 +1,6 @@
-module RVRS.Env
-  ( TypedVal(..)
-  , ValueEnv
-  , TypeEnv
-  ) where
+module RVRS.Env where
 
-import qualified Data.Map as Map
-import RVRS.Value (Value)
+import Data.Map
+import RVRS.AST
 
--- TEMPORARY: define here until TypeCheck exists
-data RVRSValueType = VNum | VStr | VBool
-  deriving (Show, Eq)
-
-data TypedVal = TypedVal RVRSValueType Value
-  deriving (Show, Eq)
-
-type ValueEnv = Map.Map String Value
-type TypeEnv  = Map.Map String TypedVal
+type ValueEnv = Map String Value

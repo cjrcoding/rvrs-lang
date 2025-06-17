@@ -16,7 +16,7 @@ module RVRS.Eval (
 
 import Data.Map (Map, insert, union)
 import qualified Data.Map as Map (lookup)
-import Data.Maybe (maybe, fromMaybe)
+import Data.Maybe (maybe, fromJust)
 import Data.Traversable (for)
 import Control.Monad.Except (ExceptT, runExceptT, throwError, catchError)
 import Control.Monad.State (StateT, runStateT, get, modify, liftIO)
@@ -105,14 +105,14 @@ evalStmt stmt = case unwrap stmt of
 
   Assert expr ->
     evalExpr expr >>= \case
-      VPrim (Bool True)  -> return Nothing
-      VPrim (Bool False) -> throwError $ RuntimeError "Assertion failed"
+      Bool True  -> return Nothing
+      Bool False -> throwError $ RuntimeError "Assertion failed"
       _           -> throwError $ RuntimeError "Assert expects boolean"
 
   Branch cond tBlock eBlock ->
     evalExpr cond >>= \case
-      VPrim (Bool True)  -> isolate (evalBody tBlock)
-      VPrim (Bool False) -> isolate (evalBody eBlock)
+      Bool True  -> isolate (evalBody tBlock)
+      Bool False -> isolate (evalBody eBlock)
       _           -> throwError $ RuntimeError "Condition must be boolean"
 
   Delta name _mType expr ->
@@ -125,12 +125,12 @@ evalStmt stmt = case unwrap stmt of
 
 binOp :: (Double -> Double -> Double) -> Recursive Expression -> Recursive Expression -> EvalIR Value
 binOp op a b = (,) <$> evalExpr a <*> evalExpr b >>= \case
-  (VPrim (Double n1), VPrim (Double n2)) -> return $ VPrim . Double $ op n1 n2
+  (Double n1, Double n2) -> return $ Double $ op n1 n2
   _ -> throwError $ RuntimeError "Type error in arithmetic operation"
 
 evalExpr :: Recursive Expression -> EvalIR Value
 evalExpr expr = case unwrap expr of
-  Literal x -> return `ha` VPrim `hv__` is @String `ho` String `la` is @Double `ho` Double `la` is @Bool `ho` Bool `li` x
+  Literal x -> return `hv__` is @String `ho` String `la` is @Double `ho` Double `la` is @Bool `ho` Bool `li` x
 
   Variable name ->
     Map.lookup name <$> get
@@ -142,41 +142,41 @@ evalExpr expr = case unwrap expr of
 
   Operator (Binary (Div a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VPrim (Double _), VPrim (Double 0))  -> throwError $ RuntimeError "Division by zero"
-      (VPrim (Double n1), VPrim (Double n2)) -> return . VPrim . Double $ n1 / n2
+      (Double _, Double 0)  -> throwError $ RuntimeError "Division by zero"
+      (Double n1, Double n2) -> return . Double $ n1 / n2
       _                  -> throwError $ RuntimeError "Type error in division"
 
   Operator (Unary (Neg e)) ->
     evalExpr e >>= \case
-      VPrim (Double n) -> return . VPrim $ Double (-n)
+      Double n -> return $ Double (-n)
       _      -> throwError $ RuntimeError "Negation requires number"
 
   Operator (Unary (Not e)) ->
     evalExpr e >>= \case
-      VPrim (Bool b) -> return . VPrim . Bool $ not b
+      Bool b -> return . Bool $ not b
       _       -> throwError $ RuntimeError "Expected boolean in 'not'"
 
   Operator (Binary (Equals a b)) ->
-    VPrim . Bool <$> ((==) <$> evalExpr a <*> evalExpr b)
+    Bool <$> ((==) <$> evalExpr a <*> evalExpr b)
 
   Operator (Binary (Greater a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VPrim (Double n1), VPrim (Double n2)) -> return . VPrim . Bool $ n1 > n2
+      (Double n1, Double n2) -> return . Bool $ n1 > n2
       _ -> throwError $ RuntimeError "> requires numeric values"
 
   Operator (Binary (Less a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VPrim (Double n1), VPrim (Double n2)) -> return . VPrim . Bool $ n1 < n2
+      (Double n1, Double n2) -> return . Bool $ n1 < n2
       _ -> throwError $ RuntimeError "< requires numeric values"
 
   Operator (Binary (And a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VPrim (Bool b1), VPrim (Bool b2)) -> return . VPrim . Bool $ b1 && b2
+      (Bool b1, Bool b2) -> return . Bool $ b1 && b2
       _ -> throwError $ RuntimeError "and requires booleans"
 
   Operator (Binary (Or a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VPrim (Bool b1), VPrim (Bool b2)) -> return . VPrim . Bool $ b1 || b2
+      (Bool b1, Bool b2) -> return . Bool $ b1 || b2
       _ -> throwError $ RuntimeError "or requires booleans"
 
   Calling name args -> do
@@ -187,7 +187,9 @@ evalExpr expr = case unwrap expr of
         argVals <- for args evalExpr
         if length paramNames /= length argVals
           then throwError $ RuntimeError ("Arity mismatch calling: " ++ name)
-          else fromMaybe VVoid `ha` fst <$> do callBody body `ha` fromList $ zip paramNames argVals
+          -- TODO: here you have to extract a `Value` from `Maybe Value` because you accept
+          -- list instead of nonempty list. I'll plumb it with primitive `error` for now, but -- once we replace `List` with `Nonempty List` it's going to be resolved by itself
+          else fromJust `ha` fst <$> do callBody body `ha` fromList $ zip paramNames argVals
 
 callBody :: [Recursive Statement] -> ValueEnv -> EvalIR (Maybe Value, ValueEnv)
 callBody body callEnv = runReaderT (evalBody body) <$> ask >>= lift `ha` lift `ha` flip runStateT callEnv
