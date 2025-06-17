@@ -3,14 +3,14 @@ module Main where
 import Test.HUnit
 import qualified Data.Map as Map
 
-import Ya (Recursive(..), pattern Unit)
+import Ya (Recursive(..), pattern Unit, pattern Ok, pattern Error)
+import Ya.Instances ()
 
-import RVRS.Typecheck.Check (typeOfExpr)
-import RVRS.Typecheck.Types
 import RVRS.AST
+import RVRS.Checker
 
 -- Define a test environment with some known vars
-testEnv :: TypeEnv
+testEnv :: Map.Map String Typed
 testEnv = Map.fromList
   [ ("x", Double Unit)
   , ("y", Bool Unit)
@@ -42,37 +42,37 @@ notExpr = Recursive . Not
 -- Define the actual tests
 tests :: Test
 tests = TestList
-  [ "Num literal" ~: typeOfExpr testEnv (num 42) ~?= Right (Double Unit)
-  , "Bool literal" ~: typeOfExpr testEnv (bool True) ~?= Right (Bool Unit)
-  , "Str literal" ~: typeOfExpr testEnv (str "hello") ~?= Right (String Unit)
+  [ "Num literal" ~: expression testEnv (num 42) ~?= Ok (Double Unit)
+  , "Bool literal" ~: expression testEnv (bool True) ~?= Ok (Bool Unit)
+  , "Str literal" ~: expression testEnv (str "hello") ~?= Ok (String Unit)
 
-  , "Known variable" ~: typeOfExpr testEnv (var "x") ~?= Right (Double Unit)
-  , "Unknown variable" ~: typeOfExpr testEnv (var "z") ~?= Left (UnknownVariable "z")
+  , "Known variable" ~: expression testEnv (var "x") ~?= Ok (Double Unit)
+  , "Unknown variable" ~: expression testEnv (var "z") ~?= Error (Unknown "z")
 
-  , "Valid addition" ~: typeOfExpr testEnv (add (num 5) (num 7)) ~?= Right (Double Unit)
+  , "Valid addition" ~: expression testEnv (add (num 5) (num 7)) ~?= Ok (Double Unit)
 
   , "Invalid addition" ~: TestCase $
-      case typeOfExpr testEnv (add (num 5) (bool True)) of
-        Left (TypeMismatch _ _) -> return ()
-        _ -> assertFailure "Expected TypeMismatch"
+      case expression testEnv (add (num 5) (bool True)) of
+        Error (Mismatched _) -> return ()
+        _ -> assertFailure "Expected Mismatched"
 
-  , "Equals matching types" ~: typeOfExpr testEnv (equals (num 1) (num 1)) ~?= Right (Bool Unit)
+  , "Equals matching types" ~: expression testEnv (equals (num 1) (num 1)) ~?= Ok (Bool Unit)
 
   , "Equals mismatched types" ~: TestCase $
-      case typeOfExpr testEnv (equals (str "hi") (bool False)) of
-        Left (TypeMismatch _ _) -> return ()
-        _ -> assertFailure "Expected TypeMismatch"
+      case expression testEnv (equals (str "hi") (bool False)) of
+        Error (Mismatched _) -> return ()
+        _ -> assertFailure "Expected Mismatched"
 
-  , "Not on Bool" ~: typeOfExpr testEnv (notExpr (bool False)) ~?= Right (Bool Unit)
+  , "Not on Bool" ~: expression testEnv (notExpr (bool False)) ~?= Ok (Bool Unit)
 
   , "Not on Num" ~: TestCase $
-      case typeOfExpr testEnv (notExpr (num 0)) of
-        Left (TypeMismatch _ _) -> return ()
-        _ -> assertFailure "Expected TypeMismatch"
+      case expression testEnv (notExpr (num 0)) of
+        Error (Mismatched _) -> return ()
+        _ -> assertFailure "Expected Mismatched"
   ]
 
 main :: IO ()
 main = do
-  putStrLn "🔍 Running typeOfExpr tests..."
+  putStrLn "🔍 Running expression tests..."
   _ <- runTestTT tests
   return ()
