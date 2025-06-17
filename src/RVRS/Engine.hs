@@ -26,7 +26,7 @@ type Reason = Runtime `S` Value
 pattern Runtime e = This e :: Reason
 pattern Returns e = That e :: Reason
 
-type Runtime = Primitive `S` String `S` String
+type Runtime = Typed `S` String `S` String
 
 pattern Require e = This (This e)
 pattern Unknown e = This (That e)
@@ -40,10 +40,10 @@ statement x = case unwrap x of
 
 expression :: Recursive Expression `AR__` Engine `T'I` Value
 expression x = case unwrap x of
- Lit x -> intro @Engine `ha` VPrim `hv` x
- Var name -> intro @Engine `hv` Unit
-  `yuk_` Old `hv__` State `ha` Event `hv` get `yo` Map.lookup name `ho` to @Optional
-  `yok_` Try `ha__` None `hu_` Error `ha` Runtime `hv` Unbound name `la` Ok
+ Literal x -> intro @Engine `hv` x
+ Variable x -> intro @Engine `hv` Unit
+  `yuk_` Old `hv__` State `ha` Event `hv` get `yo` Map.lookup x `ho` to @Optional
+  `yok_` Try `ha__` None `hu_` Error `ha` Runtime `hv` Unbound x `la` Ok
 
  -- Equals a b -> expression a `lu'yp` Run `hv` expression b
  --  `yo` (\(These a' b') -> VPrim `ha` Bool `hv` (a' == b'))

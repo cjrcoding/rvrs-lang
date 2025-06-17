@@ -124,7 +124,7 @@ evalExpr :: Recursive Expression -> EvalIR Value
 evalExpr expr = case unwrap expr of
   Literal x -> return `hv__` is @String `ho` String `la` is @Double `ho` Double `la` is @Bool `ho` Bool `li` x
 
-  Var name ->
+  Variable name ->
     Map.lookup name <$> T.get
       >>= maybe (throwError `ha` RuntimeError $ "Unbound variable: " ++ name) pure
 
@@ -189,29 +189,4 @@ callBody body callEnv = runReaderT (evalBody body) <$> ask >>= lift `ha` lift `h
 -- Flow body evaluator used in both Calling and CallStmt
 evalBody :: [Recursive Statement] -> EvalIR (Maybe Value)
 evalBody [] = return Nothing
-<<<<<<< HEAD
 evalBody (stmt:rest) = evalStmt stmt >>= maybe (evalBody rest) (pure `ha` Just)
-=======
-evalBody (stmt:rest) = evalStmt stmt >>= maybe (evalBody rest) (pure `ha` Just)
-
--- evalBody' stmts = fromList @(Nonempty List `T'I` Recursive Statement) stmts
- -- `yokl`Forth `ha` Try `ha`Maybe `ha` not `ha` may `ha` evalStmt
-
-type Engine = Given FlowEnv `JNT` State ValueEnv `JNT` Error EvalError `JNT` World
-
-evalStmt' :: Recursive Statement `AR__` Engine `T'I` Maybe Value
-evalStmt' stmt = case unwrap stmt of
-  -- Echo expr -> Nothing <$ do evalExpr expr >>= display "echo"
-  -- Whisper expr -> Nothing <$ do evalExpr expr >>= display "→ whisper: "
-  -- Mouth expr -> Nothing <$ do evalExpr expr >>= display "mouth: "
-
--- evalExpr' expr = case unwrap expr of
---   NumLit n -> intro `hv` VNum n
---   StrLit s -> intro `hv` VStr s
---   BoolLit b -> intro `hv` VBool b
-
-  -- Variable name -> intro `hv` Unit
-  --  `yuk_` Run `hv__` Old `ha` State `ha` Event `hv` Y.get `yo` Map.lookup name `ho` may
-  --  `yok_` Run `ha__` None `hu` Error (RuntimeError $ "Unbound variable: " ++ name) `la` intro
-  --  `yok_` Run `ha__` intro @Engine @(AR)
->>>>>>> main
