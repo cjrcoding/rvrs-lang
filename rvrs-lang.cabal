@@ -53,6 +53,7 @@ library
   other-modules:
       RVRS.Codegen
     , RVRS.Parser
+    , RVRS.Checker
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
@@ -74,6 +75,7 @@ executable rvrs
       RVRS.AST
     , RVRS.Codegen
     , RVRS.Parser
+    , RVRS.Checker
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
@@ -95,6 +97,7 @@ executable RunAll
       RVRS.AST
     , RVRS.Codegen
     , RVRS.Parser
+    , RVRS.Checker
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
@@ -116,6 +119,7 @@ executable TestLower
       RVRS.AST
     , RVRS.Codegen
     , RVRS.Parser
+    , RVRS.Checker
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
@@ -137,6 +141,7 @@ executable RunIRTests
       RVRS.AST
     , RVRS.Codegen
     , RVRS.Parser
+    , RVRS.Checker
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
@@ -159,6 +164,7 @@ executable TestTypeCheck
     , RVRS.Typecheck.Check
     , RVRS.Typecheck.Types
     , RVRS.Parser.Type
+    , RVRS.Checker
     , Ya.Conversion
     , Ya.Instances
 
@@ -168,6 +174,7 @@ executable testtypechecknegative
   other-modules:
       RVRS.AST
     , RVRS.Parser.Type
+    , RVRS.Checker
     , RVRS.Typecheck.Check
     , RVRS.Typecheck.Types
     , Ya.Instances

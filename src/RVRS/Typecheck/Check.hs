@@ -1,10 +1,12 @@
 module RVRS.Typecheck.Check where
 
-import Ya (Recursive (..), pattern Unit, is, unwrap, ha__, hu, la, li)
+import qualified Data.Map as Map
+
+import Ya (Recursive (..), pattern Unit, unwrap)
+
 import RVRS.AST
 import RVRS.Value
 import RVRS.Typecheck.Types
-import qualified Data.Map as Map
 
 typeOfExpr :: TypeEnv -> Recursive Expression -> Either TypeError Typed
 typeOfExpr env expr = case unwrap expr of
@@ -45,7 +47,6 @@ typeOfExpr env expr = case unwrap expr of
   LessThan a b    -> checkBinary env (Double Unit) (Bool Unit) a b
 
   other -> Left $ UnsupportedOp (show other)
-
 
 checkBinary :: TypeEnv -> Typed -> Typed -> Recursive Expression -> Recursive Expression -> Either TypeError Typed
 checkBinary env expected retType a b = do

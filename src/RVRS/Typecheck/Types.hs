@@ -1,13 +1,14 @@
 module RVRS.Typecheck.Types where
 
-import qualified Data.Map as Map
+import Data.Map
 
 import RVRS.AST (type Typed)
 
-type TypeEnv = Map.Map String Typed
+type TypeEnv = Map String Typed
 
 data TypeError
   = TypeMismatch Typed Typed
+  | NotExpected Typed Typed
   | UnknownVariable String
   | UnsupportedOp String
   deriving (Show, Eq)
