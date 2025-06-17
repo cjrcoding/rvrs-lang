@@ -48,8 +48,6 @@ library
   import: lib-settings
   exposed-modules:
       RVRS.AST
-    , RVRS.Typecheck.Check
-    , RVRS.Typecheck.Types
   other-modules:
       RVRS.Codegen
     , RVRS.Parser
@@ -85,8 +83,6 @@ executable rvrs
     , RVRS.Lower
     , RVRS.Env
     , RVRS.Utils
-    , RVRS.Typecheck.Check
-    , RVRS.Typecheck.Types
     , Ya.Conversion
     , Ya.Instances
 
@@ -107,8 +103,6 @@ executable RunAll
     , RVRS.Lower
     , RVRS.Env
     , RVRS.Utils
-    , RVRS.Typecheck.Check
-    , RVRS.Typecheck.Types
     , Ya.Conversion
     , Ya.Instances
 
@@ -129,8 +123,6 @@ executable TestLower
     , RVRS.Lower
     , RVRS.Env
     , RVRS.Utils
-    , RVRS.Typecheck.Check
-    , RVRS.Typecheck.Types
     , Ya.Conversion
     , Ya.Instances
 
@@ -151,8 +143,6 @@ executable RunIRTests
     , RVRS.Lower
     , RVRS.Env
     , RVRS.Utils
-    , RVRS.Typecheck.Check
-    , RVRS.Typecheck.Types
     , Ya.Conversion
     , Ya.Instances
 
@@ -161,8 +151,6 @@ executable TestTypeCheck
   main-is: TestTypeCheck.hs
   other-modules:
       RVRS.AST
-    , RVRS.Typecheck.Check
-    , RVRS.Typecheck.Types
     , RVRS.Parser.Type
     , RVRS.Checker
     , Ya.Conversion
@@ -175,6 +163,4 @@ executable testtypechecknegative
       RVRS.AST
     , RVRS.Parser.Type
     , RVRS.Checker
-    , RVRS.Typecheck.Check
-    , RVRS.Typecheck.Types
     , Ya.Instances
