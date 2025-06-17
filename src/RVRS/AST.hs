@@ -1,8 +1,7 @@
 module RVRS.AST where
 
-import Ya (S, Object (This, That), Recursive (..))
+import Ya (P, S, Object (This, That), Recursive (..), type Unit)
 
-import RVRS.Parser.Type (RVRSType(..))
 import Ya.Instances ()
 
 -- | Represents a named flow of ritual logic
@@ -18,11 +17,10 @@ data Argument = Argument
   , argType :: String            -- ^ Placeholder for the type (optional for now)
   } deriving (Show, Eq)
 
-
 -- | Statements inside a flow block
 data Statement e
-  = Source String (Maybe RVRSType) (Recursive Expression)                 -- source x = ...
-  | Delta String (Maybe RVRSType) (Recursive Expression)
+  = Source String (Maybe Typed) (Recursive Expression)                 -- source x = ...
+  | Delta String (Maybe Typed) (Recursive Expression)
   | Branch (Recursive Expression) [e] [e]-- branch cond { ... } else { ... }
   | Mouth (Recursive Expression)                          -- mouth "..."
   | Whisper (Recursive Expression)
@@ -34,27 +32,43 @@ data Statement e
   deriving (Show, Eq)
 
 data Expression e
-  = Var String
-  | Lit Primitive
-  | Equals e e
-  | GreaterThan e e
-  | LessThan e e
+  = Variable String
+  | Operator (Operation e)
+  | Calling String [e]
+  | Literal Value
+  deriving (Show, Eq)
+
+type Primitive string double bool = string `S` double `S` bool
+
+pattern String x = This (This x) :: Primitive string double bool
+pattern Double x = This (That x) :: Primitive string double bool
+pattern Bool x = That x :: Primitive string double bool
+
+type Value = Primitive String Double Bool
+
+type Typed = Primitive Unit Unit Unit
+
+data Unary e
+  = Neg e
+  | Not e
+  deriving (Show, Eq)
+
+data Binary e
+  = Equals e e
+  | Greater e e
+  | Less e e
   | Add e e
   | Sub e e
   | Mul e e
   | Div e e
-  | Not e
   | And e e
   | Or e e
-  | CallExpr String [e]
-  | Neg e
   deriving (Show, Eq)
+ 
+pattern Unary x = This x :: Operation e
+pattern Binary x = That x :: Operation e
 
-type Primitive = String `S` Double `S` Bool
-
-pattern String x = This (This x) :: Primitive
-pattern Double x = This (That x) :: Primitive
-pattern Bool x = That x :: Primitive
+type Operation e = Unary e `S` Binary e
 
 -- | Intermediate representation of a flow
 data FlowIR = FlowIR

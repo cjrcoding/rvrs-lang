@@ -1,17 +1,57 @@
-cabal-version:       >=1.10
+cabal-version:       2.2
 name:                rvrs-lang
 version:             0.1.0.0
 build-type:          Simple
 
--- === Library: rvrs-lang ===
+-- === Common Settings ===
+common base-settings
+  default-language:    Haskell2010
+  default-extensions:
+    LambdaCase
+    PatternSynonyms
+    ScopedTypeVariables
+    StandaloneDeriving
+    QuantifiedConstraints
+    TypeApplications
+    TypeOperators
+
+common rvrs-deps
+  build-depends:
+      base >=4.14 && <5
+    , text
+    , megaparsec
+    , prettyprinter
+    , parser-combinators
+    , containers
+    , mtl
+    , ya
+    , ya-world
+
+common app-settings
+  import: base-settings, rvrs-deps
+  hs-source-dirs: app, src
+
+common lib-settings
+  import: base-settings, rvrs-deps
+  hs-source-dirs: src
+
+common extra-deps
+  build-depends:
+    directory, filepath, process
+
+common hunit-deps
+  build-depends:
+    HUnit
+
+-- === Library ===
 library
+  import: lib-settings
   exposed-modules:
       RVRS.AST
-    , RVRS.Typecheck.Check
-    , RVRS.Typecheck.Types
   other-modules:
       RVRS.Codegen
     , RVRS.Parser
+    , RVRS.Checker
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
@@ -24,35 +64,17 @@ library
     , RVRS.Utils
     , Ya.Conversion
     , Ya.Instances
-  hs-source-dirs:      src
-  build-depends:
-      base >=4.14 && <5
-    , containers
-    , ya
-    , megaparsec
-    , text
-    , prettyprinter
-    , parser-combinators
-    , mtl
-    , ya-world
-  default-language:    Haskell2010
-  default-extensions:
-    LambdaCase
-    PatternSynonyms
-    ScopedTypeVariables
-    StandaloneDeriving
-    QuantifiedConstraints
-    TypeApplications
-    TypeOperators
 
--- === Executable: rvrs ===
+-- === Executables ===
+
 executable rvrs
-  main-is:             Main.hs
-  hs-source-dirs:      app, src
+  import: app-settings
+  main-is: Main.hs
   other-modules:
       RVRS.AST
     , RVRS.Codegen
     , RVRS.Parser
+    , RVRS.Checker
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
@@ -63,40 +85,17 @@ executable rvrs
     , RVRS.Lower
     , RVRS.Env
     , RVRS.Utils
-    , RVRS.Typecheck.Check
-    , RVRS.Typecheck.Types
     , Ya.Conversion
     , Ya.Instances
 
-  build-depends:
-      base >=4.14 && <5
-    , text
-    , megaparsec
-    , prettyprinter
-    , parser-combinators
-    , containers
-    , mtl
-    , ya
-    , ya-world
-
-  default-language:    Haskell2010
-  default-extensions:
-    LambdaCase
-    PatternSynonyms
-    ScopedTypeVariables
-    StandaloneDeriving
-    QuantifiedConstraints
-    TypeApplications
-    TypeOperators
-
--- === Executable: RunAll ===
 executable RunAll
-  main-is:             RunAll.hs
-  hs-source-dirs:      app, src
+  import: app-settings, extra-deps
+  main-is: RunAll.hs
   other-modules:
       RVRS.AST
     , RVRS.Codegen
     , RVRS.Parser
+    , RVRS.Checker
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
@@ -107,43 +106,17 @@ executable RunAll
     , RVRS.Lower
     , RVRS.Env
     , RVRS.Utils
-    , RVRS.Typecheck.Check
-    , RVRS.Typecheck.Types
     , Ya.Conversion
     , Ya.Instances
 
-  build-depends:
-      base >=4.14 && <5
-    , text
-    , megaparsec
-    , prettyprinter
-    , parser-combinators
-    , containers
-    , directory
-    , filepath
-    , process
-    , mtl
-    , ya
-    , ya-world
-
-  default-language:    Haskell2010
-  default-extensions:
-    LambdaCase
-    PatternSynonyms
-    ScopedTypeVariables
-    StandaloneDeriving
-    QuantifiedConstraints
-    TypeApplications
-    TypeOperators
-
--- === Executable: TestLower ===
 executable TestLower
-  main-is:             TestLower.hs
-  hs-source-dirs:      app, src
+  import: app-settings
+  main-is: TestLower.hs
   other-modules:
       RVRS.AST
     , RVRS.Codegen
     , RVRS.Parser
+    , RVRS.Checker
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
@@ -154,40 +127,17 @@ executable TestLower
     , RVRS.Lower
     , RVRS.Env
     , RVRS.Utils
-    , RVRS.Typecheck.Check
-    , RVRS.Typecheck.Types
     , Ya.Conversion
     , Ya.Instances
 
-  build-depends:
-      base >=4.14 && <5
-    , text
-    , megaparsec
-    , prettyprinter
-    , parser-combinators
-    , containers
-    , mtl
-    , ya
-    , ya-world
-
-  default-language:    Haskell2010
-  default-extensions:
-    LambdaCase
-    PatternSynonyms
-    ScopedTypeVariables
-    StandaloneDeriving
-    QuantifiedConstraints
-    TypeApplications
-    TypeOperators
-
--- === Executable: RunIRTests ===
 executable RunIRTests
-  main-is:             RunIRTests.hs
-  hs-source-dirs:      app, src
+  import: app-settings, extra-deps
+  main-is: RunIRTests.hs
   other-modules:
       RVRS.AST
     , RVRS.Codegen
     , RVRS.Parser
+    , RVRS.Checker
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
@@ -198,92 +148,24 @@ executable RunIRTests
     , RVRS.Lower
     , RVRS.Env
     , RVRS.Utils
-    , RVRS.Typecheck.Check
-    , RVRS.Typecheck.Types
     , Ya.Conversion
     , Ya.Instances
 
-  build-depends:
-      base >=4.14 && <5
-    , text
-    , megaparsec
-    , prettyprinter
-    , parser-combinators
-    , containers
-    , directory
-    , filepath
-    , process
-    , mtl
-    , ya
-    , ya-world
-
-  default-language:    Haskell2010
-  default-extensions:
-    LambdaCase
-    PatternSynonyms
-    ScopedTypeVariables
-    StandaloneDeriving
-    QuantifiedConstraints
-    TypeApplications
-    TypeOperators
-
--- === Executable: TestTypeCheck ===
 executable TestTypeCheck
-  main-is:             TestTypeCheck.hs
-  hs-source-dirs:      app, src
+  import: app-settings, hunit-deps
+  main-is: TestTypeCheck.hs
   other-modules:
       RVRS.AST
-    , RVRS.Typecheck.Check
-    , RVRS.Typecheck.Types
     , RVRS.Parser.Type
+    , RVRS.Checker
     , Ya.Conversion
     , Ya.Instances
 
-  build-depends:
-      base >=4.14 && <5
-    , text
-    , containers
-    , megaparsec
-    , prettyprinter
-    , parser-combinators
-    , mtl
-    , HUnit
-    , ya
-    , ya-world
-
-  default-language:    Haskell2010
-  default-extensions:
-    LambdaCase
-    PatternSynonyms
-    ScopedTypeVariables
-    StandaloneDeriving
-    QuantifiedConstraints
-    TypeApplications
-    TypeOperators
-
--- === Executable: TestTypeCheckNegative ===
 executable testtypechecknegative
-  main-is:             TestTypeCheckNegative.hs
-  hs-source-dirs:      app, src
+  import: app-settings, hunit-deps
+  main-is: TestTypeCheckNegative.hs
   other-modules:
       RVRS.AST
     , RVRS.Parser.Type
-    , RVRS.Typecheck.Check
-    , RVRS.Typecheck.Types
+    , RVRS.Checker
     , Ya.Instances
-
-  build-depends:
-      base >=4.14 && <5
-    , containers
-    , HUnit
-    , ya
-    , megaparsec
-
-  default-language:    Haskell2010
-  default-extensions:
-    PatternSynonyms
-    ScopedTypeVariables
-    StandaloneDeriving
-    QuantifiedConstraints
-    TypeApplications
-    TypeOperators

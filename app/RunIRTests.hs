@@ -4,7 +4,6 @@ module Main where
 import RVRS.Parser (parseRVRS)
 import RVRS.Lower (lowerFlow)
 import RVRS.Eval (evalIRFlow, EvalError)
-import RVRS.Value (Value(..))
 import qualified RVRS.AST as AST
 
 -- System / standard libraries
@@ -57,7 +56,7 @@ runIRTest file = do
           putStrLn "✅ Lowered IR:"
           print mainFlow
           putStrLn "🔁 Evaluation Output:"
-          result <- try (evalIRFlow flowMap (AST.flowNameIR mainFlow) []) :: IO (Either SomeException (Either EvalError (Maybe Value)))
+          result <- try (evalIRFlow flowMap (AST.flowNameIR mainFlow) []) :: IO (Either SomeException (Either EvalError (Maybe AST.Value)))
 
           case result of
             Left ex -> do

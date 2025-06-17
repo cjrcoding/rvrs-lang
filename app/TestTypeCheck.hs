@@ -3,76 +3,76 @@ module Main where
 import Test.HUnit
 import qualified Data.Map as Map
 
-import RVRS.Typecheck.Check (typeOfExpr)
-import RVRS.Typecheck.Types
-import RVRS.AST
-import Ya (Recursive(..)) 
+import Ya (Recursive(..), pattern Unit, pattern Ok, pattern Error, ho, ho'ho)
+import Ya.Instances ()
 
+import RVRS.AST
+import RVRS.Checker
 
 -- Define a test environment with some known vars
-testEnv :: TypeEnv
+testEnv :: Map.Map String Typed
 testEnv = Map.fromList
-  [ ("x", TNum)
-  , ("y", TBool)
-  , ("msg", TStr)
+  [ ("x", Double Unit)
+  , ("y", Bool Unit)
+  , ("msg", String Unit)
   ]
 
 -- Helper to build expressions
 num :: Double -> Recursive Expression
-num = Recursive . Lit . Double
+num = Double `ho` Literal `ho` Recursive
 
 bool :: Bool -> Recursive Expression
-bool = Recursive . Lit . Bool
+bool = Bool `ho` Literal `ho` Recursive
 
 str :: String -> Recursive Expression
-str = Recursive . Lit . String
+str = String `ho` Literal `ho` Recursive
 
 var :: String -> Recursive Expression
-var = Recursive . Var
+var = Variable `ho` Recursive
 
 add :: Recursive Expression -> Recursive Expression -> Recursive Expression
-add a b = Recursive (Add a b)
+add = Add `ho'ho` Binary `ho'ho` Operator `ho'ho` Recursive
 
 equals :: Recursive Expression -> Recursive Expression -> Recursive Expression
-equals a b = Recursive (Equals a b)
+equals = Equals `ho'ho` Binary `ho'ho` Operator `ho'ho` Recursive
 
 notExpr :: Recursive Expression -> Recursive Expression
-notExpr = Recursive . Not
+notExpr = Not `ho` Unary `ho` Operator `ho` Recursive
 
 -- Define the actual tests
 tests :: Test
 tests = TestList
-  [ "Num literal" ~: typeOfExpr testEnv (num 42) ~?= Right TNum
-  , "Bool literal" ~: typeOfExpr testEnv (bool True) ~?= Right TBool
-  , "Str literal" ~: typeOfExpr testEnv (str "hello") ~?= Right TStr
+  [ "Num literal" ~: expression testEnv (num 42) ~?= Ok (Double Unit)
+  , "Bool literal" ~: expression testEnv (bool True) ~?= Ok (Bool Unit)
+  , "Str literal" ~: expression testEnv (str "hello") ~?= Ok (String Unit)
 
-  , "Known variable" ~: typeOfExpr testEnv (var "x") ~?= Right TNum
-  , "Unknown variable" ~: typeOfExpr testEnv (var "z") ~?= Left (UnknownVariable "z")
+  , "Known variable" ~: expression testEnv (var "x") ~?= Ok (Double Unit)
+  , "Unknown variable" ~: expression testEnv (var "z") ~?= Error (Unknown "z")
 
-  , "Valid addition" ~: typeOfExpr testEnv (add (num 5) (num 7)) ~?= Right TNum
+  , "Valid addition" ~: expression testEnv (add (num 5) (num 7)) ~?= Ok (Double Unit)
 
   , "Invalid addition" ~: TestCase $
-      case typeOfExpr testEnv (add (num 5) (bool True)) of
-        Left (TypeMismatch _ _) -> return ()
-        _ -> assertFailure "Expected TypeMismatch"
+      case expression testEnv (add (num 5) (bool True)) of
+        Error (Mismatched _) -> return ()
+        _ -> assertFailure "Expected Mismatched"
 
-  , "Equals matching types" ~: typeOfExpr testEnv (equals (num 1) (num 1)) ~?= Right TBool
+  , "Equals matching types" ~: expression testEnv (equals (num 1) (num 1)) ~?= Ok (Bool Unit)
 
   , "Equals mismatched types" ~: TestCase $
-      case typeOfExpr testEnv (equals (str "hi") (bool False)) of
-        Left (TypeMismatch _ _) -> return ()
-        _ -> assertFailure "Expected TypeMismatch"
+      case expression testEnv (equals (str "hi") (bool False)) of
+        Error (Mismatched _) -> return ()
+        _ -> assertFailure "Expected Mismatched"
 
-  , "Not on Bool" ~: typeOfExpr testEnv (notExpr (bool False)) ~?= Right TBool
+  , "Not on Bool" ~: expression testEnv (notExpr (bool False)) ~?= Ok (Bool Unit)
 
   , "Not on Num" ~: TestCase $
-      case typeOfExpr testEnv (notExpr (num 0)) of
-        Left (TypeMismatch _ _) -> return ()
-        _ -> assertFailure "Expected TypeMismatch"
+      case expression testEnv (notExpr (num 0)) of
+        Error (Mismatched _) -> return ()
+        _ -> assertFailure "Expected Mismatched"
   ]
 
 main :: IO ()
 main = do
-  putStrLn "🔍 Running typeOfExpr tests..."
+  putStrLn "🔍 Running expression tests..."
   _ <- runTestTT tests
   return ()

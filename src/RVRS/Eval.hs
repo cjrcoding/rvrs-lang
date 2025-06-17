@@ -16,7 +16,7 @@ module RVRS.Eval (
 
 import Data.Map (Map, insert, union)
 import qualified Data.Map as Map (lookup)
-import Data.Maybe (maybe, fromMaybe)
+import Data.Maybe (maybe, fromJust)
 import Data.Traversable (for)
 import Control.Monad.Except (ExceptT, runExceptT, throwError, catchError)
 import Control.Monad.State (StateT, runStateT, modify, liftIO)
@@ -97,14 +97,14 @@ evalStmt stmt = case unwrap stmt of
 
   Assert expr ->
     evalExpr expr >>= \case
-      VPrim (Bool True)  -> return Nothing
-      VPrim (Bool False) -> throwError $ RuntimeError "Assertion failed"
+      Bool True  -> return Nothing
+      Bool False -> throwError $ RuntimeError "Assertion failed"
       _           -> throwError $ RuntimeError "Assert expects boolean"
 
   Branch cond tBlock eBlock ->
     evalExpr cond >>= \case
-      VPrim (Bool True)  -> isolate (evalBody tBlock)
-      VPrim (Bool False) -> isolate (evalBody eBlock)
+      Bool True  -> isolate (evalBody tBlock)
+      Bool False -> isolate (evalBody eBlock)
       _           -> throwError $ RuntimeError "Condition must be boolean"
 
   Delta name _mType expr ->
@@ -117,61 +117,61 @@ evalStmt stmt = case unwrap stmt of
 
 binOp :: (Double -> Double -> Double) -> Recursive Expression -> Recursive Expression -> EvalIR Value
 binOp op a b = (,) <$> evalExpr a <*> evalExpr b >>= \case
-  (VPrim (Double n1), VPrim (Double n2)) -> return $ VPrim . Double $ op n1 n2
+  (Double n1, Double n2) -> return $ Double $ op n1 n2
   _ -> throwError $ RuntimeError "Type error in arithmetic operation"
 
 evalExpr :: Recursive Expression -> EvalIR Value
 evalExpr expr = case unwrap expr of
-  Lit x -> return `ha` VPrim `hv__` is @String `ho` String `la` is @Double `ho` Double `la` is @Bool `ho` Bool `li` x
+  Literal x -> return `hv__` is @String `ho` String `la` is @Double `ho` Double `la` is @Bool `ho` Bool `li` x
 
   Var name ->
     Map.lookup name <$> T.get
       >>= maybe (throwError `ha` RuntimeError $ "Unbound variable: " ++ name) pure
 
-  Add a b -> binOp (+) a b
-  Sub a b -> binOp (-) a b
-  Mul a b -> binOp (*) a b
+  Operator (Binary (Add a b)) -> binOp (+) a b
+  Operator (Binary (Sub a b)) -> binOp (-) a b
+  Operator (Binary (Mul a b)) -> binOp (*) a b
 
-  Div a b ->
+  Operator (Binary (Div a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VPrim (Double _), VPrim (Double 0))  -> throwError $ RuntimeError "Division by zero"
-      (VPrim (Double n1), VPrim (Double n2)) -> return . VPrim . Double $ n1 / n2
+      (Double _, Double 0)  -> throwError $ RuntimeError "Division by zero"
+      (Double n1, Double n2) -> return . Double $ n1 / n2
       _                  -> throwError $ RuntimeError "Type error in division"
 
-  Neg e ->
+  Operator (Unary (Neg e)) ->
     evalExpr e >>= \case
-      VPrim (Double n) -> return . VPrim $ Double (-n)
+      Double n -> return $ Double (-n)
       _      -> throwError $ RuntimeError "Negation requires number"
 
-  Not e ->
+  Operator (Unary (Not e)) ->
     evalExpr e >>= \case
-      VPrim (Bool b) -> return . VPrim . Bool $ not b
+      Bool b -> return . Bool $ not b
       _       -> throwError $ RuntimeError "Expected boolean in 'not'"
 
-  Equals a b ->
-    VPrim . Bool <$> ((==) <$> evalExpr a <*> evalExpr b)
+  Operator (Binary (Equals a b)) ->
+    Bool <$> ((==) <$> evalExpr a <*> evalExpr b)
 
-  GreaterThan a b ->
+  Operator (Binary (Greater a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VPrim (Double n1), VPrim (Double n2)) -> return . VPrim . Bool $ n1 > n2
+      (Double n1, Double n2) -> return . Bool $ n1 > n2
       _ -> throwError $ RuntimeError "> requires numeric values"
 
-  LessThan a b ->
+  Operator (Binary (Less a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VPrim (Double n1), VPrim (Double n2)) -> return . VPrim . Bool $ n1 < n2
+      (Double n1, Double n2) -> return . Bool $ n1 < n2
       _ -> throwError $ RuntimeError "< requires numeric values"
 
-  And a b ->
+  Operator (Binary (And a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VPrim (Bool b1), VPrim (Bool b2)) -> return . VPrim . Bool $ b1 && b2
+      (Bool b1, Bool b2) -> return . Bool $ b1 && b2
       _ -> throwError $ RuntimeError "and requires booleans"
 
-  Or a b ->
+  Operator (Binary (Or a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (VPrim (Bool b1), VPrim (Bool b2)) -> return . VPrim . Bool $ b1 || b2
+      (Bool b1, Bool b2) -> return . Bool $ b1 || b2
       _ -> throwError $ RuntimeError "or requires booleans"
 
-  CallExpr name args -> do
+  Calling name args -> do
     fsenv <- ask
     case Map.lookup name fsenv of
       Nothing -> throwError $ RuntimeError ("Unknown function: " ++ name)
@@ -179,12 +179,39 @@ evalExpr expr = case unwrap expr of
         argVals <- for args evalExpr
         if length paramNames /= length argVals
           then throwError $ RuntimeError ("Arity mismatch calling: " ++ name)
-          else fromMaybe VVoid `ha` fst <$> do callBody body `ha` fromList $ zip paramNames argVals
+          -- TODO: here you have to extract a `Value` from `Maybe Value` because you accept
+          -- list instead of nonempty list. I'll plumb it with primitive `error` for now, but -- once we replace `List` with `Nonempty List` it's going to be resolved by itself
+          else fromJust `ha` fst <$> do callBody body `ha` fromList $ zip paramNames argVals
 
 callBody :: [Recursive Statement] -> ValueEnv -> EvalIR (Maybe Value, ValueEnv)
 callBody body callEnv = runReaderT (evalBody body) <$> ask >>= lift `ha` lift `ha` flip runStateT callEnv
 
--- Flow body evaluator used in both CallExpr and CallStmt
+-- Flow body evaluator used in both Calling and CallStmt
 evalBody :: [Recursive Statement] -> EvalIR (Maybe Value)
 evalBody [] = return Nothing
+<<<<<<< HEAD
 evalBody (stmt:rest) = evalStmt stmt >>= maybe (evalBody rest) (pure `ha` Just)
+=======
+evalBody (stmt:rest) = evalStmt stmt >>= maybe (evalBody rest) (pure `ha` Just)
+
+-- evalBody' stmts = fromList @(Nonempty List `T'I` Recursive Statement) stmts
+ -- `yokl`Forth `ha` Try `ha`Maybe `ha` not `ha` may `ha` evalStmt
+
+type Engine = Given FlowEnv `JNT` State ValueEnv `JNT` Error EvalError `JNT` World
+
+evalStmt' :: Recursive Statement `AR__` Engine `T'I` Maybe Value
+evalStmt' stmt = case unwrap stmt of
+  -- Echo expr -> Nothing <$ do evalExpr expr >>= display "echo"
+  -- Whisper expr -> Nothing <$ do evalExpr expr >>= display "→ whisper: "
+  -- Mouth expr -> Nothing <$ do evalExpr expr >>= display "mouth: "
+
+-- evalExpr' expr = case unwrap expr of
+--   NumLit n -> intro `hv` VNum n
+--   StrLit s -> intro `hv` VStr s
+--   BoolLit b -> intro `hv` VBool b
+
+  -- Variable name -> intro `hv` Unit
+  --  `yuk_` Run `hv__` Old `ha` State `ha` Event `hv` Y.get `yo` Map.lookup name `ho` may
+  --  `yok_` Run `ha__` None `hu` Error (RuntimeError $ "Unbound variable: " ++ name) `la` intro
+  --  `yok_` Run `ha__` intro @Engine @(AR)
+>>>>>>> main
