@@ -1,6 +1,6 @@
 module RVRS.AST where
 
-import Ya (S, Object (This, That), Recursive (..), type Unit)
+import Ya (P, S, Object (This, That), Recursive (..), type Unit)
 
 import Ya.Instances ()
 
@@ -32,20 +32,10 @@ data Statement e
   deriving (Show, Eq)
 
 data Expression e
-  = Var String
-  | Lit Value
-  | Equals e e
-  | GreaterThan e e
-  | LessThan e e
-  | Add e e
-  | Sub e e
-  | Mul e e
-  | Div e e
-  | Not e
-  | And e e
-  | Or e e
-  | CallExpr String [e]
-  | Neg e
+  = Variable String
+  | Operator (Operation e)
+  | Calling String [e]
+  | Literal Value
   deriving (Show, Eq)
 
 type Primitive string double bool = string `S` double `S` bool
@@ -57,6 +47,28 @@ pattern Bool x = That x :: Primitive string double bool
 type Value = Primitive String Double Bool
 
 type Typed = Primitive Unit Unit Unit
+
+data Unary e
+  = Neg e
+  | Not e
+  deriving (Show, Eq)
+
+data Binary e
+  = Equals e e
+  | Greater e e
+  | Less e e
+  | Add e e
+  | Sub e e
+  | Mul e e
+  | Div e e
+  | And e e
+  | Or e e
+  deriving (Show, Eq)
+ 
+pattern Unary x = This x :: Operation e
+pattern Binary x = That x :: Operation e
+
+type Operation e = Unary e `S` Binary e
 
 -- | Intermediate representation of a flow
 data FlowIR = FlowIR

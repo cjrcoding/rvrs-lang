@@ -3,7 +3,7 @@ module Main where
 import Test.HUnit
 import qualified Data.Map as Map
 
-import Ya (Recursive(..), pattern Unit, pattern Ok, pattern Error)
+import Ya (Recursive(..), pattern Unit, pattern Ok, pattern Error, ho, ho'ho)
 import Ya.Instances ()
 
 import RVRS.AST
@@ -19,25 +19,25 @@ testEnv = Map.fromList
 
 -- Helper to build expressions
 num :: Double -> Recursive Expression
-num = Recursive . Lit . Double
+num = Double `ho` Literal `ho` Recursive
 
 bool :: Bool -> Recursive Expression
-bool = Recursive . Lit . Bool
+bool = Bool `ho` Literal `ho` Recursive
 
 str :: String -> Recursive Expression
-str = Recursive . Lit . String
+str = String `ho` Literal `ho` Recursive
 
 var :: String -> Recursive Expression
-var = Recursive . Var
+var = Variable `ho` Recursive
 
 add :: Recursive Expression -> Recursive Expression -> Recursive Expression
-add a b = Recursive (Add a b)
+add = Add `ho'ho` Binary `ho'ho` Operator `ho'ho` Recursive
 
 equals :: Recursive Expression -> Recursive Expression -> Recursive Expression
-equals a b = Recursive (Equals a b)
+equals = Equals `ho'ho` Binary `ho'ho` Operator `ho'ho` Recursive
 
 notExpr :: Recursive Expression -> Recursive Expression
-notExpr = Recursive . Not
+notExpr = Not `ho` Unary `ho` Operator `ho` Recursive
 
 -- Define the actual tests
 tests :: Test
