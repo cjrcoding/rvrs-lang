@@ -153,6 +153,7 @@ executable TestTypeCheck
       RVRS.AST
     , RVRS.Parser.Type
     , RVRS.Checker
+    , RVRS.Value
     , Ya.Conversion
     , Ya.Instances
 
@@ -161,6 +162,9 @@ executable testtypechecknegative
   main-is: TestTypeCheckNegative.hs
   other-modules:
       RVRS.AST
-    , RVRS.Parser.Type
     , RVRS.Checker
+    , RVRS.Parser.Type
+    , RVRS.Utils
+    , RVRS.Value
+    , Ya.Conversion
     , Ya.Instances
