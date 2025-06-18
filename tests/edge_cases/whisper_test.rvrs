@@ -8,4 +8,3 @@ flow main() {
   whisper result
 }
 
-# SSH signature test
