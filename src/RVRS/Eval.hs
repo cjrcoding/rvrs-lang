@@ -19,22 +19,14 @@ import qualified Data.Map as Map (lookup)
 import Data.Maybe (maybe, fromJust)
 import Data.Traversable (for)
 import Control.Monad.Except (ExceptT, runExceptT, throwError, catchError)
-import Control.Monad.State (StateT, runStateT, get, modify, liftIO)
+import Control.Monad.State (StateT, runStateT, modify, liftIO)
+import qualified Control.Monad.State as T (get)
 import Control.Monad.Reader (ReaderT, runReaderT, ask, lift)
 import GHC.IsList (fromList)
 import System.IO (readFile)
 
-import Ya (
-    type T'I, type JNT, type AR, type AR__, type Given,
-    type Error, type State, type Recursive (..), type List, type Nonempty,
-    pattern Unit, pattern Given, pattern Run, pattern Only, pattern None,
-    pattern Error, pattern State, pattern Event, pattern Old,
-    intro, unwrap, ha, ha__, ho, hu, hv, hv_, hv__, la, is, li, yi, yo, yok, yok_, yuk_
-    )
-import qualified Ya as Y
+import Ya (type T'I, type Recursive (..), is, unwrap, ha, ho, ho___'yok, hu, hv, hv__, la, li, yo, yok)
 import Ya.World (World, pattern World)
-import Ya.Conversion (may)
-
 
 import RVRS.AST
 import RVRS.Env
@@ -80,7 +72,7 @@ handleReturn err        = throwError err
 -- Isolate scope for branches
 isolate :: EvalIR a -> EvalIR a
 isolate action =
-  fst <$> do lift `ha` lift =<< runStateT <$> runReaderT action <$> ask <*> get
+  fst <$> do lift `ha` lift =<< runStateT <$> runReaderT action <$> ask <*> T.get
 
 display :: Show a => String -> a -> EvalIR ()
 display label value = liftIO `ha` putStrLn $ label ++ ": " ++ show value
@@ -119,7 +111,7 @@ evalStmt stmt = case unwrap stmt of
     Nothing <$ do evalExpr expr >>= modify `ha` insert name
 
   Source name _mType expr -> do
-    Map.lookup name <$> get >>= \case
+    Map.lookup name <$> T.get >>= \case
       Nothing -> Nothing <$ do evalExpr expr >>= modify `ha` insert name
       Just _  -> throwError $ RuntimeError ("Variable '" ++ name ++ "' already defined")
 
@@ -133,7 +125,7 @@ evalExpr expr = case unwrap expr of
   Literal x -> return `hv__` is @String `ho` String `la` is @Double `ho` Double `la` is @Bool `ho` Bool `li` x
 
   Variable name ->
-    Map.lookup name <$> get
+    Map.lookup name <$> T.get
       >>= maybe (throwError `ha` RuntimeError $ "Unbound variable: " ++ name) pure
 
   Operator (Binary (Add a b)) -> binOp (+) a b
@@ -198,24 +190,3 @@ callBody body callEnv = runReaderT (evalBody body) <$> ask >>= lift `ha` lift `h
 evalBody :: [Recursive Statement] -> EvalIR (Maybe Value)
 evalBody [] = return Nothing
 evalBody (stmt:rest) = evalStmt stmt >>= maybe (evalBody rest) (pure `ha` Just)
-
--- evalBody' stmts = fromList @(Nonempty List `T'I` Recursive Statement) stmts
- -- `yokl`Forth `ha` Try `ha`Maybe `ha` not `ha` may `ha` evalStmt
-
-type Engine = Given FlowEnv `JNT` State ValueEnv `JNT` Error EvalError `JNT` World
-
-evalStmt' :: Recursive Statement `AR__` Engine `T'I` Maybe Value
-evalStmt' stmt = case unwrap stmt of
-  -- Echo expr -> Nothing <$ do evalExpr expr >>= display "echo"
-  -- Whisper expr -> Nothing <$ do evalExpr expr >>= display "→ whisper: "
-  -- Mouth expr -> Nothing <$ do evalExpr expr >>= display "mouth: "
-
--- evalExpr' expr = case unwrap expr of
---   NumLit n -> intro `hv` VNum n
---   StrLit s -> intro `hv` VStr s
---   BoolLit b -> intro `hv` VBool b
-
-  -- Variable name -> intro `hv` Unit
-  --  `yuk_` Run `hv__` Old `ha` State `ha` Event `hv` Y.get `yo` Map.lookup name `ho` may
-  --  `yok_` Run `ha__` None `hu` Error (RuntimeError $ "Unbound variable: " ++ name) `la` intro
-  --  `yok_` Run `ha__` intro @Engine @(AR)

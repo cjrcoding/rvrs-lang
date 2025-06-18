@@ -55,6 +55,7 @@ library
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
+    , RVRS.Engine
     , RVRS.Eval
     , RVRS.Pretty
     , RVRS.Value
@@ -77,6 +78,7 @@ executable rvrs
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
+    , RVRS.Engine
     , RVRS.Eval
     , RVRS.Pretty
     , RVRS.Value
@@ -97,6 +99,7 @@ executable RunAll
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
+    , RVRS.Engine
     , RVRS.Eval
     , RVRS.Pretty
     , RVRS.Value
@@ -117,6 +120,7 @@ executable TestLower
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
+    , RVRS.Engine
     , RVRS.Eval
     , RVRS.Pretty
     , RVRS.Value
@@ -137,6 +141,7 @@ executable RunIRTests
     , RVRS.Parser.ExprParser
     , RVRS.Parser.StmtParser
     , RVRS.Parser.Type
+    , RVRS.Engine
     , RVRS.Eval
     , RVRS.Pretty
     , RVRS.Value
