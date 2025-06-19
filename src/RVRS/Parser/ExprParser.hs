@@ -2,13 +2,15 @@
 
 module RVRS.Parser.ExprParser (exprParser) where
 
-import Ya (Recursive (..))
+import Prelude hiding (Bool (..))
 import Control.Monad (void)
 import Control.Monad.Combinators.Expr
 import Data.Void
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
+
+import Ya (Recursive (..), type Boolean, pattern False, pattern True, pattern Unit)
 
 import RVRS.AST
 import RVRS.Utils
@@ -40,8 +42,8 @@ operatorTable =
 -- Terms in the expression grammar
 term :: Parser (Recursive Expression)
 term = do try $ funcCallExpr
-   <|> do try $ Recursive (Literal $ Bool True) <$ symbol "truth"
-   <|> do try $ Recursive (Literal $ Bool False) <$ symbol "void"
+   <|> do try $ Recursive (Literal . Bool $ True Unit) <$ symbol "truth"
+   <|> do try $ Recursive (Literal . Bool $ False Unit) <$ symbol "void"
    <|> do try $ Recursive . Literal . String <$> stringLiteral
    <|> do try $ parseNumber
    <|> do try $ Recursive . Operator . Unary . Not <$> (symbol "not" *> term)

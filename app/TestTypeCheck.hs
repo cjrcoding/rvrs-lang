@@ -1,9 +1,10 @@
 module Main where
 
+import Prelude hiding (Bool (..))
 import Test.HUnit
 import qualified Data.Map as Map
 
-import Ya (Recursive(..), pattern Unit, pattern Ok, pattern Error, ho, ho'ho)
+import Ya (Recursive(..), type Boolean, pattern Unit, pattern False, pattern True, pattern Ok, pattern Error, by, ho, ho'ho, hv)
 import Ya.Instances ()
 
 import RVRS.AST
@@ -21,7 +22,7 @@ testEnv = Map.fromList
 num :: Double -> Recursive Expression
 num = Double `ho` Literal `ho` Recursive
 
-bool :: Bool -> Recursive Expression
+bool :: Boolean -> Recursive Expression
 bool = Bool `ho` Literal `ho` Recursive
 
 str :: String -> Recursive Expression
@@ -43,7 +44,7 @@ notExpr = Not `ho` Unary `ho` Operator `ho` Recursive
 tests :: Test
 tests = TestList
   [ "Num literal" ~: expression testEnv (num 42) ~?= Ok (Double Unit)
-  , "Bool literal" ~: expression testEnv (bool True) ~?= Ok (Bool Unit)
+  , "Bool literal" ~: expression testEnv (bool `hv` by True) ~?= Ok (Bool Unit)
   , "Str literal" ~: expression testEnv (str "hello") ~?= Ok (String Unit)
 
   , "Known variable" ~: expression testEnv (var "x") ~?= Ok (Double Unit)
@@ -52,18 +53,18 @@ tests = TestList
   , "Valid addition" ~: expression testEnv (add (num 5) (num 7)) ~?= Ok (Double Unit)
 
   , "Invalid addition" ~: TestCase $
-      case expression testEnv (add (num 5) (bool True)) of
+      case expression testEnv (add (num 5) (bool `hv` by True)) of
         Error (Mismatched _) -> return ()
         _ -> assertFailure "Expected Mismatched"
 
   , "Equals matching types" ~: expression testEnv (equals (num 1) (num 1)) ~?= Ok (Bool Unit)
 
   , "Equals mismatched types" ~: TestCase $
-      case expression testEnv (equals (str "hi") (bool False)) of
+      case expression testEnv (equals (str "hi") (bool `hv` by False)) of
         Error (Mismatched _) -> return ()
         _ -> assertFailure "Expected Mismatched"
 
-  , "Not on Bool" ~: expression testEnv (notExpr (bool False)) ~?= Ok (Bool Unit)
+  , "Not on Bool" ~: expression testEnv (notExpr (bool `hv` by False)) ~?= Ok (Bool Unit)
 
   , "Not on Num" ~: TestCase $
       case expression testEnv (notExpr (num 0)) of

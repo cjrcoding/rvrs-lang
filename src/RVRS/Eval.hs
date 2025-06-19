@@ -14,6 +14,8 @@ module RVRS.Eval (
   EvalError(..)
 ) where
 
+import Prelude hiding (Bool (..), not)
+import Data.Bool (bool)
 import Data.Map (Map, insert, union)
 import qualified Data.Map as Map (lookup)
 import Data.Maybe (maybe, fromJust)
@@ -25,7 +27,7 @@ import Control.Monad.Reader (ReaderT, runReaderT, ask, lift)
 import GHC.IsList (fromList)
 import System.IO (readFile)
 
-import Ya (type T'I, type Recursive (..), is, unwrap, ha, ho, ho___'yok, hu, hv, hv__, la, li, yo, yok)
+import Ya (type T'I, type Recursive (..), pattern Unit, pattern Boolean, pattern Try, type Boolean, pattern False, pattern True, is, by, not, unwrap, ha, ho, ho___'yok, hu, hv, hv__, la, li, lu'yp, yo, yok, yu)
 import Ya.World (World, pattern World)
 
 import RVRS.AST
@@ -97,14 +99,14 @@ evalStmt stmt = case unwrap stmt of
 
   Assert expr ->
     evalExpr expr >>= \case
-      Bool True  -> return Nothing
-      Bool False -> throwError $ RuntimeError "Assertion failed"
+      Bool (True _) -> return Nothing
+      Bool (False _) -> throwError $ RuntimeError "Assertion failed"
       _           -> throwError $ RuntimeError "Assert expects boolean"
 
   Branch cond tBlock eBlock ->
     evalExpr cond >>= \case
-      Bool True  -> isolate (evalBody tBlock)
-      Bool False -> isolate (evalBody eBlock)
+      Bool (True _) -> isolate (evalBody tBlock)
+      Bool (False _) -> isolate (evalBody eBlock)
       _           -> throwError $ RuntimeError "Condition must be boolean"
 
   Delta name _mType expr ->
@@ -122,7 +124,7 @@ binOp op a b = (,) <$> evalExpr a <*> evalExpr b >>= \case
 
 evalExpr :: Recursive Expression -> EvalIR Value
 evalExpr expr = case unwrap expr of
-  Literal x -> return `hv__` is @String `ho` String `la` is @Double `ho` Double `la` is @Bool `ho` Bool `li` x
+  Literal x -> return `hv__` is @String `ho` String `la` is @Double `ho` Double `la` is @Boolean `ho` Bool `li` x
 
   Variable name ->
     Map.lookup name <$> T.get
@@ -145,31 +147,31 @@ evalExpr expr = case unwrap expr of
 
   Operator (Unary (Not e)) ->
     evalExpr e >>= \case
-      Bool b -> return . Bool $ not b
+      Bool b -> return . Bool . Boolean $ not b
       _       -> throwError $ RuntimeError "Expected boolean in 'not'"
 
   Operator (Binary (Equals a b)) ->
-    Bool <$> ((==) <$> evalExpr a <*> evalExpr b)
+    Bool . bool (by False) (by True) <$> ((==) <$> evalExpr a <*> evalExpr b)
 
   Operator (Binary (Greater a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (Double n1, Double n2) -> return . Bool $ n1 > n2
+      (Double n1, Double n2) -> return . Bool . bool (by False) (by True) $ n1 > n2
       _ -> throwError $ RuntimeError "> requires numeric values"
 
   Operator (Binary (Less a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (Double n1, Double n2) -> return . Bool $ n1 < n2
+      (Double n1, Double n2) -> return . Bool . bool (by False) (by True) $ n1 < n2
       _ -> throwError $ RuntimeError "< requires numeric values"
 
   Operator (Binary (And a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (Bool b1, Bool b2) -> return . Bool $ b1 && b2
+      (Bool b1, Bool b2) -> return . Bool $ (b1 `lu'yp` Try `hv` b2 `yu` Unit)
       _ -> throwError $ RuntimeError "and requires booleans"
 
-  Operator (Binary (Or a b)) ->
-    (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (Bool b1, Bool b2) -> return . Bool $ b1 || b2
-      _ -> throwError $ RuntimeError "or requires booleans"
+  -- Operator (Binary (Or a b)) ->
+    -- (,) <$> evalExpr a <*> evalExpr b >>= \case
+      -- (Bool b1, Bool b2) -> return . Bool $ b1 || b2
+      -- _ -> throwError $ RuntimeError "or requires booleans"
 
   Calling name args -> do
     fsenv <- ask

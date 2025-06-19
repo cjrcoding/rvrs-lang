@@ -1,6 +1,6 @@
 module RVRS.AST where
 
-import Ya (P, S, Object (This, That), Recursive (..), type Unit)
+import Ya (P, S, Object (This, That), Recursive (..), type Unit, type Boolean)
 
 import Ya.Instances ()
 
@@ -44,7 +44,7 @@ pattern String x = This (This x) :: Primitive string double bool
 pattern Double x = This (That x) :: Primitive string double bool
 pattern Bool x = That x :: Primitive string double bool
 
-type Value = Primitive String Double Bool
+type Value = Primitive String Double Boolean
 
 type Typed = Primitive Unit Unit Unit
 
