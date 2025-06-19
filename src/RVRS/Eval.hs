@@ -27,7 +27,7 @@ import Control.Monad.Reader (ReaderT, runReaderT, ask, lift)
 import GHC.IsList (fromList)
 import System.IO (readFile)
 
-import Ya (type T'I, type Recursive (..), pattern Unit, pattern Boolean, pattern Try, type Boolean, pattern False, pattern True, is, by, not, unwrap, ha, ho, ho___'yok, hu, hv, hv__, la, li, lu'yp, yo, yok, yu)
+import Ya (type T'I, type Recursive (..), pattern Unit, pattern Boolean, pattern Try, type Boolean, pattern False, pattern True, is, by, not, unwrap, ha, ho, ho___'yok, hu, hv, hv__, la, li, lu'yp, lu'ys'la, yo, yok, yu)
 import Ya.World (World, pattern World)
 
 import RVRS.AST
@@ -165,13 +165,13 @@ evalExpr expr = case unwrap expr of
 
   Operator (Binary (And a b)) ->
     (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (Bool b1, Bool b2) -> return . Bool $ (b1 `lu'yp` Try `hv` b2 `yu` Unit)
+      (Bool b1, Bool b2) -> return . Bool $ b1 `lu'yp` Try `hv` b2 `yu` Unit
       _ -> throwError $ RuntimeError "and requires booleans"
 
-  -- Operator (Binary (Or a b)) ->
-    -- (,) <$> evalExpr a <*> evalExpr b >>= \case
-      -- (Bool b1, Bool b2) -> return . Bool $ b1 || b2
-      -- _ -> throwError $ RuntimeError "or requires booleans"
+  Operator (Binary (Or a b)) ->
+    (,) <$> evalExpr a <*> evalExpr b >>= \case
+      (Bool b1, Bool b2) -> return . Bool $ b1 `lu'ys'la` Try b2
+      _ -> throwError $ RuntimeError "or requires booleans"
 
   Calling name args -> do
     fsenv <- ask
