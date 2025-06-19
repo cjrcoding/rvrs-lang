@@ -1,55 +1,70 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE PatternSynonyms #-}
+
 module RVRS.Typecheck.Check where
 
-import Ya (Recursive (..), is, unwrap, ha__, hu, la, li)
+import Ya hiding (Binary)
+import Ya.Instances ()
+
+import Data.Map
+import Data.String
+import Text.Show
+
 import RVRS.AST
+import RVRS.Value
 import RVRS.Typecheck.Types
-import qualified Data.Map as Map
 
-typeOfExpr :: TypeEnv -> Recursive Expression -> Either TypeError RVRS_Type
-typeOfExpr env expr = case unwrap expr of
-  Literal x -> Right (is @String `hu` TStr `la` is @Double `hu` TNum `la` is @Bool `hu` TBool `li` x)
+-- Define error types for expression-level typechecking
+-- (Consider unifying this with StmtTypes later)
+type Types = (Typed `P` Typed) `S` (Typed `P` Typed) `S` String `S` String
+
+pattern Mismatched x = This (This (This x)) :: Types
+pattern Unexpected x = This (This (That x)) :: Types
+pattern Unsupported x = This (That x) :: Types
+pattern Unknown x = That x :: Types
+
+expression :: Map String Typed -> Recursive Expression -> Error Types Typed
+expression env expr = case unwrap expr of
+  Literal x -> Ok `hv` valueToType x
+
   Variable x ->
-    case Map.lookup x env of
-      Just t  -> Right t
-      Nothing -> Left $ UnknownVariable x
+    lookup x env
+      `yi_` None
+      `hu_` Error `hv` Unknown x
+      `la` Ok `ha_` to @Optional
 
-  Operator (Binary (Add a b)) -> checkBinary env TNum TNum a b
-  Operator (Binary (Sub a b)) -> checkBinary env TNum TNum a b
-  Operator (Binary (Mul a b)) -> checkBinary env TNum TNum a b
-  Operator (Binary (Div a b)) -> checkBinary env TNum TNum a b
+  Operator (Binary (Add x y)) -> binary env x y `yok` Try `ha_` expect `hv` by Double
+  Operator (Binary (Sub x y)) -> binary env x y `yok` Try `ha_` expect `hv` by Double
+  Operator (Binary (Mul x y)) -> binary env x y `yok` Try `ha_` expect `hv` Double Unit
+  Operator (Binary (Div x y)) -> binary env x y `yok` Try `ha_` expect `hv` Double Unit
 
-  Operator (Binary (Equals a b)) -> do
-    t1 <- typeOfExpr env a
-    t2 <- typeOfExpr env b
-    case t1 == t2 of
-      True  -> Right TBool
-      False -> Left $ TypeMismatch t1 t2
+  Operator (Binary (And x y)) -> binary env x y `yok` Try `ha_` expect `hv` by Bool
+  Operator (Binary (Or x y))  -> binary env x y `yok` Try `ha_` expect `hv` by Bool
 
-  Operator (Binary (And a b)) -> checkBinary env TBool TBool a b
-  Operator (Binary (Or a b))  -> checkBinary env TBool TBool a b
+  Operator (Unary (Not x)) -> expression env x `yok` Try `ha_` expect `hv` by Bool
+  Operator (Unary (Neg x)) -> expression env x `yok` Try `ha_` expect `hv` by Double
 
-  Operator (Unary (Not e)) -> do
-    t <- typeOfExpr env e
-    case t of
-      TBool -> Right TBool
-      _     -> Left $ TypeMismatch t TBool
+  Operator (Binary (Equals x y)) -> binary env x y `yu` Bool Unit
 
-  Operator (Unary (Neg e)) -> do
-    t <- typeOfExpr env e
-    case t of
-      TNum -> Right TNum
-      _    -> Left $ TypeMismatch t TNum
+  Operator (Binary (Greater x y)) ->
+    binary env x y
+      `yok` Try `ha_` expect `hv` by Double
+      `ho'yu` by Bool
 
-  Operator (Binary (Greater a b)) -> checkBinary env TNum TBool a b
-  Operator (Binary (Less a b)) -> checkBinary env TNum TBool a b
+  Operator (Binary (Less x y)) ->
+    binary env x y
+      `yok` Try `ha_` expect `hv` by Double
+      `ho'yu` by Bool
 
-  other -> Left $ UnsupportedOp (show other)
+  x -> Error `ha` Unsupported `hv` show x
 
+binary :: Map String Typed -> Recursive Expression -> Recursive Expression -> Error Types (Typed `P` Typed)
+binary env left right =
+  intro @(Error Types) Unit
+    `yuk____` Try `hv` expression env left
+    `lu'yp'yo'q` Try `hv` expression env right
+    `yok____` Try `ha__` Error `ha` Mismatched `la` Ok
 
-checkBinary :: TypeEnv -> RVRS_Type -> RVRS_Type -> Recursive Expression -> Recursive Expression -> Either TypeError RVRS_Type
-checkBinary env expected retType a b = do
-  t1 <- typeOfExpr env a
-  t2 <- typeOfExpr env b
-  case (t1, t2) of
-    (t1', t2') | t1' == expected && t2' == expected -> Right retType
-               | otherwise -> Left $ TypeMismatch t1' t2'
+expect :: Typed -> Typed -> Error Types Typed
+expect sample typed =
+  Error `ha` Unexpected `la` Ok `li` sample `hd'q` typed
