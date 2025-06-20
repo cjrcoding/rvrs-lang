@@ -5,8 +5,8 @@ import RVRS.AST
 import Ya
 
 -- Statement-level errors
-type StmtTypes = (String, Typed, Typed) `S` String `S` String
+type StmtTypes = (String, Typed, Typed) `S` String `S` Typed
 
-pattern TypeMismatchStmt var expected actual = This (This (var, expected, actual)) :: StmtTypes
-pattern RedefinedVar var = This (That var) :: StmtTypes
-pattern BadAssertType found = That found :: StmtTypes
+pattern TypeMismatchStmt x = This (This x) :: StmtTypes
+pattern RedefinedVar x = This (That x) :: StmtTypes
+pattern BadAssertType x = That x :: StmtTypes

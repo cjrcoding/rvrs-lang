@@ -3,13 +3,13 @@
 
 module Main where
 
-import Prelude (String, Double, Bool(..), IO, ($), (>>), putStrLn, return, show, Eq(..))
+import Prelude (String, Double, Bool(..), Maybe (..), IO, ($), (>>), putStrLn, return, show, Eq(..))
 import Test.HUnit
 import qualified Data.Map as Map
 
-import Ya (Recursive(..), ho, ho'ho)
+import Ya (pattern Ok, pattern Error, pattern Unit)
+import Ya (Recursive(..), ho, ho'ho, hv)
 import Ya.Instances ()
-import Ya.Program.Patterns (pattern Ok, pattern Error)
 
 import RVRS.AST
 import RVRS.Typecheck.Stmt
@@ -51,11 +51,11 @@ delta name typ expr = stmt (Delta name typ expr)
 source :: String -> Maybe Typed -> Recursive Expression -> Recursive Statement
 source name typ expr = stmt (Source name typ expr)
 
-assert :: Recursive Expression -> Recursive Statement
-assert = Assert `ho` Recursive
+assert_ :: Recursive Expression -> Recursive Statement
+assert_ = Assert `ho` Recursive
 
 branch :: Recursive Expression -> [Recursive Statement] -> [Recursive Statement] -> Recursive Statement
-branch cond tb fb = Branch cond tb fb `ho` Recursive
+branch cond tb fb = Recursive `hv` Branch cond tb fb
 
 ret :: Recursive Expression -> Recursive Statement
 ret = Return `ho` Recursive
@@ -69,7 +69,7 @@ tests = TestList
 
   , "Delta with type mismatch" ~: TestCase $
       case typeOfStmt testEnv (delta "z" (Just TBool) (num 42)) of
-        Error (TypeMismatchStmt "z" TBool TNum) -> return ()
+        Error (TypeMismatchStmt ("z", TBool, TNum)) -> return ()
         _ -> assertFailure "Expected TypeMismatchStmt"
 
   , "Source redefinition error" ~: TestCase $
@@ -78,10 +78,10 @@ tests = TestList
         _ -> assertFailure "Expected RedefinedVar"
 
   , "Valid assert on Bool" ~:
-      typeOfStmt testEnv (assert (bool True)) ~?= Ok testEnv
+      typeOfStmt testEnv (assert_ (bool True)) ~?= Ok testEnv
 
   , "Invalid assert on Num" ~: TestCase $
-      case typeOfStmt testEnv (assert (num 99)) of
+      case typeOfStmt testEnv (assert_ (num 99)) of
         Error (BadAssertType TNum) -> return ()
         _ -> assertFailure "Expected BadAssertType"
 

@@ -82,5 +82,5 @@ data FlowIR = FlowIR
   } deriving (Show, Eq)
 
 -- | Enable equality and string display for types
-deriving instance Eq Typed
-deriving instance Show Typed
+-- deriving instance Eq Typed
+-- deriving instance Show Typed
