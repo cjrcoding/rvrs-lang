@@ -2,7 +2,7 @@ module RVRS.Pretty (prettyExpr) where
 
 import Prelude hiding (Bool (..))
 
-import Ya (Recursive (..), is, ho, hu, li, la, type Boolean, pattern False, pattern True)
+import Ya (Recursive (..), is, ho, ho'he, hu, li, la, type Boolean, pattern False, pattern True)
 
 import RVRS.AST
 
@@ -19,4 +19,4 @@ prettyExpr expr = case expr of
   Recursive (Operator (Unary (Not e))) -> "(not " ++ prettyExpr e ++ ")"
   Recursive (Operator (Unary (Neg e))) -> "(-" ++ prettyExpr e ++ ")"
   Recursive (Calling name args) -> "call " ++ name ++ "(" ++ unwords (prettyExpr <$> args) ++ ")"
-  Recursive (Literal x) -> is @String `ho` show `la` is @Double `ho` show `la` is @Boolean `ho` (False `hu` "false" `la` True `hu` "true") `li` x
+  Recursive (Literal x) -> is `ho'he` show @String `la` is `ho'he` show @Double `la` is `ho'he` (False `hu` "false" `la` True `hu` "true") `li` x

@@ -124,7 +124,7 @@ binOp op a b = (,) <$> evalExpr a <*> evalExpr b >>= \case
 
 evalExpr :: Recursive Expression -> EvalIR Value
 evalExpr expr = case unwrap expr of
-  Literal x -> return `hv__` is @String `ho` String `la` is @Double `ho` Double `la` is @Boolean `ho` Bool `li` x
+  Literal x -> return x
 
   Variable name ->
     Map.lookup name <$> T.get

@@ -1,10 +1,10 @@
 packages: .
-  -- ../../personal/ya/ya.cabal
+  ../../personal/ya/ya.cabal
 
-source-repository-package
-    type: git
-    location: https://github.com/iokasimov/ya.git
-    tag: 5b940563451f4f76a475083d4aff0a0b8495ce85
+-- source-repository-package
+    -- type: git
+    -- location: https://github.com/iokasimov/ya.git
+    -- tag: 5b940563451f4f76a475083d4aff0a0b8495ce85
 
 source-repository-package
     type: git

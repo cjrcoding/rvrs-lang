@@ -21,6 +21,8 @@ deriving instance (Eq l, Eq r) => Eq (T'I'II S l r)
 deriving instance (Eq l, Eq r) => Eq (T'II'I P r l)
 deriving instance (Eq l, Eq r) => Eq (T'II'I S r l)
 
+deriving instance (Eq i) => Eq (Tagged tag i)
+
 deriving instance (Show l, Show r) => Show (l `P` r)
 deriving instance (Show l, Show r) => Show (l `S` r)
 
@@ -29,6 +31,8 @@ deriving instance (Show l, Show r) => Show (T'I'II S l r)
 
 deriving instance (Show l, Show r) => Show (T'II'I P r l)
 deriving instance (Show l, Show r) => Show (T'II'I S r l)
+
+deriving instance (Show i) => Show (Tagged tag i)
 
 instance Setoid AR String where equality (These x y) = if x == y then That y else This (These x y)
 instance Setoid AR Double where equality (These x y) = if x == y then That y else This (These x y)

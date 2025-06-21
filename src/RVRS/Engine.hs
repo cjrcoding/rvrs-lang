@@ -6,13 +6,14 @@ import Data.String (String)
 import Data.Map (Map, insert, union)
 import qualified Data.Map as Map (lookup)
 
-import Ya hiding (Binary)
+import Ya hiding (Binary, Not)
+import Ya.Conversion
 import Ya.World
 
 import RVRS.AST
+import RVRS.Parser
 import RVRS.Utils
 import RVRS.Value
-import RVRS.Parser
 import RVRS.Lower
 
 type Bindings = Map String Value
@@ -42,12 +43,17 @@ expression :: Recursive Expression `AR__` Engine `T'I` Value
 expression x = case unwrap x of
  Literal x -> intro @Engine `hv` x
  Variable x -> intro @Engine `hv` Unit
-  `yuk____` Old `hv__` State `ha` Event `hv` get `yo` Map.lookup x `ho` to @Optional
+  `yuk____` Old `hv__` State `ha` Event `hv` get @Bindings `yo` find x
   `yok____` Try `ha__` None `hu_` Error `ha` Runtime `hv` Unbound x `la` Ok
  Operator (Binary (Equals x y)) -> intro @Engine `hv` Unit
-  `yuk____` Run `hv` expression x
-  `lu'yp'yo'q` Run `hv` expression y
-  `yo_____` Bool `ha__` is `hu` by False `la` is `hu` by True
+  `yuk____` Run `hv` expression x `lu'yp'yo'q` Run `hv` expression y
+      `yo_` No `hu` False `la` Yes `hu` True `ho_'he` Bool
+ -- Operator (Binary (Add x y)) -> intro @Engine `hv` Unit
+  -- `yuk____` Run `hv` expression x `lu` Run `hv` expression y
+  -- `yp'yo` is @(
+
+-- cast :: (Unit `AR` Typed) `AR_` Value `AR` Stops
+-- cast matcher value = 
 
 -- evalBody stmts = stmts `yokl` Forth `ha` Run `ha` evaluate
 

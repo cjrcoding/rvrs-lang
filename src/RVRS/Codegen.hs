@@ -2,7 +2,7 @@ module RVRS.Codegen (generateAiken, prettyPrintFlow) where
 
 import Prelude hiding (Bool (..))
 
-import Ya (Object (..), Recursive (..), is, unwrap, ho, hu, la, li, type Boolean, pattern False, pattern True)
+import Ya (Object (..), Recursive (..), is, unwrap, ho, ho'he, hu, la, li, type Boolean, pattern False, pattern True)
 import qualified Ya as Y
 
 import RVRS.AST
@@ -33,7 +33,7 @@ genStmt stmt = case unwrap stmt of
 genExpr :: Recursive Expression -> String
 genExpr expr = case unwrap expr of
   Variable x -> x
-  Literal x -> is @String `ho` show `la` is @Double `ho` show `la` is @Boolean `ho` genBooleanExpr `li` x
+  Literal x -> is `ho'he` show @String `la` is `ho'he` show @Double `la` is `ho'he` genBooleanExpr `li` x
   Operator (Binary (Equals a b)) -> genExpr a ++ " == " ++ genExpr b
 
 genBooleanExpr = False `hu` "false" `la` True `hu` "true"
