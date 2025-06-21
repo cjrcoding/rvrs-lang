@@ -6,7 +6,7 @@
 module Ya.Instances where
 
 import Ya hiding (Maybe)
-import Ya (S, P, Object (..), Recursive (..))
+import Ya (S, P, Object (This, That, These), Recursive (Recursive), Setoid (equality))
 
 -- Deriving instances for Recursive, P, and S
 deriving instance (Eq (f (Recursive f))) => Eq (Recursive f)
@@ -29,6 +29,9 @@ deriving instance (Show l, Show r) => Show (T'I'II S l r)
 
 deriving instance (Show l, Show r) => Show (T'II'I P r l)
 deriving instance (Show l, Show r) => Show (T'II'I S r l)
+
+instance Setoid AR String where equality (These x y) = if x == y then That y else This (These x y)
+instance Setoid AR Double where equality (These x y) = if x == y then That y else This (These x y)
 
 -- Mapping instances for Optional <-> Maybe
 instance Mapping T'I'II T'I'II (AR) (AR) Maybe Optional where

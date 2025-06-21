@@ -44,12 +44,10 @@ expression x = case unwrap x of
  Variable x -> intro @Engine `hv` Unit
   `yuk____` Old `hv__` State `ha` Event `hv` get `yo` Map.lookup x `ho` to @Optional
   `yok____` Try `ha__` None `hu_` Error `ha` Runtime `hv` Unbound x `la` Ok
- -- Operator (Binary (Equals x y)) -> intro @Engine `hv` Unit
-  -- `yuk____` Run `hv` expression x
-  -- `lu'yp'yo'q` Run `hv` expression y
-  -- `yo_____` Bool `ha__` is `hu` by False `la` is `hu` by True
-
- --  `yo` (\(These a' b') -> VPrim `ha` Bool `hv` (a' == b'))
+ Operator (Binary (Equals x y)) -> intro @Engine `hv` Unit
+  `yuk____` Run `hv` expression x
+  `lu'yp'yo'q` Run `hv` expression y
+  `yo_____` Bool `ha__` is `hu` by False `la` is `hu` by True
 
 -- evalBody stmts = stmts `yokl` Forth `ha` Run `ha` evaluate
 
