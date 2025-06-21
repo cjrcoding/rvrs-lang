@@ -61,7 +61,6 @@ library
     , RVRS.Value
     , RVRS.Lower
     , RVRS.Env
-    , RVRS.Utils
     , Ya.Conversion
     , Ya.Instances
 
@@ -84,7 +83,6 @@ executable rvrs
     , RVRS.Value
     , RVRS.Lower
     , RVRS.Env
-    , RVRS.Utils
     , Ya.Conversion
     , Ya.Instances
 
@@ -105,7 +103,6 @@ executable RunAll
     , RVRS.Value
     , RVRS.Lower
     , RVRS.Env
-    , RVRS.Utils
     , Ya.Conversion
     , Ya.Instances
 
@@ -126,7 +123,6 @@ executable TestLower
     , RVRS.Value
     , RVRS.Lower
     , RVRS.Env
-    , RVRS.Utils
     , Ya.Conversion
     , Ya.Instances
 
@@ -147,7 +143,6 @@ executable RunIRTests
     , RVRS.Value
     , RVRS.Lower
     , RVRS.Env
-    , RVRS.Utils
     , Ya.Conversion
     , Ya.Instances
 

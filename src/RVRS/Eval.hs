@@ -32,7 +32,6 @@ import Ya.World (World, pattern World)
 
 import RVRS.AST
 import RVRS.Env
-import RVRS.Utils
 import RVRS.Value
 import RVRS.Parser
 import RVRS.Lower
@@ -64,7 +63,7 @@ evalIRFlow userFlows entryName args = do
   case Map.lookup entryName fullFlowMap of
     Just (FlowIR _ params body) -> do
       let initialEnv = fromList (zip params args)
-      fst <$$> do runEvalIR fullFlowMap initialEnv $ catchError (evalBody body) handleReturn
+      (fmap . fmap) fst $ do runEvalIR fullFlowMap initialEnv $ catchError (evalBody body) handleReturn
     Nothing -> return `ha` Left `ha` RuntimeError $ "No flow named '" ++ entryName ++ "' found."
 
 handleReturn :: EvalError -> EvalIR (Maybe Value)

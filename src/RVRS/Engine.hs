@@ -12,7 +12,6 @@ import Ya.World
 
 import RVRS.AST
 import RVRS.Parser
-import RVRS.Utils
 import RVRS.Value
 import RVRS.Lower
 
