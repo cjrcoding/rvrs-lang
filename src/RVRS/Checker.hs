@@ -43,4 +43,4 @@ match env left right =
  `yok____` Try `ha__` Error `ha` Mismatched `la` Ok
 
 expect sample typed =
- Error `ha` Unexpected `la` Ok `li` sample `hd'q` typed
+ sample `lu'q` typed `yi_` Error `ha` Unexpected `la` Ok

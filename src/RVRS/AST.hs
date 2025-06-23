@@ -39,11 +39,11 @@ data Expression e
   deriving (Show, Eq)
 
 type Primitive string double bool
- = (String # string) `S` (Double # double) `S` (Bool # bool)
+ = (String # string) `S` (Double # double) `S` (Boolean # bool)
 
-pattern String x = This (This (Tag x)) :: Primitive string double bool
-pattern Double x = This (That (Tag x)) :: Primitive string double bool
-pattern Bool x = That (Tag x) :: Primitive string double bool
+pattern String x = This (This (Tag @String x)) :: Primitive string double bool
+pattern Double x = This (That (Tag @Double x)) :: Primitive string double bool
+pattern Bool x = That (Tag @Boolean x) :: Primitive string double bool
 
 type Value = Primitive String Double Boolean
 

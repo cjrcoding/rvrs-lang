@@ -1,6 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 module RVRS.Engine where
 
+import Prelude (Double, (+), (-), (*), (/))
 import Data.List ((++))
 import Data.String (String)
 import Data.Map (Map, insert, union)
@@ -26,7 +27,8 @@ type Reason = Runtime `S` Value
 pattern Runtime e = This e :: Reason
 pattern Returns e = That e :: Reason
 
-type Runtime = Typed `S` String `S` String
+-- type Runtime = Value `P` Typed `S` String `S` String
+type Runtime = Unit `S` String `S` String
 
 pattern Require e = This (This e)
 pattern Unknown e = This (That e)
@@ -40,19 +42,48 @@ statement x = case unwrap x of
 
 expression :: Recursive Expression `AR__` Engine `T'I` Value
 expression x = case unwrap x of
- Literal x -> intro @Engine `hv` x
- Variable x -> intro @Engine `hv` Unit
-  `yuk____` Old `hv__` State `ha` Event `hv` get @Bindings `yo` find x
-  `yok____` Try `ha__` None `hu_` Error `ha` Runtime `hv` Unbound x `la` Ok
- Operator (Binary (Equals x y)) -> intro @Engine `hv` Unit
-  `yuk____` Run `hv` expression x `lu'yp'yo'q` Run `hv` expression y
-      `yo_` No `hu` False `la` Yes `hu` True `ho_'he` Bool
- -- Operator (Binary (Add x y)) -> intro @Engine `hv` Unit
-  -- `yuk____` Run `hv` expression x `lu` Run `hv` expression y
-  -- `yp'yo` is @(
+ Literal val
+  -> intro @Engine `hv` val
+ Variable var
+  -> intro @Engine `hv` Unit
+   `yuk____` Old `hv__` State `ha` Event `hv` get @Bindings `yo` find var
+   `yok____` Try `ha__` None `hu_` Error `ha` Runtime `hv` Unbound var `la` Ok
+ Operator (Binary (Equals x y))
+  -> intro @Engine `hv` Unit
+   `yuk____` Run `hv` expression x
+   `lu'yp'yo'q` Run `hv` expression y
+     `yo'yuu` Unit `yo` Boolean `ho` Bool
+ -- TODO: these 4 `Double` operators are the same, I need to refactor `AST`
+ Operator (Binary (Add x y))
+  -> intro @Engine `hv` Unit
+   `yuk____` Run `hv` expression x
+      `lu'yp` Run `hv` expression y
+   `yok____` Try `ha` tap `ha` this
+      `lo'yp` Try `ha` tap `ha` that
+     `ho_'yo` is `ho'hd` (+) `ho` Double
+ Operator (Binary (Mul x y))
+  -> intro @Engine `hv` Unit
+   `yuk____` Run `hv` expression x
+      `lu'yp` Run `hv` expression y
+   `yok____` Try `ha` tap `ha` this
+      `lo'yp` Try `ha` tap `ha` that
+     `ho_'yo` is `ho'hd` (*) `ho` Double
+ Operator (Binary (Sub x y))
+  -> intro @Engine `hv` Unit
+   `yuk____` Run `hv` expression x
+      `lu'yp` Run `hv` expression y
+   `yok____` Try `ha` tap `ha` this
+      `lo'yp` Try `ha` tap `ha` that
+     `ho_'yo` is `ho'hd` (-) `ho` Double
+ Operator (Binary (Div x y))
+  -> intro @Engine `hv` Unit
+   `yuk____` Run `hv` expression x
+      `lu'yp` Run `hv` expression y
+   `yok____` Try `ha` tap `ha` this
+      `lo'yp` Try `ha` tap `ha` that
+     `ho_'yo` is `ho'hd` (/) `ho` Double
 
--- cast :: (Unit `AR` Typed) `AR_` Value `AR` Stops
--- cast matcher value = 
+tap = Some `hu_` Error `ha` Runtime `ha` Require `hv` Unit `la` Valid `ha__` on
 
 -- evalBody stmts = stmts `yokl` Forth `ha` Run `ha` evaluate
 
