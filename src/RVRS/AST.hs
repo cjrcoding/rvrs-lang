@@ -1,6 +1,6 @@
 module RVRS.AST where
 
-import Ya (Tagged (Tag), type (#), type AR, P, S, Object (This, That), Recursive (..), type Unit, type Boolean)
+import Ya (Tagged (Tag), type (#), type AR, P, S, Object (This, That), Recursive (..), type Unit)
 
 import Ya.Instances ()
 
@@ -39,13 +39,13 @@ data Expression e
   deriving (Show, Eq)
 
 type Primitive string double bool
- = (String # string) `S` (Double # double) `S` (Boolean # bool)
+ = (String # string) `S` (Double # double) `S` (Bool # bool)
 
 pattern String x = This (This (Tag @String x)) :: Primitive string double bool
 pattern Double x = This (That (Tag @Double x)) :: Primitive string double bool
-pattern Bool x = That (Tag @Boolean x) :: Primitive string double bool
+pattern Bool x = That (Tag @Bool x) :: Primitive string double bool
 
-type Value = Primitive String Double Boolean
+type Value = Primitive String Double Bool
 
 type Typed = Primitive Unit Unit Unit
 

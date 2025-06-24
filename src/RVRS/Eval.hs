@@ -14,7 +14,6 @@ module RVRS.Eval (
   EvalError(..)
 ) where
 
-import Prelude hiding (Bool (..), not)
 import Data.Bool (bool)
 import Data.Map (Map, insert, union)
 import qualified Data.Map as Map (lookup)
@@ -27,7 +26,7 @@ import Control.Monad.Reader (ReaderT, runReaderT, ask, lift)
 import GHC.IsList (fromList)
 import System.IO (readFile)
 
-import Ya (type T'I, type Recursive (..), pattern Unit, pattern Boolean, pattern Try, type Boolean, pattern False, pattern True, is, by, not, unwrap, ha, ho, ho___'yok, hu, hv, hv__, la, li, lu'yp, lu'ys'la, yo, yok, yu)
+import Ya (type T'I, type Recursive (..), pattern Unit, pattern Try, is, by, unwrap, ha, ho, ho___'yok, hu, hv, hv__, la, li, lu'yp, lu'ys'la, yo, yok, yu)
 import Ya.World (World, pattern World)
 
 import RVRS.AST
@@ -98,14 +97,14 @@ evalStmt stmt = case unwrap stmt of
 
   Assert expr ->
     evalExpr expr >>= \case
-      Bool (True _) -> return Nothing
-      Bool (False _) -> throwError $ RuntimeError "Assertion failed"
+      Bool True -> return Nothing
+      Bool False -> throwError $ RuntimeError "Assertion failed"
       _           -> throwError $ RuntimeError "Assert expects boolean"
 
   Branch cond tBlock eBlock ->
     evalExpr cond >>= \case
-      Bool (True _) -> isolate (evalBody tBlock)
-      Bool (False _) -> isolate (evalBody eBlock)
+      Bool True -> isolate (evalBody tBlock)
+      Bool False -> isolate (evalBody eBlock)
       _           -> throwError $ RuntimeError "Condition must be boolean"
 
   Delta name _mType expr ->
@@ -146,7 +145,7 @@ evalExpr expr = case unwrap expr of
 
   Operator (Unary (Not e)) ->
     evalExpr e >>= \case
-      Bool b -> return . Bool . Boolean $ not b
+      Bool b -> return . Bool $ not b
       _       -> throwError $ RuntimeError "Expected boolean in 'not'"
 
   -- Operator (Binary (Equals a b)) ->

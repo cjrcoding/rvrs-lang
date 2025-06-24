@@ -1,8 +1,9 @@
 module RVRS.Value (Binding(..), valueToType, formatVal) where
 
-import Prelude hiding (Bool (..))
+import Prelude
+import Data.Bool (bool)
 
-import Ya (is, ho, ho'he, hu, hu'he, he'hu, la, li, pattern Unit, type Boolean, pattern False, pattern True, unwrap)
+import Ya (is, ho, ho'he, hu, hu'he, he'hu, la, li, pattern Unit, unwrap)
 
 import RVRS.AST (type Value, type Typed, pattern String, pattern Double, pattern Bool)
 
@@ -18,4 +19,4 @@ valueToType = is `hu` String Unit `la` is `hu` Double Unit `la` is `hu` Bool Uni
 
 -- | Format Value into a human-readable string
 formatVal :: Value -> String
-formatVal = unwrap `la` is `ho'he` show @Double `la` is `ho'he` (False `hu` "false" `la` True `hu` "true")
+formatVal = unwrap `la` is `ho'he` show @Double `la` is `ho'he` bool "false" "true"
