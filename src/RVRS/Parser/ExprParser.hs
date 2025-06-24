@@ -10,7 +10,7 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 
-import Ya (Recursive (..), type Boolean, pattern False, pattern True, pattern Unit, ho'ho, ha)
+import Ya (Recursive (..), type AR, type AR_, type AR__, type Unit, pattern Unit, pattern False, pattern True, pattern Unit, yi, ho'ho, ha, lu)
 
 import RVRS.AST
 
@@ -23,20 +23,23 @@ exprParser = makeExprParser term operatorTable
 -- Operator precedence table
 operatorTable :: [[Operator Parser (Recursive Expression)]]
 operatorTable =
-  [ [ InfixL (Mul `ho'ho` (Recursive `ha` Operator `ha` Binary) <$ symbol "*")
-    , InfixL (Div `ho'ho` (Recursive `ha` Operator `ha` Binary) <$ symbol "/")
+  [ [ InfixL $ binop (Arithmetic `ha` Mul) <$ symbol "*"
+    , InfixL $ binop (Arithmetic `ha` Div) <$ symbol "/"
     ]
-  , [ InfixL (Add `ho'ho` (Recursive `ha` Operator `ha` Binary) <$ symbol "+")
-    , InfixL (Sub `ho'ho` (Recursive `ha` Operator `ha` Binary) <$ symbol "-")
+  , [ InfixL $ binop (Arithmetic `ha` Add) <$ symbol "+"
+    , InfixL $ binop (Arithmetic `ha` Sub) <$ symbol "-"
     ]
-  , [ InfixN (Equals `ho'ho` (Recursive `ha` Operator `ha` Binary) <$ symbol "==")
-    , InfixN (Greater `ho'ho` (Recursive `ha` Operator `ha` Binary) <$ symbol ">")
-    , InfixN (Less `ho'ho` (Recursive `ha` Operator `ha` Binary )<$ symbol "<")
+  , [ InfixL $ binop (Comparison `ha` Equals) <$ symbol "=="
+    , InfixL $ binop (Comparison `ha` Greater) <$ symbol "<"
+    , InfixL $ binop (Comparison `ha` Less) <$ symbol "<"
     ]
-  , [ InfixL ((And `ho'ho` (Recursive `ha` Operator `ha` Binary)) <$ symbol "and")
-    , InfixL ((Or `ho'ho` (Recursive `ha` Operator `ha` Binary))  <$ symbol "or")
+  , [ InfixL $ binop (Combinated `ha` And) <$ symbol "and"
+    , InfixL $ binop (Combinated `ha` Or) <$ symbol "or"
     ]
   ]
+
+binop f x y = x `lu` y `lu` f Unit
+ `yi` Recursive `ha` Operator `ha` Binary
 
 -- Terms in the expression grammar
 term :: Parser (Recursive Expression)

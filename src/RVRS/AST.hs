@@ -1,6 +1,6 @@
 module RVRS.AST where
 
-import Ya (Tagged (Tag), type (#), P, S, Object (This, That), Recursive (..), type Unit, type Boolean)
+import Ya (Tagged (Tag), type (#), type AR, P, S, Object (This, That), Recursive (..), type Unit, type Boolean)
 
 import Ya.Instances ()
 
@@ -54,22 +54,37 @@ data Unary e
   | Not e
   deriving (Show, Eq)
 
-data Binary e
-  = Equals e e
-  | Greater e e
-  | Less e e
-  | Add e e
-  | Sub e e
-  | Mul e e
-  | Div e e
-  | And e e
-  | Or e e
-  deriving (Show, Eq)
- 
+type Dyadic = Arithmetic `S` Comparison `S` Combinated
+
+pattern Arithmetic x = This (This x)
+pattern Comparison x = This (That x)
+pattern Combinated x = That x
+
+type Arithmetic = Unit `S` Unit `S` Unit `S` Unit
+
+pattern Add, Sub, Mul, Div :: Unit `AR` Arithmetic
+pattern Add x = This (This (This x))
+pattern Sub x = This (This (That x))
+pattern Mul x = This (That x)
+pattern Div x = That x
+
+type Comparison = Unit `S` Unit `S` Unit
+
+pattern Greater, Equals, Less :: Unit `AR` Comparison
+pattern Greater x = This (This x)
+pattern Equals x = This (That x)
+pattern Less x = That x
+
+type Combinated = Unit `S` Unit
+
+pattern And, Or :: Unit `AR` Combinated
+pattern And x = This x
+pattern Or x = That x
+
+type Operation e = Unary e `S` (e `P` e `P` Dyadic)
+
 pattern Unary x = This x :: Operation e
 pattern Binary x = That x :: Operation e
-
-type Operation e = Unary e `S` Binary e
 
 -- | Intermediate representation of a flow
 data FlowIR = FlowIR

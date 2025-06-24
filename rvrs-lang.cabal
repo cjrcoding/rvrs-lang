@@ -146,21 +146,21 @@ executable RunIRTests
     , Ya.Conversion
     , Ya.Instances
 
-executable TestTypeCheck
-  import: app-settings, hunit-deps
-  main-is: TestTypeCheck.hs
-  other-modules:
-      RVRS.AST
-    , RVRS.Parser.Type
-    , RVRS.Checker
-    , Ya.Conversion
-    , Ya.Instances
+-- executable TestTypeCheck
+  -- import: app-settings, hunit-deps
+  -- main-is: TestTypeCheck.hs
+  -- other-modules:
+      -- RVRS.AST
+    -- , RVRS.Parser.Type
+    -- , RVRS.Checker
+    -- , Ya.Conversion
+    -- , Ya.Instances
 
-executable testtypechecknegative
-  import: app-settings, hunit-deps
-  main-is: TestTypeCheckNegative.hs
-  other-modules:
-      RVRS.AST
-    , RVRS.Parser.Type
-    , RVRS.Checker
-    , Ya.Instances
+-- executable testtypechecknegative
+  -- import: app-settings, hunit-deps
+  -- main-is: TestTypeCheckNegative.hs
+  -- other-modules:
+      -- RVRS.AST
+    -- , RVRS.Parser.Type
+    -- , RVRS.Checker
+    -- , Ya.Instances

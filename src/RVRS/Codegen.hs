@@ -34,7 +34,7 @@ genExpr :: Recursive Expression -> String
 genExpr expr = case unwrap expr of
   Variable x -> x
   Literal x -> is `ho'he` show @String `la` is `ho'he` show @Double `la` is `ho'he` genBooleanExpr `li` x
-  Operator (Binary (Equals a b)) -> genExpr a ++ " == " ++ genExpr b
+  Operator (Binary (These (These x y) (Comparison (Equals _)))) -> genExpr x ++ " == " ++ genExpr y
 
 genBooleanExpr = False `hu` "false" `la` True `hu` "true"
 

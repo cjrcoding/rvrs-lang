@@ -129,15 +129,15 @@ evalExpr expr = case unwrap expr of
     Map.lookup name <$> T.get
       >>= maybe (throwError `ha` RuntimeError $ "Unbound variable: " ++ name) pure
 
-  Operator (Binary (Add a b)) -> binOp (+) a b
-  Operator (Binary (Sub a b)) -> binOp (-) a b
-  Operator (Binary (Mul a b)) -> binOp (*) a b
+  -- Operator (Binary (Add a b)) -> binOp (+) a b
+  -- Operator (Binary (Sub a b)) -> binOp (-) a b
+  -- Operator (Binary (Mul a b)) -> binOp (*) a b
 
-  Operator (Binary (Div a b)) ->
-    (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (Double _, Double 0)  -> throwError $ RuntimeError "Division by zero"
-      (Double n1, Double n2) -> return . Double $ n1 / n2
-      _                  -> throwError $ RuntimeError "Type error in division"
+  -- Operator (Binary (Div a b)) ->
+    -- (,) <$> evalExpr a <*> evalExpr b >>= \case
+      -- (Double _, Double 0)  -> throwError $ RuntimeError "Division by zero"
+      -- (Double n1, Double n2) -> return . Double $ n1 / n2
+      -- _                  -> throwError $ RuntimeError "Type error in division"
 
   Operator (Unary (Neg e)) ->
     evalExpr e >>= \case
@@ -149,28 +149,28 @@ evalExpr expr = case unwrap expr of
       Bool b -> return . Bool . Boolean $ not b
       _       -> throwError $ RuntimeError "Expected boolean in 'not'"
 
-  Operator (Binary (Equals a b)) ->
-    Bool . bool (by False) (by True) <$> ((==) <$> evalExpr a <*> evalExpr b)
+  -- Operator (Binary (Equals a b)) ->
+    -- Bool . bool (by False) (by True) <$> ((==) <$> evalExpr a <*> evalExpr b)
 
-  Operator (Binary (Greater a b)) ->
-    (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (Double n1, Double n2) -> return . Bool . bool (by False) (by True) $ n1 > n2
-      _ -> throwError $ RuntimeError "> requires numeric values"
+  -- Operator (Binary (Greater a b)) ->
+    -- (,) <$> evalExpr a <*> evalExpr b >>= \case
+      -- (Double n1, Double n2) -> return . Bool . bool (by False) (by True) $ n1 > n2
+      -- _ -> throwError $ RuntimeError "> requires numeric values"
 
-  Operator (Binary (Less a b)) ->
-    (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (Double n1, Double n2) -> return . Bool . bool (by False) (by True) $ n1 < n2
-      _ -> throwError $ RuntimeError "< requires numeric values"
+  -- Operator (Binary (Less a b)) ->
+    -- (,) <$> evalExpr a <*> evalExpr b >>= \case
+      -- (Double n1, Double n2) -> return . Bool . bool (by False) (by True) $ n1 < n2
+      -- _ -> throwError $ RuntimeError "< requires numeric values"
 
-  Operator (Binary (And a b)) ->
-    (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (Bool b1, Bool b2) -> return . Bool $ b1 `lu'yp` Try `hv` b2 `yu` Unit
-      _ -> throwError $ RuntimeError "and requires booleans"
+  -- Operator (Binary (And a b)) ->
+    -- (,) <$> evalExpr a <*> evalExpr b >>= \case
+      -- (Bool b1, Bool b2) -> return . Bool $ b1 `lu'yp` Try `hv` b2 `yu` Unit
+      -- _ -> throwError $ RuntimeError "and requires booleans"
 
-  Operator (Binary (Or a b)) ->
-    (,) <$> evalExpr a <*> evalExpr b >>= \case
-      (Bool b1, Bool b2) -> return . Bool $ b1 `lu'ys'la` Try b2
-      _ -> throwError $ RuntimeError "or requires booleans"
+  -- Operator (Binary (Or a b)) ->
+    -- (,) <$> evalExpr a <*> evalExpr b >>= \case
+      -- (Bool b1, Bool b2) -> return . Bool $ b1 `lu'ys'la` Try b2
+      -- _ -> throwError $ RuntimeError "or requires booleans"
 
   Calling name args -> do
     fsenv <- ask
