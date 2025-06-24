@@ -1,7 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 module RVRS.Engine where
 
-import Prelude (Double, (+), (-), (*), (/), (>))
+import Prelude (Bool, Double, (+), (-), (*), (/), (&&), (||), (<), (==), (>))
 import Data.List ((++))
 import Data.String (String)
 import Data.Map (Map, insert, union)
@@ -46,16 +46,15 @@ expression x = case unwrap x of
  Variable var -> intro @Engine `hv` Unit
    `yuk____` Old `hv__` State `ha` Event `hv` get @Bindings `yo` find var
    `yok____` Try `ha__` None `hu_` Error `ha` Runtime `hv` Unbound var `la` Ok
- -- Operator (Binary (These (These x y) (Comparison (Equals _)))) -> intro @Engine `hv` Unit
- --   `yuk____` Run `hv` expression x
- --   `lu'yp'yo'q` Run `hv` expression y
- --     `yo'yuu` Unit `yo` Boolean `ho` Bool
- -- Operator (Binary (These (These x y) (Comparison (Greater _)))) -> intro @Engine `hv` Unit
- --   `yuk____` Run `hv` expression x
- --      `lu'yp` Run `hv` expression y
- --   `yok____` Try `ha` tap `ha` on @Double `ha` this
- --      `lo'yp` Try `ha` tap `ha` on @Double `ha` that
- --   `ho___'yo` is `ho'hd` (>) @Double `ho` Bool
+ Operator (Binary (These (These x y) (Comparison operation))) -> intro @Engine `hv` Unit
+   `yuk____` Run `hv` expression x
+      `lu'yp` Run `hv` expression y
+   `yok____` Try `ha` tap `ha` on @Double `ha` this
+      `lo'yp` Try `ha` tap `ha` on @Double `ha` that
+   `ho___'yo` Greater `hu` (is `ho'hd` (>) `ho` Bool)
+        `la` Equals `hu` (is `ho'hd` (==) `ho` Bool)
+        `la` Less `hu` (is `ho'hd` (<) `ho` Bool)
+        `li` is @Comparison operation
  Operator (Binary (These (These x y) (Arithmetic operation))) -> intro @Engine `hv` Unit
    `yuk____` Run `hv` expression x
       `lu'yp` Run `hv` expression y
@@ -66,14 +65,14 @@ expression x = case unwrap x of
         `la` Mul `hu` (is `ho'hd` (*) `ho` Double)
         `la` Div `hu` (is `ho'hd` (/) `ho` Double)
         `li` is @Arithmetic operation
- -- Operator (Binary (These (These x y) (Combinated operation))) -> intro @Engine `hv` Unit
- --   `yuk____` Run `hv` expression x
- --      `lu'yp` Run `hv` expression y
- --   `yok____` Try `ha` tap `ha` on @Boolean `ha` this
- --      `lo'yp` Try `ha` tap `ha` on @Boolean `ha` that
- --   `ho___'yo` And `hu` (p @AR @Boolean `ho` Bool)
- --        `la` Or `hu` (s @AR @Boolean `ho` Bool)
- --        `li` is @Combinated operation
+ Operator (Binary (These (These x y) (Combinated operation))) -> intro @Engine `hv` Unit
+   `yuk____` Run `hv` expression x
+      `lu'yp` Run `hv` expression y
+   `yok____` Try `ha` tap `ha` on @Bool `ha` this
+      `lo'yp` Try `ha` tap `ha` on @Bool `ha` that
+   `ho___'yo` And `hu` (is `ho'hd` (&&) `ho` Bool)
+        `la` Or `hu` (is `ho'hd` (||) `ho` Bool)
+        `li` is @Combinated operation
 
 tap :: forall target . Value `M` target `S` target `AR___` Error Reason target
 tap = Some `hu_` Error `ha` Runtime `ha` Require `hv` Unit `la` Valid @target
