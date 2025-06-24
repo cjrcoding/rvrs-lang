@@ -6,16 +6,19 @@ module RVRS.Typecheck.Stmt where
 import Prelude (Eq(..), Show(..), String, Maybe (..), Bool, (==), ($), (.), foldl)
 import RVRS.AST
 import RVRS.Value
-import RVRS.Checker (expression, pattern Unexpected)
-import RVRS.Typecheck.Types
-  ( StmtTypes(..)
-  , pattern TypeMismatchStmt
-  , pattern RedefinedVar
-  , pattern BadAssertType
-  )
+import RVRS.Checker
+
 import Ya hiding (Binary)
 import Data.Map (Map)
 import qualified Data.Map as Map
+
+-- Statement-level errors
+type StmtTypes = Types `S` (String, Typed, Typed) `S` String `S` Typed
+
+pattern ExprTypeError x = This (This (This x)) :: StmtTypes
+pattern TypeMismatchStmt x = This (This (That x)) :: StmtTypes
+pattern RedefinedVar x = This (That x) :: StmtTypes
+pattern BadAssertType x = That x :: StmtTypes
 
 typeOfStmt :: Map String Typed -> Recursive Statement -> Error StmtTypes (Map String Typed)
 typeOfStmt env stmt = case unwrap stmt of
@@ -25,11 +28,11 @@ typeOfStmt env stmt = case unwrap stmt of
       then Ok `hv` Map.insert name anno env
       else Error `ha` TypeMismatchStmt `hv` (name, anno, foundType)
 
-  -- Delta name (Just anno) expr ->
-    -- expression env expr `yok` Try `ha__` \found ->
-      -- if found == anno
-        -- then Ok `hv` Map.insert name anno env
-        -- else Error `ha` Unexpected `hv` show (anno, found)
+  Delta name (Just anno) expr ->
+    (Error `ha` ExprTypeError `la` Ok `li` expression env expr) `yok` Try `ha` (\found ->
+      if found == anno
+        then Ok `hv` Map.insert name anno env
+        else Error `ha` ExprTypeError `ha` Unexpected `hv` (anno `lu` found))
 
   -- Delta name Nothing expr ->
     -- expression env expr `yok` Try `ha__` \found ->

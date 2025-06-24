@@ -13,7 +13,6 @@ import Ya.Instances ()
 
 import RVRS.AST
 import RVRS.Typecheck.Stmt
-import RVRS.Typecheck.Types
 
 -- Optional type synonyms for clarity
 pattern TNum = Double Unit

@@ -175,5 +175,4 @@ executable TestTypeCheckStmt
   other-modules:
       RVRS.AST
     , RVRS.Typecheck.Stmt
-    , RVRS.Typecheck.Types
     , Ya.Instances
