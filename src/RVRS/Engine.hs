@@ -53,37 +53,19 @@ expression x = case unwrap x of
    `yuk____` Run `hv` expression x
    `lu'yp'yo'q` Run `hv` expression y
      `yo'yuu` Unit `yo` Boolean `ho` Bool
- -- TODO: these 4 `Double` operators are the same, I need to refactor `AST`
- -- Operator (Binary (Add x y))
-  -- -> intro @Engine `hv` Unit
-   -- `yuk____` Run `hv` expression x
-      -- `lu'yp` Run `hv` expression y
-   -- `yok____` Try `ha` tap `ha` this
-      -- `lo'yp` Try `ha` tap `ha` that
-     -- `ho_'yo` is `ho'hd` (+) `ho` Double
- -- Operator (Binary (Mul x y))
-  -- -> intro @Engine `hv` Unit
-   -- `yuk____` Run `hv` expression x
-      -- `lu'yp` Run `hv` expression y
-   -- `yok____` Try `ha` tap `ha` this
-      -- `lo'yp` Try `ha` tap `ha` that
-     -- `ho_'yo` is `ho'hd` (*) `ho` Double
- -- Operator (Binary (Sub x y))
-  -- -> intro @Engine `hv` Unit
-   -- `yuk____` Run `hv` expression x
-      -- `lu'yp` Run `hv` expression y
-   -- `yok____` Try `ha` tap `ha` this
-      -- `lo'yp` Try `ha` tap `ha` that
-     -- `ho_'yo` is `ho'hd` (-) `ho` Double
- -- Operator (Binary (Div x y))
-  -- -> intro @Engine `hv` Unit
-   -- `yuk____` Run `hv` expression x
-      -- `lu'yp` Run `hv` expression y
-   -- `yok____` Try `ha` tap `ha` this
-      -- -- `lo'yp` Try `ha` tap `ha` that
-     -- `ho_'yo` is `ho'hd` (/) `ho` Double
+ Operator (Binary (These (These x y) (Arithmetic operation)))
+  -> intro @Engine `hv` Unit
+   `yuk____` Run `hv` expression x
+      `lu'yp` Run `hv` expression y
+   `yok____` Try `ha` tap `ha` on @Double `ha` this
+      `lo'yp` Try `ha` tap `ha` on @Double `ha` that
+   `ho___'yo` Add `hu` (is `ho'hd` (+) `ho` Double)
+        `la` Sub `hu` (is `ho'hd` (-) `ho` Double)
+        `la` Mul `hu` (is `ho'hd` (*) `ho` Double)
+        `la` Div `hu` (is `ho'hd` (/) `ho` Double)
+        `li` is @Arithmetic operation
 
--- tap = Some `hu_` Error `ha` Runtime `ha` Require `hv` Unit `la` Valid `ha__` on
+tap = Some `hu_` Error `ha` Runtime `ha` Require `hv` Unit `la` Valid
 
 -- evalBody stmts = stmts `yokl` Forth `ha` Run `ha` evaluate
 
