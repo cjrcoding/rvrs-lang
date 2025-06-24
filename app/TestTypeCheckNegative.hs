@@ -1,10 +1,10 @@
 module Main where
 
-import Prelude hiding (Bool (..))
+import Prelude
 import Test.HUnit
 import qualified Data.Map as Map
 
-import Ya (Recursive(..), type Boolean, pattern Unit, pattern True, pattern False, pattern Error, pattern Valid)
+import Ya (Recursive(..), pattern Unit, pattern Error, pattern Valid, yi, ho, ha, hv, lu)
 
 import RVRS.AST
 import RVRS.Checker
@@ -21,7 +21,7 @@ testEnv = Map.fromList
 num :: Double -> Recursive Expression
 num = Recursive . Literal . Double
 
-bool :: Boolean -> Recursive Expression
+bool :: Bool -> Recursive Expression
 bool = Recursive . Literal . Bool
 
 str :: String -> Recursive Expression
@@ -31,15 +31,15 @@ var :: String -> Recursive Expression
 var = Recursive . Variable
 
 add :: Recursive Expression -> Recursive Expression -> Recursive Expression
-add a b = Recursive (Operator (Binary (Add a b)))
+add x y = x `lu` y `lu` Arithmetic `ha` Add `hv` Unit `yi` Binary `ho` Operator `ho` Recursive
 
 eq :: Recursive Expression -> Recursive Expression -> Recursive Expression
-eq a b = Recursive (Operator (Binary (Equals a b)))
+eq x y = x `lu` y `lu` Comparison `ha` Equals `hv` Unit `yi` Binary `ho` Operator `ho` Recursive
 
 -- Negative test cases (expected to fail)
 testBadAddBoolNum :: Test
 testBadAddBoolNum = TestCase $
-  case expression testEnv (add (bool (True Unit)) (num 1)) of
+  case expression testEnv (add (bool `hv` True) (num 1)) of
     Error _ -> return ()  -- ✅ expected failure
     Valid t -> assertFailure $ "Unexpected success: got " ++ show t
 
@@ -57,7 +57,7 @@ testBadVarUnbound = TestCase $
 
 testBadNestedAdd :: Test
 testBadNestedAdd = TestCase $
-  case expression testEnv (add (add (bool (True Unit)) (num 2)) (num 1)) of
+  case expression testEnv (add (add (bool `hv` True) (num 2)) (num 1)) of
     Error _ -> return ()
     Valid t -> assertFailure $ "Unexpected success: got " ++ show t
 

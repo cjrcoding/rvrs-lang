@@ -149,7 +149,7 @@ evalExpr expr = case unwrap expr of
       _       -> throwError $ RuntimeError "Expected boolean in 'not'"
 
   -- Operator (Binary (Equals a b)) ->
-    -- Bool . bool (by False) (by True) <$> ((==) <$> evalExpr a <*> evalExpr b)
+  --   Bool . bool (by False) (by True) <$> ((==) <$> evalExpr a <*> evalExpr b)
 
   -- Operator (Binary (Greater a b)) ->
     -- (,) <$> evalExpr a <*> evalExpr b >>= \case

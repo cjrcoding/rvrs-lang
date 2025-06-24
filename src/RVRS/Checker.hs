@@ -21,14 +21,14 @@ pattern Unknown x = That x :: Types
 
 expression :: Map String Typed -> Recursive Expression -> Error Types Typed
 expression env expr = case unwrap expr of
-  Literal x -> Ok `hv` valueToType x
-  Variable x -> lookup x env `yi_` None `hu_` Error `hv` Unknown x `la` Ok `ha_` to @Optional
-  Operator (Binary (These (These x y) (Arithmetic _))) -> match env x y `yok` Try `ha_` expect `hv` by Double
-  Operator (Binary (These (These x y) (Comparison _))) -> match env x y `yok` Try `ha_` expect `hv` by Double `ho'yu` by Bool
-  Operator (Binary (These (These x y) (Combinated _))) -> match env x y `yok` Try `ha_` expect `hv` by Bool
-  Operator (Unary (Not x)) -> expression env x `yok` Try `ha_` expect `hv` by Bool
-  Operator (Unary (Neg x)) -> expression env x `yok` Try `ha_` expect `hv` by Double
-  x -> Error `ha` Unsupported `hv` show x
+ Literal x -> Ok `hv` valueToType x
+ Variable x -> lookup x env `yi_` None `hu_` Error `hv` Unknown x `la` Ok `ha_` to @Optional
+ Operator (Binary (These (These x y) (Arithmetic _))) -> match env x y `yok` Try `ha_` expect `hv` by Double
+ Operator (Binary (These (These x y) (Comparison _))) -> match env x y `yok` Try `ha_` expect `hv` by Double `ho'yu` by Bool
+ Operator (Binary (These (These x y) (Combinated _))) -> match env x y `yok` Try `ha_` expect `hv` by Bool
+ Operator (Unary (Not x)) -> expression env x `yok` Try `ha_` expect `hv` by Bool
+ Operator (Unary (Neg x)) -> expression env x `yok` Try `ha_` expect `hv` by Double
+ x -> Error `ha` Unsupported `hv` show x
 
 match env left right =
  intro @(Error Types) Unit
