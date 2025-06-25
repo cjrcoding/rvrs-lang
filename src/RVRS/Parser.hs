@@ -1,21 +1,15 @@
 module RVRS.Parser (parseRVRS) where
 
--- Internal: RVRS language components
-import RVRS.AST
-import RVRS.Parser.StmtParser (statementParser)
-
--- External: Parsing libraries
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
-
--- External: General utilities
+import GHC.IsList (fromList, toList)
 import Data.Char (isAlphaNum)
 import Data.Void
-
--- Debug (last and clear it's temporary)
 import Debug.Trace (trace)
 
+import RVRS.AST
+import RVRS.Parser.StmtParser (statementParser)
 
 type Parser = Parsec Void String
 
@@ -35,14 +29,10 @@ parseRVRS input =
 
 
 flowParser :: Parser Flow
-flowParser = do
-  _ <- symbol "flow" <|> symbol "ceremony"
-  name <- identifier
-  args <- argListParser
-  body <- between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc))
-  return $ Flow name args body
-
-
+flowParser = Flow
+  <$> ((symbol "flow" <|> symbol "ceremony") *> identifier)
+  <*> argListParser
+  <*> (fromList <$> between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc)))
 
 -- Optional argument list
 argListParser :: Parser [Argument]

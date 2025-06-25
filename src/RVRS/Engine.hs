@@ -18,7 +18,7 @@ import RVRS.Lower
 
 type Bindings = Map String Value
 
-type Flowings = Map String FlowIR
+type Flowings = Map String Flow
 
 type Stops = Error
 

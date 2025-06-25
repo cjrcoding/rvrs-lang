@@ -2,8 +2,9 @@ module RVRS.Codegen (generateAiken, prettyPrintFlow) where
 
 import Prelude
 import Data.Bool (bool)
+import GHC.IsList (fromList, toList)
 
-import Ya (Object (..), Recursive (..), is, unwrap, ho, ho'he, hu, la, li)
+import Ya (Object (..), Recursive (..), is, unwrap, yo, ho, ho'he, hu, la, li)
 import qualified Ya as Y
 
 import RVRS.AST
@@ -13,7 +14,7 @@ generateAiken :: Flow -> String
 generateAiken (Flow name args body) =
   unlines $
     ["fn " ++ name ++ "(" ++ commaSep (map renderArg args) ++ ") -> String {"] ++
-    map ("  " ++) (concatMap genStmt body) ++
+    map ("  " ++) (concatMap genStmt (toList body)) ++
     ["}"]
 
 -- | Convert a statement into one or more Aiken lines
@@ -55,4 +56,4 @@ prettyPrintFlow :: Flow -> String
 prettyPrintFlow (Flow name args body) =
   "Flow\n  name: " ++ name ++
   "\n  args: " ++ show args ++
-  "\n  body:\n    " ++ unlines (map show body)
+  "\n  body:\n    " ++ unlines (toList $ body `yo` show)

@@ -7,9 +7,9 @@ import Ya.Literal ()
 
 -- | Represents a named flow of ritual logic
 data Flow = Flow
-  { flowName :: String           -- ^ The flow's name (e.g. "main", "add")
-  , flowArgs :: [Argument]       -- ^ Named ritual arguments, optionally typed
-  , flowBody :: [Recursive Statement]      -- ^ The ritual body (statements)
+  { flowName :: String
+  , flowArgs :: [Argument]
+  , flowBody :: Nonempty List `T'I` Recursive Statement
   } deriving (Show, Eq)
 
 -- | A named argument to a flow, e.g., `x: Number`
@@ -86,10 +86,3 @@ type Operation e = Unary e `S` (e `P` e `P` Dyadic)
 
 pattern Unary x = This x :: Operation e
 pattern Binary x = That x :: Operation e
-
--- | Intermediate representation of a flow
-data FlowIR = FlowIR
-  { flowNameIR :: String
-  , flowArgsIR :: [String]
-  , flowBodyIR :: Nonempty List `T'I` Recursive Statement
-  } deriving (Show, Eq)

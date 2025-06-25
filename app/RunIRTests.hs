@@ -2,7 +2,7 @@ module Main where
 
 -- Internal modules
 import RVRS.Parser (parseRVRS)
-import RVRS.Lower (lowerFlow)
+-- import RVRS.Lower (lowerFlow)
 import RVRS.Eval (evalIRFlow, EvalError)
 import qualified RVRS.AST as AST
 

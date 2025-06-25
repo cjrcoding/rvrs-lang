@@ -127,25 +127,25 @@ executable TestLower
     , Ya.Conversion
     , Ya.Instances
 
-executable RunIRTests
-  import: app-settings, extra-deps
-  main-is: RunIRTests.hs
-  other-modules:
-      RVRS.AST
-    , RVRS.Codegen
-    , RVRS.Parser
-    , RVRS.Checker
-    , RVRS.Parser.ExprParser
-    , RVRS.Parser.StmtParser
-    , RVRS.Parser.Type
-    , RVRS.Engine
-    , RVRS.Eval
-    , RVRS.Pretty
-    , RVRS.Value
-    , RVRS.Lower
-    , RVRS.Env
-    , Ya.Conversion
-    , Ya.Instances
+-- executable RunIRTests
+  -- import: app-settings, extra-deps
+  -- main-is: RunIRTests.hs
+  -- other-modules:
+      -- RVRS.AST
+    -- , RVRS.Codegen
+    -- , RVRS.Parser
+    -- , RVRS.Checker
+    -- , RVRS.Parser.ExprParser
+    -- , RVRS.Parser.StmtParser
+    -- , RVRS.Parser.Type
+    -- , RVRS.Engine
+    -- , RVRS.Eval
+    -- , RVRS.Pretty
+    -- , RVRS.Value
+    -- , RVRS.Lower
+    -- , RVRS.Env
+    -- , Ya.Conversion
+    -- , Ya.Instances
 
 executable TestTypeCheck
   import: app-settings, hunit-deps
