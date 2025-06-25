@@ -1,6 +1,6 @@
 module RVRS.Parser (parseRVRS) where
 
-import Ya (lu)
+import Ya (type P, lu)
 
 import Text.Megaparsec
 import Text.Megaparsec.Char
@@ -20,7 +20,7 @@ debug :: Bool
 debug = False  -- Set to True if you want parser debug output
 
 -- Top-level parse function
-parseRVRS :: String -> Either (ParseErrorBundle String Void) [Flow]
+parseRVRS :: String -> Either (ParseErrorBundle String Void) [Flow `P` String]
 parseRVRS input =
   case parse (between sc eof (many flowParser)) "RVRS" input of
     Left err -> trace "❌ PARSE FAILED" (Left err)
@@ -29,8 +29,8 @@ parseRVRS input =
         then trace ("✅ Parsed flows:\n" ++ show flows) (Right flows)
         else Right flows
 
-flowParser :: Parser Flow
-flowParser = (\name params body -> name `lu` params `lu` body)
+flowParser :: Parser (Flow `P` String)
+flowParser = (\name params body -> body `lu` params `lu` name)
   <$> ((symbol "flow" <|> symbol "ceremony") *> identifier)
   <*> (fromList <$> argListParser)
   <*> (fromList <$> between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc)))

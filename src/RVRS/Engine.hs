@@ -76,7 +76,11 @@ expression x = case unwrap x of
  -- Calling name args -> intro @Engine `hv` Unit
   -- `yuk____` Run `hv__` Given `hv` is @Flowings `yo` find name
   -- `yok____` Try `ha__` None `hu_` Error `ha` Runtime `hv` Unknown name `la` Ok
+  -- `yok____` Run `ha__` 
 
+    -- fsenv <- ask
+    -- case Map.lookup name fsenv of
+      -- Nothing -> throwError $ RuntimeError ("Unknown function: " ++ name)
       -- Just (FlowIR _ paramNames body) -> do
         -- argVals <- for (toList args) evalExpr
         -- if length paramNames /= length argVals

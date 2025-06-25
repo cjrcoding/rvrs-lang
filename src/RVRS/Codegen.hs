@@ -4,14 +4,14 @@ import Prelude
 import Data.Bool (bool)
 import GHC.IsList (fromList, toList)
 
-import Ya (Object (..), Recursive (..), is, unwrap, yo, ho, ho'he, hu, la, li)
+import Ya (Object (..), Recursive (..), type AR__, type P, is, unwrap, yo, ho, ho'he, hu, la, li)
 import Ya.Literal ()
 
 import RVRS.AST
 
 -- | Convert an entire flow into Aiken-style code
-generateAiken :: Flow -> String
-generateAiken (These (These name args) body) =
+generateAiken :: Flow `P` String `AR__` String
+generateAiken (These (These body args) name) =
   unlines $
     ["fn " ++ name ++ "(" ++ commaSep (toList $ args `yo` renderArg) ++ ") -> String {"] ++
     map ("  " ++) (concatMap genStmt (toList body)) ++
@@ -52,8 +52,8 @@ indent :: [String] -> [String]
 indent = map ("  " ++)
 
 -- | Pretty-print the Flow structure (used for debugging)
-prettyPrintFlow :: Flow -> String
-prettyPrintFlow (These (These name args) body) =
+prettyPrintFlow :: Flow `P` String `AR__` String
+prettyPrintFlow (These (These body args) name) =
   "Flow\n  name: " ++ name ++
   "\n  args: " ++ show args ++
   "\n  body:\n    " ++ unlines (toList $ body `yo` show)
