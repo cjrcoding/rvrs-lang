@@ -27,11 +27,10 @@ parseRVRS input =
         then trace ("✅ Parsed flows:\n" ++ show flows) (Right flows)
         else Right flows
 
-
 flowParser :: Parser Flow
 flowParser = Flow
   <$> ((symbol "flow" <|> symbol "ceremony") *> identifier)
-  <*> argListParser
+  <*> (fromList <$> argListParser)
   <*> (fromList <$> between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc)))
 
 -- Optional argument list

@@ -8,7 +8,7 @@ import Ya.Literal ()
 -- | Represents a named flow of ritual logic
 data Flow = Flow
   { flowName :: String
-  , flowArgs :: [Argument]
+  , flowArgs :: Nonempty List `T'I` Argument
   , flowBody :: Nonempty List `T'I` Recursive Statement
   } deriving (Show, Eq)
 

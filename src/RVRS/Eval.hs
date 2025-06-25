@@ -62,7 +62,7 @@ evalIRFlow userFlows entryName args = do
   fullFlowMap <- loadAndMergeStdlib `yo` union userFlows
   case Map.lookup entryName fullFlowMap of
     Just (Flow _ params body) -> do
-      let initialEnv = fromList $ zip (argName <$> params) args
+      let initialEnv = fromList $ zip (toList $ params `yo` argName) args
       (fmap . fmap) fst $ do runEvalIR fullFlowMap initialEnv $ catchError (evalBody $ toList body) handleReturn
     Nothing -> return `ha` Left `ha` RuntimeError $ "No flow named '" ++ entryName ++ "' found."
 
@@ -91,7 +91,7 @@ evalStmt stmt = case unwrap stmt of
     case Map.lookup name flowMap of
       Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
       Just (Flow _ params body) ->
-        Nothing <$ do for args evalExpr >>= lift `ha` lift `ha` runStateT (runReaderT (evalBody (toList body)) flowMap) `ha` fromList `ha` zip (argName <$> params)
+        Nothing <$ do for args evalExpr >>= lift `ha` lift `ha` runStateT (runReaderT (evalBody (toList body)) flowMap) `ha` fromList `ha` zip (toList $ params `yo` argName)
 
   Return expr ->
     Just <$> evalExpr expr
@@ -178,11 +178,11 @@ evalExpr expr = case unwrap expr of
       Nothing -> throwError $ RuntimeError ("Unknown function: " ++ name)
       Just (Flow _ params body) -> do
         argVals <- for (toList args) evalExpr
-        if length params /= length argVals
+        if length (toList params) /= length argVals
           then throwError $ RuntimeError ("Arity mismatch calling: " ++ name)
           -- TODO: here you have to extract a `Value` from `Maybe Value` because you accept
           -- list instead of nonempty list. I'll plumb it with primitive `error` for now, but -- once we replace `List` with `Nonempty List` it's going to be resolved by itself
-          else fromJust `ha` fst <$> do callBody (toList body) `ha` fromList $ zip (argName <$> params) argVals
+          else fromJust `ha` fst <$> do callBody (toList body) `ha` fromList $ zip (toList $ params `yo` argName) argVals
 
 callBody :: [Recursive Statement] -> ValueEnv -> EvalIR (Maybe Value, ValueEnv)
 callBody body callEnv = runReaderT (evalBody body) <$> ask >>= lift `ha` lift `ha` flip runStateT callEnv

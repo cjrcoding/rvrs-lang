@@ -5,7 +5,7 @@ import Data.Bool (bool)
 import GHC.IsList (fromList, toList)
 
 import Ya (Object (..), Recursive (..), is, unwrap, yo, ho, ho'he, hu, la, li)
-import qualified Ya as Y
+import Ya.Literal ()
 
 import RVRS.AST
 
@@ -13,7 +13,7 @@ import RVRS.AST
 generateAiken :: Flow -> String
 generateAiken (Flow name args body) =
   unlines $
-    ["fn " ++ name ++ "(" ++ commaSep (map renderArg args) ++ ") -> String {"] ++
+    ["fn " ++ name ++ "(" ++ commaSep (toList $ args `yo` renderArg) ++ ") -> String {"] ++
     map ("  " ++) (concatMap genStmt (toList body)) ++
     ["}"]
 
