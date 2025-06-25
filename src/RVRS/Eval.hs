@@ -37,7 +37,7 @@ import RVRS.Parser
 import RVRS.Lower
 
 type Env     = Map String Value
-type FlowEnv = Map String (Flow `P` String)
+type FlowEnv = Map String Flow
 
 type EvalIR a = ReaderT FlowEnv (StateT ValueEnv (ExceptT EvalError IO)) a
 
@@ -47,21 +47,21 @@ data EvalError
   deriving (Show, Eq)
 
 -- Load stdlib and merge
-loadAndMergeStdlib :: World `T'I` Map String (Flow `P` String)
+loadAndMergeStdlib :: World `T'I` Map String Flow
 loadAndMergeStdlib = readFile "stdlib/stdlib.rvrs" `yo` parseRVRS `yok` \case
   Left err -> World `ha` error $ "Stdlib parse error:\n" ++ show err
-  Right flows -> World `ha` return `ha` fromList $ (,) <$> at `ho` this @String <*> id <$> flows
+  Right flows -> World `ha` return `ha` fromList $ (\(These flow name) -> (name, flow)) <$> flows
 
 -- Runner
-runEvalIR :: Map String (Flow `P` String) -> Map String Value -> EvalIR a -> IO (Either EvalError (a, Map String Value))
+runEvalIR :: Map String Flow -> Map String Value -> EvalIR a -> IO (Either EvalError (a, Map String Value))
 runEvalIR flows env action = runExceptT `ha` flip runStateT env `hv` runReaderT action flows
 
 -- Flow evaluation
-evalIRFlow :: Map String (Flow `P` String) -> String -> [Value] -> IO (Either EvalError (Maybe Value))
+evalIRFlow :: Map String Flow -> String -> [Value] -> IO (Either EvalError (Maybe Value))
 evalIRFlow userFlows entryName args = do
   fullFlowMap <- loadAndMergeStdlib `yo` union userFlows
   case Map.lookup entryName fullFlowMap of
-    Just (These (These body params) _) -> do
+    Just (These body params) -> do
       let initialEnv = fromList $ zip (toList $ params `yo` argName) args
       (fmap . fmap) fst $ do runEvalIR fullFlowMap initialEnv $ catchError (evalBody $ toList body) handleReturn
     Nothing -> return `ha` Left `ha` RuntimeError $ "No flow named '" ++ entryName ++ "' found."
@@ -90,7 +90,7 @@ evalStmt stmt = case unwrap stmt of
     flowMap <- ask
     case Map.lookup name flowMap of
       Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
-      Just (These (These body params) _) -> do
+      Just (These body params) -> do
         Nothing <$ do for args evalExpr >>= lift `ha` lift `ha` runStateT (runReaderT (evalBody (toList body)) flowMap) `ha` fromList `ha` zip (toList $ params `yo` argName)
 
   Return expr ->
@@ -176,7 +176,7 @@ evalExpr expr = case unwrap expr of
     fsenv <- ask
     case Map.lookup name fsenv of
       Nothing -> throwError $ RuntimeError ("Unknown function: " ++ name)
-      Just (These (These body params) _) -> do
+      Just (These body params) -> do
         argVals <- for (toList args) evalExpr
         if length (toList params) /= length argVals
           then throwError $ RuntimeError ("Arity mismatch calling: " ++ name)

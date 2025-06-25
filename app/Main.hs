@@ -2,18 +2,20 @@
 
 module Main where
 
+import Ya (Object (..), at, this, ho)
+
 -- Internal modules
 import RVRS.AST (Flow)
 import RVRS.Parser (parseRVRS)
 import RVRS.Eval (evalIRFlow, EvalError)
 import RVRS.Codegen (prettyPrintFlow)
-import RVRS.Lower (mergeAndLower)
 
 -- System/environment
 import System.Environment (getArgs)
 
 -- External libraries
 import Control.Monad (when)
+import GHC.IsList (fromList)
 import qualified Data.Map as M
 import Text.Megaparsec (errorBundlePretty)
 
@@ -39,8 +41,7 @@ main = do
             Right stdlibFlows -> do
 
               -- 🛠️ Combine stdlib first, then user flows (user can override)
-              let allFlows = stdlibFlows ++ userFlows
-              let lowered = mergeAndLower allFlows
+              let allFlows = fromList $ (\(These flow name) -> (name, flow)) <$> (stdlibFlows ++ userFlows)
 
               when debug $ do
                 putStrLn "\n🔎 Parsed User Flows:"
@@ -48,7 +49,7 @@ main = do
 
               -- Evaluate main flow
               putStrLn "\nEvaluation Output:"
-              evalResult <- evalIRFlow lowered "main" []
+              evalResult <- evalIRFlow allFlows "main" []
 
               case evalResult of
                 Left err -> putStrLn ("Eval Error: " ++ show err)

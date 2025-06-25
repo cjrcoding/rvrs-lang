@@ -5,7 +5,7 @@ import Ya (Tagged (Tag), type (#), type T'I, type AR, P, S, Object (This, That),
 import Ya.Instances ()
 import Ya.Literal ()
 
--- | Represents a named flow of ritual logic
+-- | Represents a flow of ritual logic
 type Flow = Nonempty List (Recursive Statement) `P` Nonempty List Argument
 
 -- | A named argument to a flow, e.g., `x: Number`
