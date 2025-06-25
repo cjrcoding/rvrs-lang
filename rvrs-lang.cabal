@@ -60,7 +60,6 @@ library
     , RVRS.Eval
     , RVRS.Pretty
     , RVRS.Value
-    , RVRS.Lower
     , RVRS.Env
     , Ya.Conversion
     , Ya.Instances
@@ -82,7 +81,6 @@ executable rvrs
     , RVRS.Eval
     , RVRS.Pretty
     , RVRS.Value
-    , RVRS.Lower
     , RVRS.Env
     , Ya.Conversion
     , Ya.Instances
@@ -102,7 +100,6 @@ executable RunAll
     , RVRS.Eval
     , RVRS.Pretty
     , RVRS.Value
-    , RVRS.Lower
     , RVRS.Env
     , Ya.Conversion
     , Ya.Instances
@@ -142,7 +139,6 @@ executable RunAll
     -- , RVRS.Eval
     -- , RVRS.Pretty
     -- , RVRS.Value
-    -- , RVRS.Lower
     -- , RVRS.Env
     -- , Ya.Conversion
     -- , Ya.Instances

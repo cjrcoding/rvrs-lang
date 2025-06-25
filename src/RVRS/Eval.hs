@@ -34,7 +34,6 @@ import RVRS.AST
 import RVRS.Env
 import RVRS.Value
 import RVRS.Parser
-import RVRS.Lower
 
 type Env     = Map String Value
 type FlowEnv = Map String Flow

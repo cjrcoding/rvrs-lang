@@ -14,7 +14,6 @@ import Ya.World
 import RVRS.AST
 import RVRS.Parser
 import RVRS.Value
-import RVRS.Lower
 
 type Bindings = Map String Value
 
