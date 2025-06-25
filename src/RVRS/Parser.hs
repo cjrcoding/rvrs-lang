@@ -1,5 +1,7 @@
 module RVRS.Parser (parseRVRS) where
 
+import Ya (lu)
+
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
@@ -28,7 +30,7 @@ parseRVRS input =
         else Right flows
 
 flowParser :: Parser Flow
-flowParser = Flow
+flowParser = (\name params body -> name `lu` params `lu` body)
   <$> ((symbol "flow" <|> symbol "ceremony") *> identifier)
   <*> (fromList <$> argListParser)
   <*> (fromList <$> between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc)))

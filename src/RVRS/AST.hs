@@ -6,11 +6,9 @@ import Ya.Instances ()
 import Ya.Literal ()
 
 -- | Represents a named flow of ritual logic
-data Flow = Flow
-  { flowName :: String
-  , flowArgs :: Nonempty List `T'I` Argument
-  , flowBody :: Nonempty List `T'I` Recursive Statement
-  } deriving (Show, Eq)
+type Flow = String
+ `P` (Nonempty List `T'I` Argument)
+ `P` (Nonempty List `T'I` Recursive Statement)
 
 -- | A named argument to a flow, e.g., `x: Number`
 data Argument = Argument

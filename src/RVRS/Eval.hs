@@ -26,7 +26,7 @@ import Control.Monad.Reader (ReaderT, runReaderT, ask, lift)
 import GHC.IsList (fromList, toList)
 import System.IO (readFile)
 
-import Ya (type T'I, type Recursive (..), pattern Unit, pattern Try, is, by, unwrap, ha, ho, ho___'yok, hu, hv, hv__, la, li, lu'yp, lu'ys'la, yo, yok, yu)
+import Ya (Object (..), type T'I, type Recursive (..), pattern Unit, pattern Try, is, at, by, this, unwrap, ha, ho, ho___'yok, hu, hv, hv__, la, li, lu'yp, lu'ys'la, yo, yok, yu)
 import Ya.World (World, pattern World)
 import Ya.Literal ()
 
@@ -50,7 +50,7 @@ data EvalError
 loadAndMergeStdlib :: World `T'I` Map String Flow
 loadAndMergeStdlib = readFile "stdlib/stdlib.rvrs" `yo` parseRVRS `yok` \case
   Left err -> World `ha` error $ "Stdlib parse error:\n" ++ show err
-  Right flows -> World `ha` return `ha` fromList $ (,) <$> flowName <*> id <$> flows
+  Right flows -> World `ha` return `ha` fromList $ (,) <$> at `ho` this @String <*> id <$> flows
 
 -- Runner
 runEvalIR :: Map String Flow -> Map String Value -> EvalIR a -> IO (Either EvalError (a, Map String Value))
@@ -61,7 +61,7 @@ evalIRFlow :: Map String Flow -> String -> [Value] -> IO (Either EvalError (Mayb
 evalIRFlow userFlows entryName args = do
   fullFlowMap <- loadAndMergeStdlib `yo` union userFlows
   case Map.lookup entryName fullFlowMap of
-    Just (Flow _ params body) -> do
+    Just (These (These _ params) body) -> do
       let initialEnv = fromList $ zip (toList $ params `yo` argName) args
       (fmap . fmap) fst $ do runEvalIR fullFlowMap initialEnv $ catchError (evalBody $ toList body) handleReturn
     Nothing -> return `ha` Left `ha` RuntimeError $ "No flow named '" ++ entryName ++ "' found."
@@ -90,7 +90,7 @@ evalStmt stmt = case unwrap stmt of
     flowMap <- ask
     case Map.lookup name flowMap of
       Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
-      Just (Flow _ params body) ->
+      Just (These (These _ params) body) -> do
         Nothing <$ do for args evalExpr >>= lift `ha` lift `ha` runStateT (runReaderT (evalBody (toList body)) flowMap) `ha` fromList `ha` zip (toList $ params `yo` argName)
 
   Return expr ->
@@ -176,7 +176,7 @@ evalExpr expr = case unwrap expr of
     fsenv <- ask
     case Map.lookup name fsenv of
       Nothing -> throwError $ RuntimeError ("Unknown function: " ++ name)
-      Just (Flow _ params body) -> do
+      Just (These (These _ params) body) -> do
         argVals <- for (toList args) evalExpr
         if length (toList params) /= length argVals
           then throwError $ RuntimeError ("Arity mismatch calling: " ++ name)

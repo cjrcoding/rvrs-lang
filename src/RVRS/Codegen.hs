@@ -11,7 +11,7 @@ import RVRS.AST
 
 -- | Convert an entire flow into Aiken-style code
 generateAiken :: Flow -> String
-generateAiken (Flow name args body) =
+generateAiken (These (These name args) body) =
   unlines $
     ["fn " ++ name ++ "(" ++ commaSep (toList $ args `yo` renderArg) ++ ") -> String {"] ++
     map ("  " ++) (concatMap genStmt (toList body)) ++
@@ -53,7 +53,7 @@ indent = map ("  " ++)
 
 -- | Pretty-print the Flow structure (used for debugging)
 prettyPrintFlow :: Flow -> String
-prettyPrintFlow (Flow name args body) =
+prettyPrintFlow (These (These name args) body) =
   "Flow\n  name: " ++ name ++
   "\n  args: " ++ show args ++
   "\n  body:\n    " ++ unlines (toList $ body `yo` show)
