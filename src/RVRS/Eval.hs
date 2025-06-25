@@ -63,7 +63,7 @@ evalIRFlow userFlows entryName args = do
   case Map.lookup entryName fullFlowMap of
     Just (FlowIR _ params body) -> do
       let initialEnv = fromList (zip params args)
-      (fmap . fmap) fst $ do runEvalIR fullFlowMap initialEnv $ catchError (evalBody body) handleReturn
+      (fmap . fmap) fst $ do runEvalIR fullFlowMap initialEnv $ catchError (evalBody $ toList body) handleReturn
     Nothing -> return `ha` Left `ha` RuntimeError $ "No flow named '" ++ entryName ++ "' found."
 
 handleReturn :: EvalError -> EvalIR (Maybe Value)
@@ -91,7 +91,7 @@ evalStmt stmt = case unwrap stmt of
     case Map.lookup name flowMap of
       Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
       Just (FlowIR _ params body) ->
-        Nothing <$ do for args evalExpr >>= lift `ha` lift `ha` runStateT (runReaderT (evalBody body) flowMap) `ha` fromList `ha` zip params
+        Nothing <$ do for args evalExpr >>= lift `ha` lift `ha` runStateT (runReaderT (evalBody (toList body)) flowMap) `ha` fromList `ha` zip params
 
   Return expr ->
     Just <$> evalExpr expr
@@ -182,7 +182,7 @@ evalExpr expr = case unwrap expr of
           then throwError $ RuntimeError ("Arity mismatch calling: " ++ name)
           -- TODO: here you have to extract a `Value` from `Maybe Value` because you accept
           -- list instead of nonempty list. I'll plumb it with primitive `error` for now, but -- once we replace `List` with `Nonempty List` it's going to be resolved by itself
-          else fromJust `ha` fst <$> do callBody body `ha` fromList $ zip paramNames argVals
+          else fromJust `ha` fst <$> do callBody (toList body) `ha` fromList $ zip paramNames argVals
 
 callBody :: [Recursive Statement] -> ValueEnv -> EvalIR (Maybe Value, ValueEnv)
 callBody body callEnv = runReaderT (evalBody body) <$> ask >>= lift `ha` lift `ha` flip runStateT callEnv

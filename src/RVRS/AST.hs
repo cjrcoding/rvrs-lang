@@ -1,6 +1,6 @@
 module RVRS.AST where
 
-import Ya (Tagged (Tag), type (#), type AR, P, S, Object (This, That), Recursive (..), type Unit, type Nonempty, type List)
+import Ya (Tagged (Tag), type (#), type T'I, type AR, P, S, Object (This, That), Recursive (..), type Unit, type Nonempty, type List)
 
 import Ya.Instances ()
 import Ya.Literal ()
@@ -91,5 +91,5 @@ pattern Binary x = That x :: Operation e
 data FlowIR = FlowIR
   { flowNameIR :: String
   , flowArgsIR :: [String]
-  , flowBodyIR :: [Recursive Statement]
+  , flowBodyIR :: Nonempty List `T'I` Recursive Statement
   } deriving (Show, Eq)
