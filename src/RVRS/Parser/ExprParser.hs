@@ -3,6 +3,7 @@
 module RVRS.Parser.ExprParser (exprParser) where
 
 import Prelude
+import GHC.IsList (fromList)
 import Control.Monad (void)
 import Control.Monad.Combinators.Expr
 import Data.Void
@@ -59,7 +60,8 @@ parseNumber = Recursive . Literal <$> Double <$> do lexeme $ try L.float <|> fro
 
 -- Function call expressions (e.g., fuse(2, 3))
 funcCallExpr :: Parser (Recursive Expression)
-funcCallExpr = Calling `ho'ho` Recursive <$> identifier <*> parens (exprParser `sepBy` symbol ",")
+funcCallExpr = Calling `ho'ho` Recursive <$> identifier
+ <*> (fromList <$> parens (exprParser `sepBy` symbol ","))
 
 -- Utility parsers
 lexeme :: Parser a -> Parser a

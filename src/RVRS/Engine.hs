@@ -79,7 +79,7 @@ tap = Some `hu_` Error `ha` Runtime `ha` Require `hv` Unit `la` Valid @target
 
 -- evalBody stmts = stmts `yokl` Forth `ha` Run `ha` evaluate
 
--- evaluate x = statement x `yok_` Try `ha__` Continue `la` Interrupt `ha` ReturnValue
+-- evaluate x = statement x `yok_` Try `ha__` Continue `la` Interrupt `ha` Returns
 
 -- evalBody :: [Recursive Statement] -> EvalIR (Maybe Value)
 -- evalBody [] = return Nothing

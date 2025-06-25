@@ -23,11 +23,12 @@ import Control.Monad.Except (ExceptT, runExceptT, throwError, catchError)
 import Control.Monad.State (StateT, runStateT, modify, liftIO)
 import qualified Control.Monad.State as T (get)
 import Control.Monad.Reader (ReaderT, runReaderT, ask, lift)
-import GHC.IsList (fromList)
+import GHC.IsList (fromList, toList)
 import System.IO (readFile)
 
 import Ya (type T'I, type Recursive (..), pattern Unit, pattern Try, is, by, unwrap, ha, ho, ho___'yok, hu, hv, hv__, la, li, lu'yp, lu'ys'la, yo, yok, yu)
 import Ya.World (World, pattern World)
+import Ya.Literal ()
 
 import RVRS.AST
 import RVRS.Env
@@ -176,7 +177,7 @@ evalExpr expr = case unwrap expr of
     case Map.lookup name fsenv of
       Nothing -> throwError $ RuntimeError ("Unknown function: " ++ name)
       Just (FlowIR _ paramNames body) -> do
-        argVals <- for args evalExpr
+        argVals <- for (toList args) evalExpr
         if length paramNames /= length argVals
           then throwError $ RuntimeError ("Arity mismatch calling: " ++ name)
           -- TODO: here you have to extract a `Value` from `Maybe Value` because you accept

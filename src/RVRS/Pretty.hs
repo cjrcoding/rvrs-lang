@@ -2,6 +2,7 @@ module RVRS.Pretty (prettyExpr) where
 
 import Prelude
 import Data.Bool (bool)
+import GHC.IsList (toList)
 
 import Ya (type AR, Recursive (..), Object (These), is, ho, ho'he, hu, li, la, la__)
 
@@ -13,7 +14,7 @@ prettyExpr expr = case expr of
   Recursive (Operator (Binary (These (These x y) op))) -> "(" ++ prettyExpr x ++ bin op ++ prettyExpr y ++ ")"
   Recursive (Operator (Unary (Not e))) -> "(not " ++ prettyExpr e ++ ")"
   Recursive (Operator (Unary (Neg e))) -> "(-" ++ prettyExpr e ++ ")"
-  Recursive (Calling name args) -> "call " ++ name ++ "(" ++ unwords (prettyExpr <$> args) ++ ")"
+  Recursive (Calling name args) -> "call " ++ name ++ "(" ++ unwords (prettyExpr <$> toList args) ++ ")"
   Recursive (Literal x) -> is `ho'he` show @String `la` is `ho'he` show @Double `la` is `ho'he` bool "false" "true" `li` x
 
 bin :: Dyadic `AR` String

@@ -1,8 +1,9 @@
 module RVRS.AST where
 
-import Ya (Tagged (Tag), type (#), type AR, P, S, Object (This, That), Recursive (..), type Unit)
+import Ya (Tagged (Tag), type (#), type AR, P, S, Object (This, That), Recursive (..), type Unit, type Nonempty, type List)
 
 import Ya.Instances ()
+import Ya.Literal ()
 
 -- | Represents a named flow of ritual logic
 data Flow = Flow
@@ -34,7 +35,7 @@ data Statement e
 data Expression e
   = Variable String
   | Operator (Operation e)
-  | Calling String [e]
+  | Calling String (Nonempty List e)
   | Literal Value
   deriving (Show, Eq)
 

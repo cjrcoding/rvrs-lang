@@ -26,6 +26,7 @@ common rvrs-deps
     , mtl
     , ya
     , ya-world
+    , ya-literal
 
 common app-settings
   import: base-settings, rvrs-deps

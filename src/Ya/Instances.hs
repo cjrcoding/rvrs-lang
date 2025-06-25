@@ -21,6 +21,9 @@ deriving instance (Eq l, Eq r) => Eq (T'I'II S l r)
 deriving instance (Eq l, Eq r) => Eq (T'II'I P r l)
 deriving instance (Eq l, Eq r) => Eq (T'II'I S r l)
 
+deriving instance (Eq (tt i (t ii)), Eq i, Eq ii) => Eq (TT'I'T'II t tt i ii)
+deriving instance (Eq i) => Eq (Construction Optional i)
+
 deriving instance (Eq i) => Eq (Tagged tag i)
 
 deriving instance (Show l, Show r) => Show (l `P` r)
@@ -31,6 +34,9 @@ deriving instance (Show l, Show r) => Show (T'I'II S l r)
 
 deriving instance (Show l, Show r) => Show (T'II'I P r l)
 deriving instance (Show l, Show r) => Show (T'II'I S r l)
+
+deriving instance (Show (tt i (t ii)), Show i, Show ii) => Show (TT'I'T'II t tt i ii)
+deriving instance (Show i) => Show (Construction Optional i)
 
 deriving instance (Show i) => Show (Tagged tag i)
 
