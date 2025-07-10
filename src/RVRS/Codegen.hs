@@ -11,7 +11,7 @@ import RVRS.AST
 
 -- | Convert an entire flow into Aiken-style code
 generateAiken :: Flow `P` String `AR__` String
-generateAiken (These (These body args) name) =
+generateAiken (These (These args body) name) =
   unlines $
     ["fn " ++ name ++ "(" ++ commaSep (toList $ args `yo` renderArg) ++ ") -> String {"] ++
     map ("  " ++) (concatMap genStmt (toList body)) ++

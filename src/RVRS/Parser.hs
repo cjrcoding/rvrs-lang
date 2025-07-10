@@ -30,7 +30,7 @@ parseRVRS input =
         else Right flows
 
 flowParser :: Parser (Flow `P` String)
-flowParser = (\name params body -> body `lu` params `lu` name)
+flowParser = (\name params body -> params `lu` body `lu` name)
   <$> ((symbol "flow" <|> symbol "ceremony") *> identifier)
   <*> (fromList <$> argListParser)
   <*> (fromList <$> between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc)))

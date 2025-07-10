@@ -60,7 +60,7 @@ evalIRFlow :: Map String Flow -> String -> [Value] -> IO (Either EvalError (Mayb
 evalIRFlow userFlows entryName args = do
   fullFlowMap <- loadAndMergeStdlib `yo` union userFlows
   case Map.lookup entryName fullFlowMap of
-    Just (These body params) -> do
+    Just (These params body) -> do
       let initialEnv = fromList $ zip (toList $ params `yo` argName) args
       (fmap . fmap) fst $ do runEvalIR fullFlowMap initialEnv $ catchError (evalBody $ toList body) handleReturn
     Nothing -> return `ha` Left `ha` RuntimeError $ "No flow named '" ++ entryName ++ "' found."
@@ -89,7 +89,7 @@ evalStmt stmt = case unwrap stmt of
     flowMap <- ask
     case Map.lookup name flowMap of
       Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
-      Just (These body params) -> do
+      Just (These params body) -> do
         Nothing <$ do for args evalExpr >>= lift `ha` lift `ha` runStateT (runReaderT (evalBody (toList body)) flowMap) `ha` fromList `ha` zip (toList $ params `yo` argName)
 
   Return expr ->
@@ -175,7 +175,7 @@ evalExpr expr = case unwrap expr of
     fsenv <- ask
     case Map.lookup name fsenv of
       Nothing -> throwError $ RuntimeError ("Unknown function: " ++ name)
-      Just (These body params) -> do
+      Just (These params body) -> do
         argVals <- for (toList args) evalExpr
         if length (toList params) /= length argVals
           then throwError $ RuntimeError ("Arity mismatch calling: " ++ name)

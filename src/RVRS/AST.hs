@@ -6,8 +6,9 @@ import Ya.Instances ()
 import Ya.Literal ()
 
 -- | Represents a flow of ritual logic
-type Flow = Nonempty List (Recursive Statement) `P` Nonempty List Argument
+type Flow = Nonempty List Argument `P` Nonempty List (Recursive Statement)
 
+-- TODO: is `argType` really necessary here?
 -- | A named argument to a flow, e.g., `x: Number`
 data Argument = Argument
   { argName :: String            -- ^ The argument name

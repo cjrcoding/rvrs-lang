@@ -86,11 +86,11 @@ setup name = intro @Engine `hv` Unit
 
 -- TODO: we should evaluate expressions to values first!
 match :: Nonempty List `T` Recursive Expression
-  `AR___` (Nonempty List `T` Recursive Statement `P` (Nonempty List `T` Argument))
+  `AR___` ((Nonempty List `T` Argument) `P` (Nonempty List `T` Recursive Statement))
     `AR_` Stops Reason (Nonempty List `T'I` Equipped String (Recursive Expression))
     -- `AR_` Stops Reason Bindings
 
-match exprs (These body names) =
+match exprs (These names body) =
  exprs `lu'yr` Align `hv` (names `yo` argName)
  `yokl` Run `ho` Forth `ha__` Error `ha` Runtime `ha` Valency `la` Ok `ha` Equip
 
