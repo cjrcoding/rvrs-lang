@@ -3,6 +3,56 @@
 
 module RVRS.Typecheck.Stmt where
 
+-- TODO: Statement Typechecking Coverage
+--
+-- This checklist tracks which statement forms are covered in `typeOfStmt`
+-- and what logic still needs to be implemented. Aim is full case coverage
+-- and meaningful error reporting for incorrect usage.
+
+-- Delta
+--   - Ensure right-hand side (RHS) expression typechecks
+--   - If a type annotation exists, ensure it matches the inferred type
+
+-- Source
+--   - Ensure variable already exists in scope
+--   - Ensure RHS type matches the declared type of the variable
+--   - Enforce immutability: cannot reassign a Source-defined variable
+
+-- Echo
+--   - Typecheck the expression being echoed
+--   - Likely returns Unit or allows passthrough
+
+-- Mouth
+--   - Typecheck argument expression
+--   - May act as passthrough or produce Unit
+
+-- Assert
+--   - Ensure the expression evaluates to a Bool
+--   - Otherwise, return a type error indicating misuse
+
+-- Branch
+--   - Condition expression must typecheck to Bool
+--   - Typecheck both branches independently
+--   - Optionally enforce matching return types across branches
+
+-- Return
+--   - Ensure the returned expression type aligns with expected flow return type
+--   - May require deferring type until flow type is known
+
+-- Call
+--   - Lookup flow by name
+--   - Ensure number and types of arguments match parameters
+--   - Typecheck returned value as expected type of the call
+
+-- Fallback
+--   - Add a catch-all case with `UnsupportedStmt` to avoid crashes
+
+-- Final Tasks
+--   - Eliminate all "non-exhaustive pattern" runtime errors
+--   - Ensure all `testtypecheckstmt` tests either pass or fail with meaningful errors
+--   - Add new cases for invalid usage: assert with non-Bool, branch with mismatched returns, etc.
+
+
 import Prelude (Eq(..), Show(..), String, Maybe (..), Bool, (==), ($), (.), foldl)
 import RVRS.AST
 import RVRS.Value
