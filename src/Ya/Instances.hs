@@ -7,6 +7,10 @@ module Ya.Instances where
 
 import Ya hiding (Maybe)
 import Ya (S, P, Object (This, That, These), Recursive (Recursive), Setoid (equality))
+import Ya.Literal ()
+
+import GHC.IsList (fromList, toList)
+import Data.Map (Map)
 
 -- Deriving instances for Recursive, P, and S
 deriving instance (Eq (f (Recursive f))) => Eq (Recursive f)
@@ -51,3 +55,6 @@ instance Mapping T'I'II T'I'II (AR) (AR) Maybe Optional where
 
 instance Mapping T'I'II T'I'II (AR) (AR) Optional Maybe where
   mapping = rewrap `identity` \from -> None `hu` Nothing `la` Just `ha` from
+
+instance Ord key => Mapping T'I'II T'I'II (AR) (AR) (Construction Optional `T'TT'I` Equipped key) (Map key) where
+  mapping = rewrap `identity` \from x -> unwrap x `yo` unwrap @(AR) `ho` (\(These v k) -> (k, from v)) `yi` toList `ho` fromList
