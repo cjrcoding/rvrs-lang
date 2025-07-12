@@ -27,7 +27,7 @@ pattern Runtime e = This e :: Reason
 pattern Returns e = That e :: Reason
 
 -- type Runtime = Value `P` Typed `S` String `S` String `S` (Argument `S` Value)
-type Runtime = Unit `S` String `S` String `S` (Recursive Expression `S` String)
+type Runtime = Unit `S` String `S` String `S` (Value `S` String)
 
 pattern Require e = This (This (This e))
 pattern Unknown e = This (This (That e))
@@ -45,7 +45,7 @@ expression x = case unwrap x of
  Literal val -> intro @Engine `hv` val
  Variable var -> intro @Engine `hv` Unit
   `yuk____` Old `hv__` State `ha` Event `hv` get @Bindings `yo` find var
-  `yok____` Try `ha__` None `hu_` Error `ha` Runtime `hv` Unbound var `la` Ok
+  `yok____` Try `ha__` Error `ha` Runtime `ha` Unbound `la` Ok
  Operator (Binary (These (These x y) (Comparison operation))) -> intro @Engine `hv` Unit
   `yuk____` Run `hv` expression x
      `lu'yp` Run `hv` expression y
@@ -73,64 +73,37 @@ expression x = case unwrap x of
   `ho___'yo` And `hu` (is `ho'hd` (&&) `ho` Bool)
        `la` Or `hu` (is `ho'hd` (||) `ho` Bool)
        `li` is @Combinated operation
-
  Calling name args -> intro @Engine `hv` Unit
-  `yuk____` Run `hv__` Given `hv` is @Flowings `yo` find name
-  `yok____` Try `ha__` None `hu_` Error `ha` Runtime `hv` Unknown name `la` Ok
-  `yok____` Try `ha__` match `hv` args
+  `yuk____` Run `hv` params args `lu'yp` Run `hv` setup name
+  `yok____` Try `ha__` order `ho_'yoikl` Run `ha` Try `ha` match
+  `yok____` Run `ha__` calls
   `yuk____` Run `hv__` intro @Engine `hv` Bool True
 
-setup name = intro @Engine `hv` Unit
+setup name = intro @Engine @(AR) `hv` Unit
  `yuk____` Run `hv__` Given `hv` is @Flowings `yo` find name
- `yok____` Try `ha__` None `hu_` Error `ha` Runtime `hv` Unknown name `la` Ok
+ `yok____` Try `ha__` Error `ha` Runtime `ha` Unknown `la` Ok @Flow
 
--- TODO: we should evaluate expressions to values first!
-match :: Nonempty List `T` Recursive Expression
-  `AR___` ((Nonempty List `T` Argument) `P` (Nonempty List `T` Recursive Statement))
-    `AR_` Stops Reason (Nonempty List `T'I` Equipped String (Recursive Expression))
-    -- `AR_` Stops Reason Bindings
+params args = is @(Nonempty List `T` Recursive Expression)
+ args `yokl` Forth `ha` Run `ha` expression
 
-match exprs (These names body) =
- exprs `lu'yr` Align `hv` (names `yo` argName)
+match :: Nonempty List Value `P` Nonempty List Argument `AR` Stops Reason Bindings
+match (These values names) = values `lu'yr` Align `hv` (names `yo` argName)
  `yokl` Run `ho` Forth `ha__` Error `ha` Runtime `ha` Valency `la` Ok `ha` Equip
-
- -- `yok_` Run `ha` (\x -> x `yokl'yokl` Forth `ha` Run `ha` Run `ha` expression)
- -- `yok_` New `ha` State `ha` Event `ha` put @Bindings `ha` to `ha` wrap @AR @(Nonempty List `T'TT'I` Equipped String `T'I_` Value)
- -- `yok_` Run `ha` (is `hu` evalBody body)
- -- `lo'yp` Run `ha` intro @Engine @AR
- -- `yok_` New `ha` State `ha` Event `ha` put @Bindings `ha` that
+ `yo__` to `ha` wrap @(AR) @(Nonempty List `T'TT'I` Equipped String `T'I_` Value)
 
 tap :: forall target . Value `M` target `S` target `AR___` Error Reason target
 tap = Some `hu_` Error `ha` Runtime `ha` Require `hv` Unit `la` Valid @target
 
--- callBody :: [Recursive Statement] -> ValueEnv -> EvalIR (Maybe Value, ValueEnv)
--- callBody body callEnv = runReaderT (evalBody body) <$> ask >>= lift `ha` lift `ha` flip runStateT callEnv
+order (These x (These xx xxx)) = These (These x xx) xxx
 
+calls :: Bindings `P` (Nonempty List `T` Recursive Statement) `AR` Engine Bindings
+calls (These ctx body) = intro @Engine `hv` Unit
+ `yuk___` New `ha` State `ha` Event `ha` put @Bindings `hv` ctx
+ `yok___` Ok `hu_` Run `hv` block body `lo'yp` Run `ha` intro @Engine @(AR)
+ `yok___` New `ha` State `ha` Event `ha` put @Bindings `ha` that
 
--- `yuk____` Run `hv__` setup name
-
--- Nonempty List (Recursive Statement) `P` Nonempty List Argument
-
-    -- x `yiokl'yokl` f
-  -- `yuk____` Run `hv` flow name
-  -- args `yokl` Forth `ha` Run `ha` expression
-
-  -- Just (These body params) -> do
-    -- argVals <- for (toList args) evalExpr
-    -- if length (toList params) /= length argVals
-      -- then throwError $ RuntimeError ("Arity mismatch calling: " ++ name)
-      -- else fromJust `ha` fst <$> do callBody (toList body) `ha` fromList $ zip (toList $ params `yo` argName) argVals
-
--- flow name = intro @Engine `hv` Unit
- -- `yuk____` Run `hv__` Given `hv` is @Flowings `yo` find name
- -- `yok____` Try `ha__` None `hu_` Error `ha` Runtime `hv` Unknown name `la` Ok
-
--- Calling String (Nonempty List (Expression _))
-
--- type Flow = Nonempty List (Recursive Statement) `P` Nonempty List Argument
-
-evalBody :: Nonempty List `T` Recursive Statement `AR___` Engine (Nonempty List Unit)
-evalBody stmts = stmts `yokl` Forth `ha` Run `ha` evaluate
+block :: Nonempty List `T` Recursive Statement `AR___` Engine (Nonempty List Unit)
+block stmts = stmts `yokl` Forth `ha` Run `ha` evaluate
 
 evaluate :: Recursive Statement `AR__` Engine Unit
 evaluate x = statement x `yok_` Try `ha__` Continue `la` Interrupt `ha` Returns
