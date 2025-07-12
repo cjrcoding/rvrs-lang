@@ -75,7 +75,7 @@ expression x = case unwrap x of
        `li` is @Combinated operation
  Calling name args -> intro @Engine `hv` Unit
   `yuk____` Run `hv` params args `lu'yp` Run `hv` setup name
-  `yok____` Try `ha__` order `ho_'yoikl` Run `ha` Try `ha` match
+  `yok____` Try `ha__` unwrap @AR `ho_'yoikl` Run `ha` Try `ha` match
   `yok____` Run `ha__` calls
   `yuk____` Run `hv__` intro @Engine `hv` Bool True
 
@@ -94,8 +94,6 @@ match (These values names) = values `lu'yr` Align `hv` (names `yo` argName)
 tap :: forall target . Value `M` target `S` target `AR___` Error Reason target
 tap = Some `hu_` Error `ha` Runtime `ha` Require `hv` Unit `la` Valid @target
 
-order (These x (These xx xxx)) = These (These x xx) xxx
-
 calls :: Bindings `P` (Nonempty List `T` Recursive Statement) `AR` Engine Bindings
 calls (These ctx body) = intro @Engine `hv` Unit
  `yuk___` New `ha` State `ha` Event `ha` put @Bindings `hv` ctx
@@ -104,6 +102,8 @@ calls (These ctx body) = intro @Engine `hv` Unit
 
 block :: Nonempty List `T` Recursive Statement `AR___` Engine (Nonempty List Unit)
 block stmts = stmts `yokl` Forth `ha` Run `ha` evaluate
+
+string = "TEST"
 
 evaluate :: Recursive Statement `AR__` Engine Unit
 evaluate x = statement x `yok_` Try `ha__` Continue `la` Interrupt `ha` Returns
