@@ -5,6 +5,7 @@ import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 import Control.Monad (void)
 import Control.Monad.Combinators.Expr
+import GHC.IsList (fromList)
 import Data.Void
 import Data.Char (isAlphaNum)
 
@@ -58,7 +59,7 @@ sourceParser = Source `ho'ho'ho` Recursive
 bareCallStmt :: Parser (Recursive Statement)
 bareCallStmt = Call `ho'ho` Recursive
   <$> identifier
-  <*> between (symbol "(") (symbol ")") (exprParser `sepBy` symbol ",")
+  <*> do fromList <$> do between (symbol "(") (symbol ")") (exprParser `sepBy` symbol ",")
 
 -- Delta parser supporting both typed and untyped declarations
 deltaParser :: Parser (Recursive Statement)
@@ -87,7 +88,7 @@ blockParser = between (symbol "{") (symbol "}") (many (sc *> statementParser <* 
 callStmt :: Parser (Recursive Statement)
 callStmt = Call `ho'ho` Recursive
   <$> do symbol "call" *> identifier
-  <*> do option [] . parens $ exprParser `sepBy` symbol ","
+  <*> do fromList <$> do option [] . parens $ exprParser `sepBy` symbol ","
 
 -- Shared utilities
 

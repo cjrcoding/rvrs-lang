@@ -25,7 +25,6 @@ import qualified Control.Monad.State as T (get)
 import Control.Monad.Reader (ReaderT, runReaderT, ask, lift)
 import GHC.IsList (fromList, toList)
 import System.IO (readFile)
-
 import Ya (Object (..), type T'I, type P, type Recursive (..), pattern Unit, pattern Try, is, at, by, this, unwrap, ha, ho, ho___'yok, hu, hv, hv__, la, li, lu'yp, lu'ys'la, yo, yok, yu)
 import Ya.World (World, pattern World)
 import Ya.Literal ()
@@ -90,7 +89,7 @@ evalStmt stmt = case unwrap stmt of
     case Map.lookup name flowMap of
       Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
       Just (These params body) -> do
-        Nothing <$ do for args evalExpr >>= lift `ha` lift `ha` runStateT (runReaderT (evalBody (toList body)) flowMap) `ha` fromList `ha` zip (toList $ params `yo` argName)
+        Nothing <$ do for (toList args) evalExpr >>= lift `ha` lift `ha` runStateT (runReaderT (evalBody (toList body)) flowMap) `ha` fromList `ha` zip (toList $ params `yo` argName)
 
   Return expr ->
     Just <$> evalExpr expr

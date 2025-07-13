@@ -40,6 +40,13 @@ statement :: Recursive Statement `AR__` Engine `T'I` Optional Value
 statement x = case unwrap x of
  Return e -> expression e `yo` Some
 
+ -- Call name args -> intro @Engine `hv` Unit
+    -- flowMap <- ask
+    -- case Map.lookup name flowMap of
+      -- Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
+      -- Just (These params body) -> do
+        -- Nothing <$ do for args evalExpr >>= lift `ha` lift `ha` runStateT (runReaderT (evalBody (toList body)) flowMap) `ha` fromList `ha` zip (toList $ params `yo` argName)
+
 expression :: Recursive Expression `AR__` Engine `T'I` Value
 expression x = case unwrap x of
  Literal val -> intro @Engine `hv` val

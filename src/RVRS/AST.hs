@@ -1,6 +1,6 @@
 module RVRS.AST where
 
-import Ya (Tagged (Tag), type (#), type T'I, type AR, P, S, Object (This, That), Recursive (..), type Unit, type Nonempty, type List)
+import Ya (Tagged (Tag), type (#), type T, type AR, P, S, Object (This, That), Recursive (..), type Unit, type Nonempty, type List)
 
 import Ya.Instances ()
 import Ya.Literal ()
@@ -25,7 +25,7 @@ data Statement e
   | Echo (Recursive Expression)                           -- echo x
   | Pillar String (Recursive Expression)  -- pillar NAME = ...
   | Return (Recursive Expression)
-  | Call String [Recursive Expression]
+  | Call String (Nonempty List `T` Recursive Expression)
   | Assert (Recursive Expression)
   deriving (Show, Eq)
 
