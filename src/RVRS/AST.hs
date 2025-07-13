@@ -19,7 +19,7 @@ data Argument = Argument
 data Statement e
   = Source String (Maybe Typed) (Recursive Expression)                 -- source x = ...
   | Delta String (Maybe Typed) (Recursive Expression)
-  | Branch (Recursive Expression) [e] [e]-- branch cond { ... } else { ... }
+  | Branch (Recursive Expression) (Nonempty List e) (Nonempty List e)-- branch cond { ... } else { ... }
   | Mouth (Recursive Expression)                          -- mouth "..."
   | Whisper (Recursive Expression)
   | Echo (Recursive Expression)                           -- echo x

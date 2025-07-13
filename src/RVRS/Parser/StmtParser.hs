@@ -79,8 +79,8 @@ returnParser = Recursive <$> Return <$> do symbol "return" *> exprParser
 branchParser :: Parser (Recursive Statement)
 branchParser = Branch `ho'ho'ho` Recursive
   <$> do symbol "branch" *> exprParser
-  <*> do sc *> blockParser
-  <*> do maybe [] id <$> do optional . try $ sc *> symbol "else" *> sc *> blockParser
+  <*> do fromList <$> do sc *> blockParser
+  <*> do fromList <$> do maybe [] id <$> do optional . try $ sc *> symbol "else" *> sc *> blockParser
 
 blockParser :: Parser [Recursive Statement]
 blockParser = between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc))

@@ -26,9 +26,9 @@ genStmt stmt = case unwrap stmt of
   Echo expr -> ["return " ++ genExpr expr]
   Branch cond tBranch fBranch ->
     ["if " ++ genExpr cond ++ " {"] ++
-    indent (concatMap genStmt tBranch) ++
+    indent (concatMap genStmt $ toList tBranch) ++
     ["} else {"] ++
-    indent (concatMap genStmt fBranch) ++
+    indent (concatMap genStmt $ toList fBranch) ++
     ["}"]
 
 -- | Convert an expression into Aiken-compatible syntax

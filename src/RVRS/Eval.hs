@@ -102,8 +102,8 @@ evalStmt stmt = case unwrap stmt of
 
   Branch cond tBlock eBlock ->
     evalExpr cond >>= \case
-      Bool True -> isolate (evalBody tBlock)
-      Bool False -> isolate (evalBody eBlock)
+      Bool True -> isolate (evalBody $ toList tBlock)
+      Bool False -> isolate (evalBody $ toList eBlock)
       _           -> throwError $ RuntimeError "Condition must be boolean"
 
   Delta name _mType expr ->
