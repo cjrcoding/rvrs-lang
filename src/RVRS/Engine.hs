@@ -1,8 +1,9 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 module RVRS.Engine where
 
-import Prelude (Bool (..), Double, (+), (-), (*), (/), (&&), (||), (<), (==), (>))
+import Prelude (Double, (+), (-), (*), (/), (<), (==), (>))
 import Data.List ((++))
+import Data.Bool (Bool (..), bool, (&&), (||))
 import Data.String (String)
 import Data.Map (Map, insert, union)
 import qualified Data.Map as Map (lookup)
@@ -26,26 +27,28 @@ type Reason = Runtime `S` Value
 pattern Runtime e = This e :: Reason
 pattern Returns e = That e :: Reason
 
--- type Runtime = Value `P` Typed `S` String `S` String `S` (Argument `S` Value)
-type Runtime = Unit `S` String `S` String `S` (Value `S` String)
+type Runtime = Unit `S` String `S` String `S` (Value `S` String) `S` Recursive Expression
 
-pattern Require e = This (This (This e))
-pattern Unknown e = This (This (That e))
-pattern Unbound e = This (That e)
-pattern Valency e = That e
+pattern Require e = This (This (This (This e)))
+pattern Unknown e = This (This (This (That e)))
+pattern Unbound e = This (This (That e))
+pattern Valency e = This (That e)
+pattern Neglect e = That e
 
 type Engine = Given Flowings `JNT` State Bindings `JNT` Stops Reason `JNT` World
 
 statement :: Recursive Statement `AR__` Engine `T'I` Optional Value
 statement x = case unwrap x of
  Return e -> expression e `yo` Some
-
- -- Call name args -> intro @Engine `hv` Unit
-    -- flowMap <- ask
-    -- case Map.lookup name flowMap of
-      -- Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
-      -- Just (These params body) -> do
-        -- Nothing <$ do for args evalExpr >>= lift `ha` lift `ha` runStateT (runReaderT (evalBody (toList body)) flowMap) `ha` fromList `ha` zip (toList $ params `yo` argName)
+ Call name args -> intro @Engine `hv` Unit
+  `yuk____` Run `hv` params args `lu'yp` Run `hv` setup name
+  `yok____` Try `ha__` unwrap @AR `ho_'yoikl` Run `ha` Try `ha` match
+  `yok____` Run `ha__` calls
+  `yuk____` Run `hv__` intro @Engine `ha` None `hv` Unit
+ Assert expr -> intro @Engine `hv` Unit
+  `yuk____` Run `hv` expression expr
+  `yok____` Try `ha` tap `ha` on @Bool
+  `yok____` Try `ha` assert expr
 
 expression :: Recursive Expression `AR__` Engine `T'I` Value
 expression x = case unwrap x of
@@ -114,3 +117,5 @@ string = "TEST"
 
 evaluate :: Recursive Statement `AR__` Engine Unit
 evaluate x = statement x `yok_` Try `ha__` Continue `la` Interrupt `ha` Returns
+
+assert expr = bool (Error `ha` Runtime `ha` Neglect `hv` expr) (Ok `ha` None `hv` Unit)
