@@ -35,7 +35,7 @@ genStmt stmt = case unwrap stmt of
 genExpr :: Recursive Expression -> String
 genExpr expr = case unwrap expr of
   Variable x -> x
-  Literal x -> is `ho'he` show @String `la` is `ho'he` show @Double `la` is `ho'he` bool "false" "true"  `li` x
+  Literal x -> is `ho` show @String `la` is `ho` show @Double `la` is `ho` bool "false" "true"  `li` x
   Operator (Binary (These (These x y) (Comparison (Equals _)))) -> genExpr x ++ " == " ++ genExpr y
 
 -- | Render a function argument

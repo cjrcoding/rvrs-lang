@@ -4,7 +4,7 @@ import Prelude
 import Data.Bool (bool)
 import GHC.IsList (toList)
 
-import Ya (type AR, Recursive (..), Object (These), is, ho, ho'he, hu, li, la, la__)
+import Ya (type AR, Recursive (..), Object (These), is, ho, hu, li, la, la__)
 
 import RVRS.AST
 
@@ -15,7 +15,7 @@ prettyExpr expr = case expr of
   Recursive (Operator (Unary (Not e))) -> "(not " ++ prettyExpr e ++ ")"
   Recursive (Operator (Unary (Neg e))) -> "(-" ++ prettyExpr e ++ ")"
   Recursive (Calling name args) -> "call " ++ name ++ "(" ++ unwords (prettyExpr <$> toList args) ++ ")"
-  Recursive (Literal x) -> is `ho'he` show @String `la` is `ho'he` show @Double `la` is `ho'he` bool "false" "true" `li` x
+  Recursive (Literal x) -> is `ho` show @String `la` is `ho` show @Double `la` is `ho` bool "false" "true" `li` x
 
 bin :: Dyadic `AR` String
 bin = Add `hu` " + " `la` Sub `hu` " - " `la` Mul `hu` " * " `la` Div `hu` " / "

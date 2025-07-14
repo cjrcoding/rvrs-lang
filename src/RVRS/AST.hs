@@ -19,7 +19,7 @@ data Argument = Argument
 data Statement e
   = Source String (Maybe Typed) (Recursive Expression)                 -- source x = ...
   | Delta String (Maybe Typed) (Recursive Expression)
-  | Branch (Recursive Expression) (Nonempty List e) (Nonempty List e)-- branch cond { ... } else { ... }
+  | Branch (Recursive Expression) (Nonempty List e) (Nonempty List e) -- branch cond { ... } else { ... }
   | Mouth (Recursive Expression)                          -- mouth "..."
   | Whisper (Recursive Expression)
   | Echo (Recursive Expression)                           -- echo x
@@ -37,11 +37,11 @@ data Expression e
   deriving (Show, Eq)
 
 type Primitive string double bool
- = (String # string) `S` (Double # double) `S` (Bool # bool)
+ = string `S` double `S` bool
 
-pattern String x = This (This (Tag @String x)) :: Primitive string double bool
-pattern Double x = This (That (Tag @Double x)) :: Primitive string double bool
-pattern Bool x = That (Tag @Bool x) :: Primitive string double bool
+pattern String x = This (This x) :: Primitive string double bool
+pattern Double x = This (That x) :: Primitive string double bool
+pattern Bool x = That x :: Primitive string double bool
 
 type Value = Primitive String Double Bool
 

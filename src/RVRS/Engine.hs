@@ -49,6 +49,10 @@ statement x = case unwrap x of
   `yuk____` Run `hv` expression expr
   `yok____` Try `ha` tap `ha` on @Bool
   `yok____` Try `ha` assert expr
+ -- Branch expr if_block else_block -> intro @Engine `hv` Unit
+  -- `yuk____` Run `hv` expression expr
+  -- `yok____` Try `ha` tap `ha` on @Bool
+  -- `yuk____` Run `ha` calls `ha` bool if_block else_block
 
 expression :: Recursive Expression `AR__` Engine `T'I` Value
 expression x = case unwrap x of
