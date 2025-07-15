@@ -5,37 +5,67 @@ module RVRS.Typecheck.Stmt where
 
 -- TODO: Statement Type-checking Coverage
 --
--- This checklist tracks which statement forms are covered in `typeOfStmt`
--- and what logic still needs to be implemented.
---
+-- This checklist tracks progress in `typeOfStmt` and outlines what's implemented,
+-- what remains, and what each statement type must enforce.
+
 -- ✅ Delta
---   - RHS expression type-checks
---   - Annotation match enforced
---
--- 🔜 Source
---   - Ensure var exists & immutability
---
--- 🔜 Echo
--- 🔜 Mouth
---
--- 🔜 Assert
---   - Must evaluate to Bool
---
--- 🔜 Branch
---   - Bool condition, type-check both blocks
---
--- 🔜 Return
---   - Match flow’s expected return type
---
--- 🔜 Call
---   - Arg/return type validation
---
+--   - RHS expression must type-check successfully
+--   - If annotated, ensure annotation matches inferred type
+
+-- 🟡 Source
+--   - Lookup variable: must already exist in environment
+--   - Ensure RHS type matches declared variable type
+--   - Enforce immutability (no reassignment to Source-bound vars)
+--   - Return updated environment or RedefinedVar error
+
+-- 🟢 Echo
+--   - Type-check expression
+--   - Returns Unit or allows passthrough
+--   - Ensure expression is well-typed
+
+-- 🟢 Mouth
+--   - Type-check argument expression
+--   - Returns Unit or passthrough
+--   - Ensure no side-effect errors
+
+-- ✅ Assert
+--   - Expression must type-check to Bool
+--   - Else return BadAssertType error
+--   - Assert itself returns Unit
+
+-- 🔴 Branch
+--   - Condition expression must type-check to Bool
+--   - Both blocks type-checked in isolation
+--   - Optionally enforce both branches unify in return type
+--   - Merge environments correctly
+
+-- 🔴 Return
+--   - Type-check expression to match flow’s return type
+--   - May require storing expected return type in context
+--   - Return type info to caller
+
+-- 🔴 Call
+--   - Lookup flow definition by name
+--   - Type-check arguments against flow’s parameters
+--   - Ensure return type aligns with expected context
+--   - Insert any scoped bindings as needed
+
 -- ✅ Fallback
---   - Catch-all `Unsupported` to avoid crashes
---
--- Final tasks
---   • Eliminate remaining “Unhandled statement” test failures
---   • Add negative tests (assert non-Bool, branch mismatches, etc.)
+--   - Catch-all `UnsupportedStmt` ensures non-exhaustive cases don’t crash
+
+-- Final Tasks
+--   • Eliminate “Unhandled statement” test failures
+--   • Add negative tests for invalid usage:
+--     - Assert on non-Bool
+--     - Branch condition not Bool
+--     - Source reassignment
+--     - Return with wrong type
+--     - Calling flow with wrong arity or types
+--   • Once all branches covered, remove fallback or move it to end as a guard
+
+-- Tip:
+-- Use descriptive error constructors for all remaining types, e.g., BadBranchCond, BadReturnType, etc.
+
 
 
 
