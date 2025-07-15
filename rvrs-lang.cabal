@@ -176,3 +176,5 @@ executable TestTypeCheckStmt
       RVRS.AST
     , RVRS.Typecheck.Stmt
     , Ya.Instances
+    , RVRS.Checker
+    , RVRS.Value

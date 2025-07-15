@@ -62,6 +62,10 @@ import Ya hiding (Binary)
 import Data.Map (Map)
 import qualified Data.Map as Map
 
+liftError :: (e1 -> e2) -> Error e1 a -> Error e2 a
+liftError f (Ok x)   = Ok x
+liftError f (Error e) = Error (f e)
+
 -- Statement-level errors
 type StmtTypes = Types `S` (String, Typed, Typed) `S` String `S` Typed
 
@@ -84,13 +88,18 @@ typeOfStmt env stmt = case unwrap stmt of
         then Ok `hv` Map.insert name anno env
         else Error `ha` ExprTypeError `ha` Unexpected `hv` (anno `lu` found))
 
-  -- Delta name Nothing expr ->
-    -- expression env expr `yok` Try `ha__` \found ->
-      -- Ok `hv` Map.insert name found env
+  Delta name Nothing expr ->
+    let typedExpr :: Error StmtTypes Typed
+        typedExpr = liftError ExprTypeError (expression env expr)
+    in typedExpr
+        `yok` Try `ha` \found ->
+            (Ok `hv` (Map.insert name found env) :: Error StmtTypes (Map String Typed))
+  _ -> Error `ha` ExprTypeError `ha` Unsupported `hv` "Unhandled statement"
 
-  -- _ -> Error (UnsupportedStmt (show stmt))
+
 
 -- typeOfBlock :: Map String Typed -> [Recursive Statement] -> Error StmtTypes (Map String Typed)
 -- typeOfBlock initial = foldl step (Ok initial)
   -- where
     -- step acc stmt = acc `yok` Try `ha__` \env -> typeOfStmt env stmt
+
