@@ -69,7 +69,7 @@ module RVRS.Typecheck.Stmt where
 
 
 
-import Prelude (Eq(..), Show(..), String, Maybe (..), Bool, (==), ($), (.), foldl)
+import Prelude (Eq(..), Show(..), String, Maybe(..), Bool(..), (==), ($), (.), foldl)
 import RVRS.AST
 import RVRS.Value
 import RVRS.Checker
@@ -79,55 +79,66 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 
 liftError :: (e1 -> e2) -> Error e1 a -> Error e2 a
-liftError f (Ok x)   = Ok x
+liftError f (Ok x)    = Ok x
 liftError f (Error e) = Error (f e)
 
 -- Statement-level errors
 type StmtTypes = Types `S` (String, Typed, Typed) `S` String `S` Typed
 
-pattern ExprTypeError x = This (This (This x)) :: StmtTypes
-pattern TypeMismatchStmt x = This (This (That x)) :: StmtTypes
-pattern RedefinedVar x = This (That x) :: StmtTypes
-pattern BadAssertType x = That x :: StmtTypes
+pattern ExprTypeError x     = This (This (This x)) :: StmtTypes
+pattern TypeMismatchStmt x  = This (This (That x)) :: StmtTypes
+pattern RedefinedVar x      = This (That x)        :: StmtTypes
+pattern BadAssertType x     = That x               :: StmtTypes
 
 typeOfStmt :: Map String Typed -> Recursive Statement -> Error StmtTypes (Map String Typed)
 typeOfStmt env stmt = case unwrap stmt of
+
+  -- Delta with literal and annotation
   Delta name (Just anno) (Recursive (Literal found)) ->
     let foundType = valueToType found in
     if foundType == anno
       then Ok `hv` Map.insert name anno env
       else Error `ha` TypeMismatchStmt `hv` (name, anno, foundType)
 
+  -- Delta with annotation
   Delta name (Just anno) expr ->
-    (Error `ha` ExprTypeError `la` Ok `li` expression env expr) `yok` Try `ha` (\found ->
-      if found == anno
-        then Ok `hv` Map.insert name anno env
-        else Error `ha` ExprTypeError `ha` Unexpected `hv` (anno `lu` found))
+    (Error `ha` ExprTypeError `la` Ok `li` expression env expr)
+      `yok` Try `ha` \found ->
+        if found == anno
+          then (Ok `hv` Map.insert name anno env :: Error StmtTypes (Map String Typed))
+          else Error `ha` ExprTypeError `ha` Unexpected `hv` (anno `lu` found)
 
+  -- Delta with no annotation
   Delta name Nothing expr ->
-    let typedExpr :: Error StmtTypes Typed
-        typedExpr = liftError ExprTypeError (expression env expr)
-    in typedExpr
-        `yok` Try `ha` \found ->
-            (Ok `hv` (Map.insert name found env) :: Error StmtTypes (Map String Typed))
+    let typedExpr = liftError ExprTypeError (expression env expr)
+    in typedExpr `yok` Try `ha` \found ->
+         (Ok `hv` Map.insert name found env :: Error StmtTypes (Map String Typed))
 
+  -- Source redefinition check
+  Source name _ _ | Map.member name env ->
+    Error `ha` RedefinedVar `hv` name
 
+  -- Source with no annotation
+  Source name Nothing expr ->
+    liftError ExprTypeError (expression env expr)
+      `yok` Try `ha` \found ->
+        (Ok `hv` Map.insert name found env :: Error StmtTypes (Map String Typed))
+
+  -- Source with annotation
+  Source name (Just anno) expr ->
+    liftError ExprTypeError (expression env expr)
+      `yok` Try `ha` \found ->
+        if found == anno
+          then (Ok `hv` Map.insert name anno env :: Error StmtTypes (Map String Typed))
+          else Error `ha` TypeMismatchStmt `hv` (name, anno, found)
+
+  -- Assert
   Assert expr ->
-    let typedExpr :: Error StmtTypes Typed
-        typedExpr = liftError ExprTypeError (expression env expr)
+    let typedExpr = liftError ExprTypeError (expression env expr)
     in typedExpr `yok` Try `ha` \found ->
          if found == Bool Unit
            then Ok `hv` env
            else Error `ha` BadAssertType `hv` found
+
+  -- Fallback
   _ -> Error `ha` ExprTypeError `ha` Unsupported `hv` "Unhandled statement"
-
-
-
-
-
-
--- typeOfBlock :: Map String Typed -> [Recursive Statement] -> Error StmtTypes (Map String Typed)
--- typeOfBlock initial = foldl step (Ok initial)
-  -- where
-    -- step acc stmt = acc `yok` Try `ha__` \env -> typeOfStmt env stmt
-
