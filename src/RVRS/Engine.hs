@@ -20,8 +20,6 @@ type Bindings = Map String Value
 
 type Flowings = Map String Flow
 
-type Stops = Error
-
 type Reason = Runtime `S` Value
 
 pattern Runtime e = This e :: Reason
@@ -56,6 +54,10 @@ statement x = case unwrap x of
   `yok____` Ok `hu_` Old `ha` State `ha` Event `hv` get @Bindings
      `lo'yp` Old `ha` intro @(State Bindings) @(AR)
   `yok____` Run `ha` calls `ha'ho` bool if_block else_block `ho'yu` None Unit
+ Delta name _ expr -> intro @Engine `hv` Unit
+  `yuk____` Run `hv` expression expr
+  `yok____` New `ha` State `ha` Event `ha` save @String @Value name
+  `ho___'yo` Some `ha` that @Value
 
 expression :: Recursive Expression `AR__` Engine `T'I` Value
 expression x = case unwrap x of
