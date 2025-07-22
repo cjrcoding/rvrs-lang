@@ -37,6 +37,7 @@ pattern Neglect e = That e
 
 type Engine = Given Flowings `JNT` State Bindings `JNT` Stops Reason `JNT` World
 
+-- TODO: can we avoid optionality in resulting value here?
 statement :: Recursive Statement `AR__` Engine `T'I` Optional Value
 statement x = case unwrap x of
  Return e -> expression e `yo` Some
@@ -49,10 +50,12 @@ statement x = case unwrap x of
   `yuk____` Run `hv` expression expr
   `yok____` Try `ha` tap `ha` on @Bool
   `yok____` Try `ha` assert expr
- -- Branch expr if_block else_block -> intro @Engine `hv` Unit
-  -- `yuk____` Run `hv` expression expr
-  -- `yok____` Try `ha` tap `ha` on @Bool
-  -- `yuk____` Run `ha` calls `ha` bool if_block else_block
+ Branch expr if_block else_block -> intro @Engine `hv` Unit
+  `yuk____` Run `hv` expression expr
+  `yok____` Try `ha` tap `ha` on @Bool
+  `yok____` Ok `hu_` Old `ha` State `ha` Event `hv` get @Bindings
+     `lo'yp` Old `ha` intro @(State Bindings) @(AR)
+  `yok____` Run `ha` calls `ha'ho` bool if_block else_block `ho'yu` None Unit
 
 expression :: Recursive Expression `AR__` Engine `T'I` Value
 expression x = case unwrap x of
@@ -116,8 +119,6 @@ calls (These ctx body) = intro @Engine `hv` Unit
 
 block :: Nonempty List `T` Recursive Statement `AR___` Engine (Nonempty List Unit)
 block stmts = stmts `yokl` Forth `ha` Run `ha` evaluate
-
-string = "TEST"
 
 evaluate :: Recursive Statement `AR__` Engine Unit
 evaluate x = statement x `yok_` Try `ha__` Continue `la` Interrupt `ha` Returns
