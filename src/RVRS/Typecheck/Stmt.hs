@@ -3,7 +3,7 @@
 
 module RVRS.Typecheck.Stmt where
 
--- TODO: Statement Type-checking Coverage
+-- ✅ Statement Type-checking Coverage (as of July 23, 2025)
 --
 -- This checklist tracks progress in `typeOfStmt` and outlines what's implemented,
 -- what remains, and what each statement type must enforce.
@@ -12,26 +12,26 @@ module RVRS.Typecheck.Stmt where
 --   - RHS expression must type-check successfully
 --   - If annotated, ensure annotation matches inferred type
 
--- 🟡 Source
+-- ✅ Source
 --   - Lookup variable: must already exist in environment
 --   - Ensure RHS type matches declared variable type
 --   - Enforce immutability (no reassignment to Source-bound vars)
 --   - Return updated environment or RedefinedVar error
 
 -- 🟢 Echo
---   - Type-check expression
---   - Returns Unit or allows passthrough
---   - Ensure expression is well-typed
+--   - Type-check expression ✔
+--   - Returns Unit or passthrough ⬜ (Unit not yet enforced strictly)
+--   - Ensure expression is well-typed ✔
 
 -- 🟢 Mouth
---   - Type-check argument expression
---   - Returns Unit or passthrough
---   - Ensure no side-effect errors
+--   - Type-check argument expression ✔
+--   - Returns Unit or passthrough ⬜
+--   - Ensure no side-effect errors ⬜
 
 -- ✅ Assert
---   - Expression must type-check to Bool
---   - Else return BadAssertType error
---   - Assert itself returns Unit
+--   - Expression must type-check to Bool ✔
+--   - Else return BadAssertType error ✔
+--   - Assert itself returns Unit (implicit) ✔
 
 -- 🔴 Branch
 --   - Condition expression must type-check to Bool
@@ -53,18 +53,20 @@ module RVRS.Typecheck.Stmt where
 -- ✅ Fallback
 --   - Catch-all `UnsupportedStmt` ensures non-exhaustive cases don’t crash
 
--- Final Tasks
---   • Eliminate “Unhandled statement” test failures
+-- 🧪 Final Tasks
+--   • Eliminate “Unhandled statement” test failures (✅ partially done)
 --   • Add negative tests for invalid usage:
---     - Assert on non-Bool
---     - Branch condition not Bool
---     - Source reassignment
---     - Return with wrong type
---     - Calling flow with wrong arity or types
+--     - ✅ Assert on non-Bool
+--     - ✅ Branch condition not Bool
+--     - ✅ Source reassignment
+--     - ⬜ Return with wrong type
+--     - ⬜ Calling flow with wrong arity or types
 --   • Once all branches covered, remove fallback or move it to end as a guard
 
--- Tip:
--- Use descriptive error constructors for all remaining types, e.g., BadBranchCond, BadReturnType, etc.
+-- 🔧 Tip:
+-- Use descriptive error constructors for remaining types:
+--   e.g., BadBranchCond, BadReturnType, WrongArgCount, FlowNotFound
+
 
 
 
