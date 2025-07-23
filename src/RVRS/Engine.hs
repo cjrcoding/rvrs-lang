@@ -25,13 +25,14 @@ type Reason = Runtime `S` Value
 pattern Runtime e = This e :: Reason
 pattern Returns e = That e :: Reason
 
-type Runtime = Unit `S` String `S` String `S` (Value `S` String) `S` Recursive Expression
+type Runtime = Unit `S` String `S` String `S` (Value `S` String) `S` Recursive Expression `S` String
 
-pattern Require e = This (This (This (This e)))
-pattern Unknown e = This (This (This (That e)))
-pattern Unbound e = This (This (That e))
-pattern Valency e = This (That e)
-pattern Neglect e = That e
+pattern Require e = This (This (This (This (This e))))
+pattern Unknown e = This (This (This (This (That e))))
+pattern Unbound e = This (This (This (That e)))
+pattern Valency e = This (This (That e))
+pattern Neglect e = This (That e)
+pattern Defined e = That e
 
 type Engine = Given Flowings `JNT` State Bindings `JNT` Stops Reason `JNT` World
 
@@ -55,6 +56,12 @@ statement x = case unwrap x of
      `lo'yp` Old `ha` intro @(State Bindings) @(AR)
   `yok____` Run `ha` calls `ha'ho` bool if_block else_block `ho'yu` None Unit
  Delta name _ expr -> intro @Engine `hv` Unit
+  `yuk____` Run `hv` expression expr
+  `yok____` New `ha` State `ha` Event `ha` save @String @Value name
+  `ho___'yo` Some `ha` that @Value
+ Source name _ expr -> intro @Engine `hv` Unit
+  `yuk____` Old `hv___` State `ha` Event `hv` get @Bindings `yo` find name
+  `yok____` Try `ha___` Error `hu_` Ok `hv` Unit `la_` Exist `hu_` Error `ha` Runtime `ha` Defined `hv` name
   `yuk____` Run `hv` expression expr
   `yok____` New `ha` State `ha` Event `ha` save @String @Value name
   `ho___'yo` Some `ha` that @Value
