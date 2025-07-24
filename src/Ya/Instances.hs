@@ -56,5 +56,10 @@ instance Mapping T'I'II T'I'II (AR) (AR) Maybe Optional where
 instance Mapping T'I'II T'I'II (AR) (AR) Optional Maybe where
   mapping = rewrap `identity` \from -> None `hu` Nothing `la` Just `ha` from
 
+-- Nonempty List `T'TT'I` Equipped key `T'I_` item -----> Map key item
 instance Ord key => Mapping T'I'II T'I'II (AR) (AR) (Construction Optional `T'TT'I` Equipped key) (Map key) where
+  mapping = rewrap `identity` \from x -> unwrap x `yo` unwrap @(AR) `ho` (\(These v k) -> (k, from v)) `yi` toList `ho` fromList
+
+-- List `T'TT'I` Equipped key `T'I_` item -----> Map key item
+instance Ord key => Mapping T'I'II T'I'II (AR) (AR) (List `T'TT'I` Equipped key) (Map key) where
   mapping = rewrap `identity` \from x -> unwrap x `yo` unwrap @(AR) `ho` (\(These v k) -> (k, from v)) `yi` toList `ho` fromList
