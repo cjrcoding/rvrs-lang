@@ -1,11 +1,12 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 module RVRS.Engine where
 
-import Prelude (Double, (+), (-), (*), (/), (<), (==), (>))
+import Prelude (Double, (+), (-), (*), (/), (<), (==), (>), putStrLn)
 import Data.List ((++))
 import Data.Bool (Bool (..), bool, (&&), (||))
 import Data.String (String)
 import Data.Map (Map, insert, union)
+import Text.Show (Show (..))
 import qualified Data.Map as Map (lookup)
 
 import Ya hiding (Binary, Not, True, False)
@@ -40,6 +41,15 @@ type Engine = Given Flowings `JNT` State Bindings `JNT` Stops Reason `JNT` World
 statement :: Recursive Statement `AR__` Engine `T'I` Optional Value
 statement x = case unwrap x of
  Return e -> expression e `yo` Some
+ Echo expr -> intro @Engine `hv` Unit
+  `yuk____` Run `hv` expression expr
+  `yok____` World `ha` display "echo: " `ho'yo` None
+ Mouth expr -> intro @Engine `hv` Unit
+  `yuk____` Run `hv` expression expr
+  `yok____` World `ha` display "mouth: " `ho'yo` None
+ Whisper expr -> intro @Engine `hv` Unit
+  `yuk____` Run `hv` expression expr
+  `yok____` World `ha` display "whisper: " `ho'yo` None
  Call name args -> intro @Engine `hv` Unit
   `yuk____` Run `hv` params args `lu'yp` Run `hv` setup name
   `yok____` Try `ha__` unwrap @(AR) `ho_'yoikl` Run `ha` Try `ha` match
@@ -61,7 +71,7 @@ statement x = case unwrap x of
   `ho___'yo` Some `ha` that @Value
  Source name _ expr -> intro @Engine `hv` Unit
   `yuk____` Old `hv___` State `ha` Event `hv` get @Bindings `yo` find name
-  `yok____` Try `ha___` Error `hu_` Ok `hv` Unit `la_` Exist `hu_` Error `ha` Runtime `ha` Defined `hv` name
+  `yok____` Try `ha___` Error `hu_` Ok `hv` Unit `la_` Some `hu_` Error `ha` Runtime `ha` Defined `hv` name
   `yuk____` Run `hv` expression expr
   `yok____` New `ha` State `ha` Event `ha` save @String @Value name
   `ho___'yo` Some `ha` that @Value
@@ -133,3 +143,6 @@ evaluate :: Recursive Statement `AR__` Engine Unit
 evaluate x = statement x `yok_` Try `ha__` Continue `la` Interrupt `ha` Returns
 
 assert expr = bool (Error `ha` Runtime `ha` Neglect `hv` expr) (Ok `ha` None `hv` Unit)
+
+display :: Show a => String -> a -> World Unit
+display label value = putStrLn (label ++ ": " ++ show value)
