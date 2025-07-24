@@ -1,15 +1,18 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 module RVRS.Engine where
 
-import Prelude (Double, (+), (-), (*), (/), (<), (==), (>), putStrLn)
+import GHC.IsList (fromList)
+import Prelude (Double, (+), (-), (*), (/), (<), (==), (>), readFile, putStrLn, error)
 import Data.List ((++))
 import Data.Bool (Bool (..), bool, (&&), (||))
 import Data.String (String)
+import Data.Either (Either (..))
+import Data.Functor ((<$>))
 import Data.Map (Map, insert, union)
 import Text.Show (Show (..))
 import qualified Data.Map as Map (lookup)
 
-import Ya hiding (Binary, Not, True, False)
+import Ya hiding (Binary, Not, True, False, Left, Right)
 import Ya.Conversion
 import Ya.World
 
@@ -146,3 +149,9 @@ assert expr = bool (Error `ha` Runtime `ha` Neglect `hv` expr) (Ok `ha` None `hv
 
 display :: Show a => String -> a -> World Unit
 display label value = putStrLn (label ++ ": " ++ show value)
+
+loadAndMergeStdlib :: World `T` Map String Flow
+loadAndMergeStdlib = readFile "stdlib/stdlib.rvrs" `yo` parseRVRS `yok` \case
+ Left err -> World `ha` error `hv` ("Stdlib parse error:\n" ++ show err)
+ Right flows -> World `ha` intro @_ @(AR) `ha` fromList
+  `hv` ((\(These flow name) -> (name, flow)) <$> flows)
