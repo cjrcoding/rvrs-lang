@@ -155,3 +155,7 @@ loadAndMergeStdlib = readFile "stdlib/stdlib.rvrs" `yo` parseRVRS `yok` \case
  Left err -> World `ha` error `hv` ("Stdlib parse error:\n" ++ show err)
  Right flows -> World `ha` intro @_ @(AR) `ha` fromList
   `hv` ((\(These flow name) -> (name, flow)) <$> flows)
+
+runEvalIR :: Map String Flow -> Map String Value -> Engine e
+ -> World (Stops Reason `T'I` Equipped `T` Map String Value `T` e)
+runEvalIR flows env action = is `hv_'he` action `he'he'hv` flows `he'he'hv` env
