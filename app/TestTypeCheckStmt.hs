@@ -3,11 +3,11 @@
 
 module Main where
 
-import Prelude (String, Double, Bool(..), Maybe (..), IO, ($), (>>), putStrLn, return, show, Eq(..))
+import Prelude (String, Double, Bool(..), Maybe (..), IO, ($), (>>), putStrLn, return, show, Eq(..), (++))
 import Test.HUnit
 import qualified Data.Map as Map
 
-import Ya (pattern Ok, pattern Error, pattern Unit)
+import Ya (pattern Ok, pattern Error, pattern Unit, pattern That, pattern This)
 import Ya (Recursive(..), ho, ho'ho, hv)
 import Ya.Instances ()
 
@@ -92,11 +92,26 @@ tests = TestList
 
   , "Branch with non-Bool condition" ~: TestCase $
       case typeOfStmt testEnv (branch (num 0) [] []) of
-        Error (BadAssertType TNum) -> return ()
-        _ -> assertFailure "Expected BadAssertType"
+        Error (TypeMismatchStmt ("<condition>", TBool, TNum)) -> return ()
+        _ -> assertFailure "Expected TypeMismatchStmt for non-Bool branch condition"
 
-  , "Return expression passes (not yet enforced)" ~:
-      typeOfStmt testEnv (ret (str "done")) ~?= Ok testEnv
+  , "Return not yet supported (expect fallback error)" ~: TestCase $
+      case typeOfStmt testEnv (ret (str "done")) of
+       Error (ExprTypeError (This (That msg))) | msg == "Unhandled statement" -> return ()
+       other -> assertFailure $ "Unexpected error: " ++ show other
+
+  , "Branch with valid Bool condition (explicit test)" ~:
+      typeOfStmt testEnv (branch (bool True)
+        [delta "z" (Just TNum) (num 1)]
+        [delta "z" (Just TNum) (num 2)])
+        ~?= Ok testEnv
+
+  , "Branch with non-Bool condition (should fail)" ~: TestCase $
+      case typeOfStmt testEnv (branch (num 0)
+        [delta "a" (Just TNum) (num 1)]
+        [delta "a" (Just TNum) (num 2)]) of
+        Error (TypeMismatchStmt ("<condition>", TBool, TNum)) -> return ()
+        _ -> assertFailure "Expected TypeMismatchStmt for non-Bool branch condition"
   ]
 
 -- Entry point

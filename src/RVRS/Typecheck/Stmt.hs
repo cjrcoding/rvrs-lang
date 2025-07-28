@@ -92,6 +92,9 @@ pattern TypeMismatchStmt x  = This (This (That x)) :: StmtTypes
 pattern RedefinedVar x      = This (That x)        :: StmtTypes
 pattern BadAssertType x     = That x               :: StmtTypes
 
+checkBlock :: Error StmtTypes (Map String Typed) -> Recursive Statement -> Error StmtTypes (Map String Typed)
+checkBlock acc stmt = acc `yok` Try `ha` \env' -> typeOfStmt env' stmt
+
 typeOfStmt :: Map String Typed -> Recursive Statement -> Error StmtTypes (Map String Typed)
 typeOfStmt env stmt = case unwrap stmt of
 
@@ -141,6 +144,23 @@ typeOfStmt env stmt = case unwrap stmt of
          if found == Bool Unit
            then Ok `hv` env
            else Error `ha` BadAssertType `hv` found
+
+  -- Branch
+  Branch cond thenBlock elseBlock ->
+    case liftError ExprTypeError (expression env cond) of
+      Error e -> Error e
+      Ok condType ->
+        case condType of
+          Bool Unit ->
+            case foldl checkBlock (Ok env) thenBlock of
+              Error e1 -> Error e1
+              Ok _ ->
+                case foldl checkBlock (Ok env) elseBlock of
+                  Error e2 -> Error e2
+                  Ok _     -> Ok `hv` env
+          otherType ->
+            Error `ha` TypeMismatchStmt `hv` ("<condition>", Bool Unit, otherType)
+
 
   -- Fallback
   _ -> Error `ha` ExprTypeError `ha` Unsupported `hv` "Unhandled statement"
