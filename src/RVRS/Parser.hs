@@ -1,21 +1,17 @@
 module RVRS.Parser (parseRVRS) where
 
--- Internal: RVRS language components
-import RVRS.AST
-import RVRS.Parser.StmtParser (statementParser)
+import Ya (type P, lu)
 
--- External: Parsing libraries
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
-
--- External: General utilities
+import GHC.IsList (fromList, toList)
 import Data.Char (isAlphaNum)
 import Data.Void
-
--- Debug (last and clear it's temporary)
 import Debug.Trace (trace)
 
+import RVRS.AST
+import RVRS.Parser.StmtParser (statementParser)
 
 type Parser = Parsec Void String
 
@@ -24,7 +20,7 @@ debug :: Bool
 debug = False  -- Set to True if you want parser debug output
 
 -- Top-level parse function
-parseRVRS :: String -> Either (ParseErrorBundle String Void) [Flow]
+parseRVRS :: String -> Either (ParseErrorBundle String Void) [Flow `P` String]
 parseRVRS input =
   case parse (between sc eof (many flowParser)) "RVRS" input of
     Left err -> trace "❌ PARSE FAILED" (Left err)
@@ -33,16 +29,11 @@ parseRVRS input =
         then trace ("✅ Parsed flows:\n" ++ show flows) (Right flows)
         else Right flows
 
-
-flowParser :: Parser Flow
-flowParser = do
-  _ <- symbol "flow" <|> symbol "ceremony"
-  name <- identifier
-  args <- argListParser
-  body <- between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc))
-  return $ Flow name args body
-
-
+flowParser :: Parser (Flow `P` String)
+flowParser = (\name params body -> params `lu` body `lu` name)
+  <$> ((symbol "flow" <|> symbol "ceremony") *> identifier)
+  <*> (fromList <$> argListParser)
+  <*> (fromList <$> between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc)))
 
 -- Optional argument list
 argListParser :: Parser [Argument]
