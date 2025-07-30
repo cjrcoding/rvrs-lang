@@ -1,9 +1,9 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 module RVRS.Engine where
 
-import GHC.IsList (fromList)
+import GHC.IsList (fromList, toList)
 import Prelude (Double, (+), (-), (*), (/), (<), (==), (>), readFile, putStrLn, error)
-import Data.List ((++))
+import Data.List ((++), zip)
 import Data.Bool (Bool (..), bool, (&&), (||))
 import Data.String (String)
 import Data.Either (Either (..))
@@ -40,46 +40,44 @@ pattern Defined e = That e
 
 type Engine = Given Flowings `JNT` State Bindings `JNT` Stops Reason `JNT` World
 
--- TODO: can we avoid optionality in resulting value here?
-statement :: Recursive Statement `AR__` Engine `T'I` Optional Value
+statement :: Recursive Statement `AR__` Engine Value
 statement x = case unwrap x of
- Return e -> expression e `yo` Some
+ Return e -> expression e
  Echo expr -> intro @Engine `hv` Unit
   `yuk____` Run `hv` expression expr
-  `yok____` World `ha` display "echo: " `ho'yo` None
+  `yok____` World `ha` display "echo: "
  Mouth expr -> intro @Engine `hv` Unit
   `yuk____` Run `hv` expression expr
-  `yok____` World `ha` display "mouth: " `ho'yo` None
+  `yok____` World `ha` display "mouth: "
  Whisper expr -> intro @Engine `hv` Unit
   `yuk____` Run `hv` expression expr
-  `yok____` World `ha` display "whisper: " `ho'yo` None
+  `yok____` World `ha` display "whisper: "
  Call name args -> intro @Engine `hv` Unit
   `yuk____` Run `hv` params args `lu'yp` Run `hv` setup name
   `yok____` Try `ha__` unwrap @(AR) `ho_'yoikl` Run `ha` Try `ha` match
   `yok____` Run `ha__` calls
-  `yuk____` Run `hv__` intro @Engine `ha` None `hv` Unit
  Assert expr -> intro @Engine `hv` Unit
   `yuk____` Run `hv` expression expr
   `yok____` Try `ha` tap `ha` on @Bool
-  `yok____` Try `ha` assert expr
+  `yok____` Try `ha` bool (Error `ha` Runtime `ha` Neglect `hv` expr) (Ok `ha` Bool `hv` True)
  Branch expr if_block else_block -> intro @Engine `hv` Unit
   `yuk____` Run `hv` expression expr
   `yok____` Try `ha` tap `ha` on @Bool
   `yok____` Ok `hu_` Old `ha` State `ha` Event `hv` get @Bindings
      `lo'yp` Old `ha` intro @(State Bindings) @(AR)
-  `yok____` Run `ha` calls `ha'ho` bool if_block else_block `ho'yu` None Unit
+  `yok____` Run `ha` calls `ha'ho` bool if_block else_block
  Delta name _ expr -> intro @Engine `hv` Unit
   `yuk____` Run `hv` expression expr
   `yok____` New `ha` State `ha` Event `ha` save @String @Value name
-  `ho___'yo` Some `ha` that @Value
+  `yok____` Try `ha` Break `ha` Returns `ha` that @Value
  Source name _ expr -> intro @Engine `hv` Unit
   `yuk____` Old `hv___` State `ha` Event `hv` get @Bindings `yo` find name
   `yok____` Try `ha___` Error `hu_` Ok `hv` Unit `la_` Some `hu_` Error `ha` Runtime `ha` Defined `hv` name
   `yuk____` Run `hv` expression expr
   `yok____` New `ha` State `ha` Event `ha` save @String @Value name
-  `ho___'yo` Some `ha` that @Value
+  `yok____` Try `ha` Break `ha` Returns `ha` that @Value
 
-expression :: Recursive Expression `AR__` Engine `T'I` Value
+expression :: Recursive Expression `AR__` Engine Value
 expression x = case unwrap x of
  Literal val -> intro @Engine `hv` val
  Variable var -> intro @Engine `hv` Unit
@@ -133,29 +131,26 @@ match (These values names) = values `lu'yr` Align `hv` (names `yo` argName)
 tap :: forall target . Value `M` target `S` target `AR___` Error Reason target
 tap = Some `hu_` Error `ha` Runtime `ha` Require `hv` Unit `la` Valid @target
 
-calls :: Bindings `P` (Nonempty List `T` Recursive Statement) `AR` Engine Bindings
-calls (These ctx body) = intro @Engine `hv` Unit
- `yuk___` New `ha` State `ha` Event `ha` put @Bindings `hv` ctx
- `yok___` Ok `hu_` Run `hv` block body `lo'yp` Run `ha` intro @Engine @(AR)
- `yok___` New `ha` State `ha` Event `ha` put @Bindings `ha` that
+calls ctxbody = intro @Engine `hv` Unit
+ `yuk___` Apply `hv__` Given `hv` is @Flowings
+ `yok___` Apply `ha__` block ctxbody
+ `yok___` Check `ha__` Error `ha` Runtime `la` Ok
 
-block :: Nonempty List `T` Recursive Statement `AR___` Engine (Nonempty List Unit)
-block stmts = stmts `yokl` Forth `ha` Run `ha` evaluate
+block :: Bindings `P` Nonempty List (Recursive Statement)
+ `AR_` Flowings `AR` World `T` Stops Runtime Value
+block (These ctx body) flows = body
+ `yokl` Forth `ha__` Run `ha` statement
+ `yi__` execute flows ctx
+ `yo__` Error `la` Ok `la` Ok `hu` (Ok `hv` Bool True)
 
-evaluate :: Recursive Statement `AR__` Engine Unit
-evaluate x = statement x `yok_` Try `ha__` Continue `la` Interrupt `ha` Returns
+execute :: Map String Flow -> Map String Value -> Engine e
+ -> World (Stops Reason `T'I` Equipped `T` Map String Value `T` e)
+execute flows bindings action = is `hv_'he` action `he'he'hv` flows `he'he'hv` bindings
 
-assert expr = bool (Error `ha` Runtime `ha` Neglect `hv` expr) (Ok `ha` None `hv` Unit)
-
-display :: Show a => String -> a -> World Unit
-display label value = putStrLn (label ++ ": " ++ show value)
+display label x = putStrLn (label ++ ": " ++ show x) `yu` x
 
 loadAndMergeStdlib :: World `T` Map String Flow
 loadAndMergeStdlib = readFile "stdlib/stdlib.rvrs" `yo` parseRVRS `yok` \case
  Left err -> World `ha` error `hv` ("Stdlib parse error:\n" ++ show err)
  Right flows -> World `ha` intro @_ @(AR) `ha` fromList
   `hv` ((\(These flow name) -> (name, flow)) <$> flows)
-
-runEvalIR :: Map String Flow -> Map String Value -> Engine e
- -> World (Stops Reason `T'I` Equipped `T` Map String Value `T` e)
-runEvalIR flows env action = is `hv_'he` action `he'he'hv` flows `he'he'hv` env
