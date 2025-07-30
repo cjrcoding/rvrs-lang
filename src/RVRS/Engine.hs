@@ -44,88 +44,88 @@ statement :: Recursive Statement `AR__` Engine Value
 statement x = case unwrap x of
  Return e -> expression e
  Echo expr -> intro @Engine `hv` Unit
-  `yuk____` Run `hv` expression expr
+  `yuk____` Apply `hv` expression expr
   `yok____` World `ha` display "echo: "
  Mouth expr -> intro @Engine `hv` Unit
-  `yuk____` Run `hv` expression expr
+  `yuk____` Apply `hv` expression expr
   `yok____` World `ha` display "mouth: "
  Whisper expr -> intro @Engine `hv` Unit
-  `yuk____` Run `hv` expression expr
+  `yuk____` Apply `hv` expression expr
   `yok____` World `ha` display "whisper: "
  Call name args -> intro @Engine `hv` Unit
-  `yuk____` Run `hv` params args `lu'yp` Run `hv` setup name
-  `yok____` Try `ha__` unwrap @(AR) `ho_'yoikl` Run `ha` Try `ha` match
-  `yok____` Run `ha__` calls
+  `yuk____` Apply `hv` params args `lu'yp` Apply `hv` setup name
+  `yok____` Check `ha__` unwrap @(AR) `ho_'yoikl` Apply `ha` Check `ha` match
+  `yok____` Apply `ha__` calls
  Assert expr -> intro @Engine `hv` Unit
-  `yuk____` Run `hv` expression expr
-  `yok____` Try `ha` tap `ha` on @Bool
-  `yok____` Try `ha` bool (Error `ha` Runtime `ha` Neglect `hv` expr) (Ok `ha` Bool `hv` True)
+  `yuk____` Apply `hv` expression expr
+  `yok____` Check `ha` tap `ha` on @Bool
+  `yok____` Check `ha` bool (Error `ha` Runtime `ha` Neglect `hv` expr) (Ok `ha` Bool `hv` True)
  Branch expr if_block else_block -> intro @Engine `hv` Unit
-  `yuk____` Run `hv` expression expr
-  `yok____` Try `ha` tap `ha` on @Bool
-  `yok____` Ok `hu_` Old `ha` State `ha` Event `hv` get @Bindings
-     `lo'yp` Old `ha` intro @(State Bindings) @(AR)
-  `yok____` Run `ha` calls `ha'ho` bool if_block else_block
+  `yuk____` Apply `hv` expression expr
+  `yok____` Check `ha` tap `ha` on @Bool
+  `yok____` Ok `hu_` Lease `ha` State `ha` Event `hv` get @Bindings
+     `lo'yp` Lease `ha` intro @(State Bindings) @(AR)
+  `yok____` Apply `ha` calls `ha'ho` bool if_block else_block
  Delta name _ expr -> intro @Engine `hv` Unit
-  `yuk____` Run `hv` expression expr
-  `yok____` New `ha` State `ha` Event `ha` save @String @Value name
-  `yok____` Try `ha` Break `ha` Returns `ha` that @Value
+  `yuk____` Apply `hv` expression expr
+  `yok____` Apply `ha` State `ha` Event `ha` save @String @Value name
+  `yok____` Check `ha` Break `ha` Returns `ha` that @Value
  Source name _ expr -> intro @Engine `hv` Unit
-  `yuk____` Old `hv___` State `ha` Event `hv` get @Bindings `yo` find name
-  `yok____` Try `ha___` Error `hu_` Ok `hv` Unit `la_` Some `hu_` Error `ha` Runtime `ha` Defined `hv` name
-  `yuk____` Run `hv` expression expr
-  `yok____` New `ha` State `ha` Event `ha` save @String @Value name
-  `yok____` Try `ha` Break `ha` Returns `ha` that @Value
+  `yuk____` Lease `hv___` State `ha` Event `hv` get @Bindings `yo` find name
+  `yok____` Check `ha___` Error `hu_` Ok `hv` Unit `la_` Some `hu_` Error `ha` Runtime `ha` Defined `hv` name
+  `yuk____` Apply `hv` expression expr
+  `yok____` Apply `ha` State `ha` Event `ha` save @String @Value name
+  `yok____` Check `ha` Break `ha` Returns `ha` that @Value
 
 expression :: Recursive Expression `AR__` Engine Value
 expression x = case unwrap x of
  Literal val -> intro @Engine `hv` val
  Variable var -> intro @Engine `hv` Unit
-  `yuk____` Old `hv__` State `ha` Event `hv` get @Bindings `yo` find var
-  `yok____` Try `ha__` Error `ha` Runtime `ha` Unbound `la` Ok
+  `yuk____` Lease `hv__` State `ha` Event `hv` get @Bindings `yo` find var
+  `yok____` Check `ha__` Error `ha` Runtime `ha` Unbound `la` Ok
  Operator (Binary (These (These x y) (Comparison operation))) -> intro @Engine `hv` Unit
-  `yuk____` Run `hv` expression x
-     `lu'yp` Run `hv` expression y
-  `yok____` Try `ha` tap `ha` on @Double `ha` this
-     `lo'yp` Try `ha` tap `ha` on @Double `ha` that
+  `yuk____` Apply `hv` expression x
+     `lu'yp` Apply `hv` expression y
+  `yok____` Check `ha` tap `ha` on @Double `ha` this
+     `lo'yp` Check `ha` tap `ha` on @Double `ha` that
   `ho___'yo` Greater `hu` (is `ho'hd` (>) `ho` Bool)
        `la` Equals `hu` (is `ho'hd` (==) `ho` Bool)
        `la` Less `hu` (is `ho'hd` (<) `ho` Bool)
        `li` is @Comparison operation
  Operator (Binary (These (These x y) (Arithmetic operation))) -> intro @Engine `hv` Unit
-  `yuk____` Run `hv` expression x
-     `lu'yp` Run `hv` expression y
-  `yok____` Try `ha` tap `ha` on @Double `ha` this
-     `lo'yp` Try `ha` tap `ha` on @Double `ha` that
+  `yuk____` Apply `hv` expression x
+     `lu'yp` Apply `hv` expression y
+  `yok____` Check `ha` tap `ha` on @Double `ha` this
+     `lo'yp` Check `ha` tap `ha` on @Double `ha` that
   `ho___'yo` Add `hu` (is `ho'hd` (+) `ho` Double)
        `la` Sub `hu` (is `ho'hd` (-) `ho` Double)
        `la` Mul `hu` (is `ho'hd` (*) `ho` Double)
        `la` Div `hu` (is `ho'hd` (/) `ho` Double)
        `li` is @Arithmetic operation
  Operator (Binary (These (These x y) (Combinated operation))) -> intro @Engine `hv` Unit
-  `yuk____` Run `hv` expression x
-     `lu'yp` Run `hv` expression y
-  `yok____` Try `ha` tap `ha` on @Bool `ha` this
-     `lo'yp` Try `ha` tap `ha` on @Bool `ha` that
+  `yuk____` Apply `hv` expression x
+     `lu'yp` Apply `hv` expression y
+  `yok____` Check `ha` tap `ha` on @Bool `ha` this
+     `lo'yp` Check `ha` tap `ha` on @Bool `ha` that
   `ho___'yo` And `hu` (is `ho'hd` (&&) `ho` Bool)
        `la` Or `hu` (is `ho'hd` (||) `ho` Bool)
        `li` is @Combinated operation
  Calling name args -> intro @Engine `hv` Unit
-  `yuk____` Run `hv` params args `lu'yp` Run `hv` setup name
-  `yok____` Try `ha__` unwrap @AR `ho_'yoikl` Run `ha` Try `ha` match
-  `yok____` Run `ha__` calls
-  `yuk____` Run `hv__` intro @Engine `hv` Bool True
+  `yuk____` Apply `hv` params args `lu'yp` Apply `hv` setup name
+  `yok____` Check `ha__` unwrap @AR `ho_'yoikl` Apply `ha` Check `ha` match
+  `yok____` Apply `ha__` calls
+  `yuk____` Apply `hv__` intro @Engine `hv` Bool True
 
 setup name = intro @Engine @(AR) `hv` Unit
- `yuk____` Run `hv__` Given `hv` is @Flowings `yo` find name
- `yok____` Try `ha__` Error `ha` Runtime `ha` Unknown `la` Ok @Flow
+ `yuk____` Apply `hv__` Given `hv` is @Flowings `yo` find name
+ `yok____` Check `ha__` Error `ha` Runtime `ha` Unknown `la` Ok @Flow
 
 params args = is @(Nonempty List `T` Recursive Expression)
- args `yokl` Forth `ha` Run `ha` expression
+ args `yokl` Forth `ha` Apply `ha` expression
 
 match :: Nonempty List Value `P` Nonempty List Argument `AR` Stops Reason Bindings
 match (These values names) = values `lu'yr` Align `hv` (names `yo` argName)
- `yokl` Run `ho` Forth `ha__` Error `ha` Runtime `ha` Valency `la` Ok `ha` Equip
+ `yokl` Apply `ho` Forth `ha__` Error `ha` Runtime `ha` Valency `la` Ok `ha` Equip
  `yo__` to `ha` wrap @(AR) @(Nonempty List `T'TT'I` Equipped String `T'I_` Value)
 
 tap :: forall target . Value `M` target `S` target `AR___` Error Reason target
@@ -139,7 +139,7 @@ calls ctxbody = intro @Engine `hv` Unit
 block :: Bindings `P` Nonempty List (Recursive Statement)
  `AR_` Flowings `AR` World `T` Stops Runtime Value
 block (These ctx body) flows = body
- `yokl` Forth `ha__` Run `ha` statement
+ `yokl` Forth `ha__` Apply `ha` statement
  `yi__` execute flows ctx
  `yo__` Error `la` Ok `la` Ok `hu` (Ok `hv` Bool True)
 
