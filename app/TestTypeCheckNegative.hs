@@ -5,6 +5,7 @@ import Test.HUnit
 import qualified Data.Map as Map
 
 import Ya (Recursive(..), pattern Unit, pattern Error, pattern Valid, yi, ho, ha, hv, lu)
+import Ya.Instances ()
 
 import RVRS.AST
 import RVRS.Checker
@@ -39,8 +40,8 @@ eq x y = x `lu` y `lu` Comparison `ha` Equals `hv` Unit `yi` Binary `ho` Operato
 -- Negative test cases (expected to fail)
 testBadAddBoolNum :: Test
 testBadAddBoolNum = TestCase $
-  case expression testEnv (add (bool `hv` True) (num 1)) of
-    Error _ -> return ()  -- ✅ expected failure
+  case expression testEnv (add (bool True) (num 1)) of
+    Error _ -> return ()
     Valid t -> assertFailure $ "Unexpected success: got " ++ show t
 
 testBadEqNumStr :: Test

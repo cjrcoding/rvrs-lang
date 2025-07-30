@@ -161,7 +161,6 @@ executable testtypechecknegative
       RVRS.AST
     , RVRS.Checker
     , RVRS.Parser.Type
-    , RVRS.Utils
     , RVRS.Value
     , Ya.Conversion
     , Ya.Instances
