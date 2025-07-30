@@ -5,6 +5,7 @@ import Test.HUnit
 import qualified Data.Map as Map
 
 import Ya (Recursive(..), pattern Unit, pattern Error, pattern Valid, yi, ho, ha, hv, lu)
+import Ya.Instances ()
 
 import RVRS.AST
 import RVRS.Checker
@@ -17,18 +18,18 @@ testEnv = Map.fromList
   , ("msg", String Unit)
   ]
 
--- Helpers
+-- Helpers using Ya visual composition
 num :: Double -> Recursive Expression
-num = Recursive . Literal . Double
+num = Double `ho` Literal `ho` Recursive
 
 bool :: Bool -> Recursive Expression
-bool = Recursive . Literal . Bool
+bool = Bool `ho` Literal `ho` Recursive
 
 str :: String -> Recursive Expression
-str = Recursive . Literal . String
+str = String `ho` Literal `ho` Recursive
 
 var :: String -> Recursive Expression
-var = Recursive . Variable
+var = Variable `ho` Recursive
 
 add :: Recursive Expression -> Recursive Expression -> Recursive Expression
 add x y = x `lu` y `lu` Arithmetic `ha` Add `hv` Unit `yi` Binary `ho` Operator `ho` Recursive
@@ -39,20 +40,20 @@ eq x y = x `lu` y `lu` Comparison `ha` Equals `hv` Unit `yi` Binary `ho` Operato
 -- Negative test cases (expected to fail)
 testBadAddBoolNum :: Test
 testBadAddBoolNum = TestCase $
-  case expression testEnv (add (bool `hv` True) (num 1)) of
-    Error _ -> return ()  -- ✅ expected failure
+  case expression testEnv (add (bool True) (num 1)) of
+    Error _ -> return ()
     Valid t -> assertFailure $ "Unexpected success: got " ++ show t
 
 testBadEqNumStr :: Test
 testBadEqNumStr = TestCase $
   case expression testEnv (eq (num 5) (str "five")) of
-    Error _ -> return ()  -- ✅ expected failure
+    Error _ -> return ()
     Valid t -> assertFailure $ "Unexpected success: got " ++ show t
 
 testBadVarUnbound :: Test
 testBadVarUnbound = TestCase $
   case expression testEnv (var "z") of
-    Error _ -> return ()  -- ✅ expected failure
+    Error _ -> return ()
     Valid t -> assertFailure $ "Unexpected success: got " ++ show t
 
 testBadNestedAdd :: Test
@@ -64,7 +65,7 @@ testBadNestedAdd = TestCase $
 -- Main runner
 main :: IO ()
 main = do
-  putStrLn "🔍 Running negative expression tests..."
+  putStrLn "[TEST] Running negative expression typecheck tests..."
   _ <- runTestTT $ TestList
     [ testBadAddBoolNum
     , testBadEqNumStr

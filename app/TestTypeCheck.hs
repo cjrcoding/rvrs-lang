@@ -74,6 +74,6 @@ tests = TestList
 
 main :: IO ()
 main = do
-  putStrLn "🔍 Running expression tests..."
+  putStrLn "[TEST] Running expression typecheck tests..."
   _ <- runTestTT tests
   return ()
