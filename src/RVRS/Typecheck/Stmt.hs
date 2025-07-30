@@ -146,20 +146,20 @@ typeOfStmt env stmt = case unwrap stmt of
            else Error `ha` BadAssertType `hv` found
 
   -- Branch
-  Branch cond thenBlock elseBlock ->
-    case liftError ExprTypeError (expression env cond) of
-      Error e -> Error e
-      Ok condType ->
-        case condType of
-          Bool Unit ->
-            case foldl checkBlock (Ok env) thenBlock of
-              Error e1 -> Error e1
-              Ok _ ->
-                case foldl checkBlock (Ok env) elseBlock of
-                  Error e2 -> Error e2
-                  Ok _     -> Ok `hv` env
-          otherType ->
-            Error `ha` TypeMismatchStmt `hv` ("<condition>", Bool Unit, otherType)
+  -- Branch cond thenBlock elseBlock ->
+    -- case liftError ExprTypeError (expression env cond) of
+      -- Error e -> Error e
+      -- Ok condType ->
+        -- case condType of
+          -- Bool Unit ->
+            -- case foldl checkBlock (Ok env) thenBlock of
+              -- Error e1 -> Error e1
+              -- Ok _ ->
+                -- case foldl checkBlock (Ok env) elseBlock of
+                  -- Error e2 -> Error e2
+                  -- Ok _     -> Ok `hv` env
+          -- otherType ->
+            -- Error `ha` TypeMismatchStmt `hv` ("<condition>", Bool Unit, otherType)
 
 
   -- Fallback
