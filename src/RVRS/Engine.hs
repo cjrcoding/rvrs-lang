@@ -138,19 +138,29 @@ calls ctxbody = intro @Engine `hv` Unit
 
 block :: Bindings `P` Nonempty List (Recursive Statement)
  `AR_` Flowings `AR` World `T` Stops Runtime Value
-block (These ctx body) flows = body
+block (These bindings body) flows = body
  `yokl` Forth `ha__` Apply `ha` statement
- `yi__` execute flows ctx
+ `yi__` execute flows bindings
  `yo__` Error `la` Ok `la` Ok `hu` (Ok `hv` Bool True)
 
-execute :: Map String Flow -> Map String Value -> Engine e
+execute :: Flowings -> Map String Value -> Engine e
  -> World (Stops Reason `T'I` Equipped `T` Map String Value `T` e)
 execute flows bindings action = is `hv_'he` action `he'he'hv` flows `he'he'hv` bindings
 
 display label x = putStrLn (label ++ ": " ++ show x) `yu` x
 
-loadAndMergeStdlib :: World `T` Map String Flow
+loadAndMergeStdlib :: World `T` Flowings
 loadAndMergeStdlib = readFile "stdlib/stdlib.rvrs" `yo` parseRVRS `yok` \case
  Left err -> World `ha` error `hv` ("Stdlib parse error:\n" ++ show err)
  Right flows -> World `ha` intro @_ @(AR) `ha` fromList
   `hv` ((\(These flow name) -> (name, flow)) <$> flows)
+
+-- TODO: I think it should be `[Recursive Expression]` instead of `[Value]`
+flowing :: Flowings -> String -> [Value] -> World (Stops Reason Value)
+flowing userFlows entryName args = do
+ fullFlowMap <- loadAndMergeStdlib `yo` union userFlows
+ case find entryName fullFlowMap of
+  Valid (These params body) ->
+   let bindings = fromList `hv` zip (params `yo` argName `yi` toList) args in
+   is `hv_'he` calls (bindings `lu` body) `he'he'hv` fullFlowMap `he'he'hv` bindings `yo'yo` is `ho'he` this @Value
+  Error name -> intro @World `ha` Error `ha` Runtime `hv` Unknown name
