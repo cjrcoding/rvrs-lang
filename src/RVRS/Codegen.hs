@@ -1,18 +1,20 @@
 module RVRS.Codegen (generateAiken, prettyPrintFlow) where
 
+import Prelude
 import Data.Bool (bool)
+import GHC.IsList (fromList, toList)
 
-import Ya (Object (..), Recursive (..), is, unwrap, ho, hu, la, li)
-import qualified Ya as Y
+import Ya (Object (..), Recursive (..), type AR__, type P, is, unwrap, yo, ho, ho'he, hu, la, li)
+import Ya.Literal ()
 
 import RVRS.AST
 
 -- | Convert an entire flow into Aiken-style code
-generateAiken :: Flow -> String
-generateAiken (Flow name args body) =
+generateAiken :: Flow `P` String `AR__` String
+generateAiken (These (These args body) name) =
   unlines $
-    ["fn " ++ name ++ "(" ++ commaSep (map renderArg args) ++ ") -> String {"] ++
-    map ("  " ++) (concatMap genStmt body) ++
+    ["fn " ++ name ++ "(" ++ commaSep (toList $ args `yo` renderArg) ++ ") -> String {"] ++
+    map ("  " ++) (concatMap genStmt (toList body)) ++
     ["}"]
 
 -- | Convert a statement into one or more Aiken lines
@@ -24,17 +26,17 @@ genStmt stmt = case unwrap stmt of
   Echo expr -> ["return " ++ genExpr expr]
   Branch cond tBranch fBranch ->
     ["if " ++ genExpr cond ++ " {"] ++
-    indent (concatMap genStmt tBranch) ++
+    indent (concatMap genStmt $ toList tBranch) ++
     ["} else {"] ++
-    indent (concatMap genStmt fBranch) ++
+    indent (concatMap genStmt $ toList fBranch) ++
     ["}"]
 
 -- | Convert an expression into Aiken-compatible syntax
 genExpr :: Recursive Expression -> String
 genExpr expr = case unwrap expr of
   Variable x -> x
-  Literal x -> is @String `ho` show `la` is @Double `ho` show `la` is @Bool `ho` bool "false" "true" `li` x
-  Operator (Binary (Equals a b)) -> genExpr a ++ " == " ++ genExpr b
+  Literal x -> is `ho` show @String `la` is `ho` show @Double `la` is `ho` bool "false" "true"  `li` x
+  Operator (Binary (These (These x y) (Comparison (Equals _)))) -> genExpr x ++ " == " ++ genExpr y
 
 -- | Render a function argument
 renderArg :: Argument -> String
@@ -50,8 +52,8 @@ indent :: [String] -> [String]
 indent = map ("  " ++)
 
 -- | Pretty-print the Flow structure (used for debugging)
-prettyPrintFlow :: Flow -> String
-prettyPrintFlow (Flow name args body) =
+prettyPrintFlow :: Flow `P` String `AR__` String
+prettyPrintFlow (These (These body args) name) =
   "Flow\n  name: " ++ name ++
   "\n  args: " ++ show args ++
-  "\n  body:\n    " ++ unlines (map show body)
+  "\n  body:\n    " ++ unlines (toList $ body `yo` show)

@@ -2,7 +2,8 @@
 
 module RVRS.Parser.ExprParser (exprParser) where
 
-import Ya (Recursive (..))
+import Prelude
+import GHC.IsList (fromList)
 import Control.Monad (void)
 import Control.Monad.Combinators.Expr
 import Data.Void
@@ -10,8 +11,9 @@ import Text.Megaparsec
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 
+import Ya (Recursive (..), type AR, type AR_, type AR__, type Unit, pattern Unit, yi, ho'ho, ha, lu)
+
 import RVRS.AST
-import RVRS.Utils
 
 type Parser = Parsec Void String
 
@@ -22,26 +24,29 @@ exprParser = makeExprParser term operatorTable
 -- Operator precedence table
 operatorTable :: [[Operator Parser (Recursive Expression)]]
 operatorTable =
-  [ [ InfixL (Recursive . Operator . Binary <$$> Mul <$ symbol "*")
-    , InfixL (Recursive . Operator . Binary <$$> Div <$ symbol "/")
+  [ [ InfixL $ binop (Arithmetic `ha` Mul) <$ symbol "*"
+    , InfixL $ binop (Arithmetic `ha` Div) <$ symbol "/"
     ]
-  , [ InfixL (Recursive . Operator . Binary <$$> Add <$ symbol "+")
-    , InfixL (Recursive . Operator . Binary <$$> Sub <$ symbol "-")
+  , [ InfixL $ binop (Arithmetic `ha` Add) <$ symbol "+"
+    , InfixL $ binop (Arithmetic `ha` Sub) <$ symbol "-"
     ]
-  , [ InfixN (Recursive . Operator . Binary <$$> Equals      <$ symbol "==")
-    , InfixN (Recursive . Operator . Binary <$$> Greater <$ symbol ">")
-    , InfixN (Recursive . Operator . Binary <$$> Less    <$ symbol "<")
+  , [ InfixL $ binop (Comparison `ha` Equals) <$ symbol "=="
+    , InfixL $ binop (Comparison `ha` Greater) <$ symbol "<"
+    , InfixL $ binop (Comparison `ha` Less) <$ symbol "<"
     ]
-  , [ InfixL ((Recursive . Operator . Binary <$$> And) <$ symbol "and")
-    , InfixL ((Recursive . Operator . Binary <$$> Or)  <$ symbol "or")
+  , [ InfixL $ binop (Combinated `ha` And) <$ symbol "and"
+    , InfixL $ binop (Combinated `ha` Or) <$ symbol "or"
     ]
   ]
+
+binop f x y = x `lu` y `lu` f Unit
+ `yi` Recursive `ha` Operator `ha` Binary
 
 -- Terms in the expression grammar
 term :: Parser (Recursive Expression)
 term = do try $ funcCallExpr
-   <|> do try $ Recursive (Literal $ Bool True) <$ symbol "truth"
-   <|> do try $ Recursive (Literal $ Bool False) <$ symbol "void"
+   <|> do try $ Recursive (Literal `ha` Bool $ True) <$ symbol "truth"
+   <|> do try $ Recursive (Literal . Bool $ False) <$ symbol "void"
    <|> do try $ Recursive . Literal . String <$> stringLiteral
    <|> do try $ parseNumber
    <|> do try $ Recursive . Operator . Unary . Not <$> (symbol "not" *> term)
@@ -55,7 +60,8 @@ parseNumber = Recursive . Literal <$> Double <$> do lexeme $ try L.float <|> fro
 
 -- Function call expressions (e.g., fuse(2, 3))
 funcCallExpr :: Parser (Recursive Expression)
-funcCallExpr = Recursive <$$> Calling <$> identifier <*> parens (exprParser `sepBy` symbol ",")
+funcCallExpr = Calling `ho'ho` Recursive <$> identifier
+ <*> (fromList <$> parens (exprParser `sepBy` symbol ","))
 
 -- Utility parsers
 lexeme :: Parser a -> Parser a

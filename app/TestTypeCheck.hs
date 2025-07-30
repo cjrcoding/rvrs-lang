@@ -1,9 +1,10 @@
 module Main where
 
+import Prelude
 import Test.HUnit
 import qualified Data.Map as Map
 
-import Ya (Recursive(..), pattern Unit, pattern Ok, pattern Error, ho, ho'ho)
+import Ya (Recursive(..), pattern Unit, pattern Ok, pattern Error, by, yi, ho, ho'ho, ha, hv, lu)
 import Ya.Instances ()
 
 import RVRS.AST
@@ -31,10 +32,10 @@ var :: String -> Recursive Expression
 var = Variable `ho` Recursive
 
 add :: Recursive Expression -> Recursive Expression -> Recursive Expression
-add = Add `ho'ho` Binary `ho'ho` Operator `ho'ho` Recursive
+add x y = x `lu` y `lu` Arithmetic `ha` Add `hv` Unit `yi` Binary `ho` Operator `ho` Recursive
 
 equals :: Recursive Expression -> Recursive Expression -> Recursive Expression
-equals = Equals `ho'ho` Binary `ho'ho` Operator `ho'ho` Recursive
+equals x y = x `lu` y `lu` Comparison `ha` Equals `hv` Unit `yi` Binary `ho` Operator `ho` Recursive
 
 notExpr :: Recursive Expression -> Recursive Expression
 notExpr = Not `ho` Unary `ho` Operator `ho` Recursive
@@ -43,7 +44,7 @@ notExpr = Not `ho` Unary `ho` Operator `ho` Recursive
 tests :: Test
 tests = TestList
   [ "Num literal" ~: expression testEnv (num 42) ~?= Ok (Double Unit)
-  , "Bool literal" ~: expression testEnv (bool True) ~?= Ok (Bool Unit)
+  , "Bool literal" ~: expression testEnv (bool `hv` True) ~?= Ok (Bool Unit)
   , "Str literal" ~: expression testEnv (str "hello") ~?= Ok (String Unit)
 
   , "Known variable" ~: expression testEnv (var "x") ~?= Ok (Double Unit)
@@ -52,18 +53,18 @@ tests = TestList
   , "Valid addition" ~: expression testEnv (add (num 5) (num 7)) ~?= Ok (Double Unit)
 
   , "Invalid addition" ~: TestCase $
-      case expression testEnv (add (num 5) (bool True)) of
+      case expression testEnv (add (num 5) (bool `hv` True)) of
         Error (Mismatched _) -> return ()
         _ -> assertFailure "Expected Mismatched"
 
   , "Equals matching types" ~: expression testEnv (equals (num 1) (num 1)) ~?= Ok (Bool Unit)
 
   , "Equals mismatched types" ~: TestCase $
-      case expression testEnv (equals (str "hi") (bool False)) of
+      case expression testEnv (equals (str "hi") (bool `hv` False)) of
         Error (Mismatched _) -> return ()
         _ -> assertFailure "Expected Mismatched"
 
-  , "Not on Bool" ~: expression testEnv (notExpr (bool False)) ~?= Ok (Bool Unit)
+  , "Not on Bool" ~: expression testEnv (notExpr (bool `hv` False)) ~?= Ok (Bool Unit)
 
   , "Not on Num" ~: TestCase $
       case expression testEnv (notExpr (num 0)) of

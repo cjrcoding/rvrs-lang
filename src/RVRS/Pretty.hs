@@ -1,21 +1,24 @@
 module RVRS.Pretty (prettyExpr) where
 
+import Prelude
 import Data.Bool (bool)
-import Ya (Recursive (..), is, ho, li, la)
+import GHC.IsList (toList)
+
+import Ya (type AR, Recursive (..), Object (These), is, ho, hu, li, la, la__)
 
 import RVRS.AST
 
 prettyExpr :: Recursive Expression -> String
 prettyExpr expr = case expr of
   Recursive (Variable name) -> name
-  Recursive (Operator (Binary (Add e1 e2))) -> "(" ++ prettyExpr e1 ++ " + " ++ prettyExpr e2 ++ ")"
-  Recursive (Operator (Binary (Sub e1 e2))) -> "(" ++ prettyExpr e1 ++ " - " ++ prettyExpr e2 ++ ")"
-  Recursive (Operator (Binary (Mul e1 e2))) -> "(" ++ prettyExpr e1 ++ " * " ++ prettyExpr e2 ++ ")"
-  Recursive (Operator (Binary (Div e1 e2))) -> "(" ++ prettyExpr e1 ++ " / " ++ prettyExpr e2 ++ ")"
-  Recursive (Operator (Binary (Equals e1 e2))) -> "(" ++ prettyExpr e1 ++ " == " ++ prettyExpr e2 ++ ")"
-  Recursive (Operator (Binary (And e1 e2))) -> "(" ++ prettyExpr e1 ++ " and " ++ prettyExpr e2 ++ ")"
-  Recursive (Operator (Binary (Or e1 e2))) -> "(" ++ prettyExpr e1 ++ " or " ++ prettyExpr e2 ++ ")"
+  Recursive (Operator (Binary (These (These x y) op))) -> "(" ++ prettyExpr x ++ bin op ++ prettyExpr y ++ ")"
   Recursive (Operator (Unary (Not e))) -> "(not " ++ prettyExpr e ++ ")"
   Recursive (Operator (Unary (Neg e))) -> "(-" ++ prettyExpr e ++ ")"
-  Recursive (Calling name args) -> "call " ++ name ++ "(" ++ unwords (prettyExpr <$> args) ++ ")"
-  Recursive (Literal x) -> is @String `ho` show `la` is @Double `ho` show `la` is @Bool `ho` bool "false" "true" `li` x
+  Recursive (Calling name args) -> "call " ++ name ++ "(" ++ unwords (prettyExpr <$> toList args) ++ ")"
+  Recursive (Literal x) -> is `ho` show @String `la` is `ho` show @Double `la` is `ho` bool "false" "true" `li` x
+
+bin :: Dyadic `AR` String
+bin = Add `hu` " + " `la` Sub `hu` " - " `la` Mul `hu` " * " `la` Div `hu` " / "
+ `la__` Greater `hu` " > " `la` Equals `hu` " == " `la` Less `hu` " < "
+ `la__` And `hu` " and " `la` Or `hu` " or "
+

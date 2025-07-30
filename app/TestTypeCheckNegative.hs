@@ -1,9 +1,10 @@
 module Main where
 
+import Prelude
 import Test.HUnit
 import qualified Data.Map as Map
 
-import Ya (Recursive(..), pattern Unit, pattern Error, pattern Valid, ho, ho'ho)
+import Ya (Recursive(..), pattern Unit, pattern Error, pattern Valid, yi, ho, ha, hv, lu)
 import Ya.Instances ()
 
 import RVRS.AST
@@ -31,10 +32,10 @@ var :: String -> Recursive Expression
 var = Variable `ho` Recursive
 
 add :: Recursive Expression -> Recursive Expression -> Recursive Expression
-add = Add `ho'ho` Binary `ho'ho` Operator `ho'ho` Recursive
+add x y = x `lu` y `lu` Arithmetic `ha` Add `hv` Unit `yi` Binary `ho` Operator `ho` Recursive
 
 eq :: Recursive Expression -> Recursive Expression -> Recursive Expression
-eq = Equals `ho'ho` Binary `ho'ho` Operator `ho'ho` Recursive
+eq x y = x `lu` y `lu` Comparison `ha` Equals `hv` Unit `yi` Binary `ho` Operator `ho` Recursive
 
 -- Negative test cases (expected to fail)
 testBadAddBoolNum :: Test
@@ -57,7 +58,7 @@ testBadVarUnbound = TestCase $
 
 testBadNestedAdd :: Test
 testBadNestedAdd = TestCase $
-  case expression testEnv (add (add (bool True) (num 2)) (num 1)) of
+  case expression testEnv (add (add (bool `hv` True) (num 2)) (num 1)) of
     Error _ -> return ()
     Valid t -> assertFailure $ "Unexpected success: got " ++ show t
 
