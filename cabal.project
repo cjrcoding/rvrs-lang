@@ -1,16 +1,16 @@
 packages: .
-  -- ../../personal/ya/ya.cabal
-  -- ../../personal/ya-world/ya-world.cabal
+  ../../personal/ya/ya.cabal
+  ../../personal/ya-world/ya-world.cabal
 
-source-repository-package
-    type: git
-    location: https://github.com/iokasimov/ya.git
-    tag: d2d76a8f162435947452446ee001e616df7e4a31
+-- source-repository-package
+    -- type: git
+    -- location: https://github.com/iokasimov/ya.git
+    -- tag: d2d76a8f162435947452446ee001e616df7e4a31
 
-source-repository-package
-    type: git
-    location: https://github.com/iokasimov/ya-world.git
-    tag: e88794783a210478ce5a77040e90af3bb291c514
+-- source-repository-package
+    -- type: git
+    -- location: https://github.com/iokasimov/ya-world.git
+    -- tag: e88794783a210478ce5a77040e90af3bb291c514
 
 source-repository-package
     type: git
