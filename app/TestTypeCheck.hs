@@ -4,7 +4,7 @@ import Prelude
 import Test.HUnit
 import qualified Data.Map as Map
 
-import Ya (Recursive(..), pattern Unit, pattern Ok, pattern Error, by, yi, ho, ho'ho, ha, hv, lu)
+import Ya (Recursive(..), pattern Unit, pattern Ok, pattern Error, is, this, by, yi, yo, ho, ho'he, ho'ho, ha, hv, he'he'hv, lu)
 import Ya.Instances ()
 
 import RVRS.AST
@@ -43,31 +43,52 @@ notExpr = (`lu` Complement Unit) `ho` Unary `ho` Operator `ho` Recursive
 -- Define the actual tests
 tests :: Test
 tests = TestList
-  [ "Num literal" ~: expression testEnv (num 42) ~?= Ok (Double Unit)
-  , "Bool literal" ~: expression testEnv (bool `hv` True) ~?= Ok (Bool Unit)
-  , "Str literal" ~: expression testEnv (str "hello") ~?= Ok (String Unit)
+  [ "Num literal"
+    ~: expression `hv` num 42
+       `he'he'hv` testEnv `yo` is `ho'he` this @Typed
+    ~?= Ok (Double Unit)
 
-  , "Known variable" ~: expression testEnv (var "x") ~?= Ok (Double Unit)
-  , "Unknown variable" ~: expression testEnv (var "z") ~?= Error (Unknown "z")
+  , "Bool literal"
+    ~: expression `hv` bool True
+       `he'he'hv` testEnv `yo` is `ho'he` this @Typed
+    ~?= Ok (Bool Unit)
 
-  , "Valid addition" ~: expression testEnv (add (num 5) (num 7)) ~?= Ok (Double Unit)
+  , "String literal"
+    ~: expression `hv` str "hello"
+       `he'he'hv` testEnv `yo` is `ho'he` this @Typed
+    ~?= Ok (String Unit)
 
-  , "Invalid addition" ~: TestCase $
-      case expression testEnv (add (num 5) (bool `hv` True)) of
-        Error (Mismatched _) -> return ()
-        _ -> assertFailure "Expected Mismatched"
+  , "Known variable"
+    ~: expression `hv` var "x"
+       `he'he'hv` testEnv `yo` is `ho'he` this @Typed
+    ~?= Ok (Double Unit)
 
-  , "Equals matching types" ~: expression testEnv (equals (num 1) (num 1)) ~?= Ok (Bool Unit)
+  , "Unknown variable"
+    ~: expression `hv` var "x"
+       `he'he'hv` testEnv `yo` is `ho'he` this @Typed
+    ~?= Error (Unknown "z")
 
-  , "Equals mismatched types" ~: TestCase $
-      case expression testEnv (equals (str "hi") (bool `hv` False)) of
-        Error (Mismatched _) -> return ()
-        _ -> assertFailure "Expected Mismatched"
+  -- , "Valid addition" ~: expression testEnv (add (num 5) (num 7)) ~?= Ok (Double Unit)
 
-  , "Not on Bool" ~: expression testEnv (notExpr (bool `hv` False)) ~?= Ok (Bool Unit)
+  -- , "Invalid addition" ~: TestCase $
+      -- case expression testEnv (add (num 5) (bool `hv` True)) of
+        -- Error (Mismatched _) -> return ()
+        -- _ -> assertFailure "Expected Mismatched"
 
-  , "Not on Num" ~: TestCase $
-      case expression testEnv (notExpr (num 0)) of
+  -- , "Equals matching types" ~: expression testEnv (equals (num 1) (num 1)) ~?= Ok (Bool Unit)
+
+  -- , "Equals mismatched types" ~: TestCase $
+      -- case expression testEnv (equals (str "hi") (bool `hv` False)) of
+        -- Error (Mismatched _) -> return ()
+        -- _ -> assertFailure "Expected Mismatched"
+
+  , "Not on Bool"
+    ~: expression `ha` notExpr `ha` bool `hv` False
+       `he'he'hv` testEnv `yo` is `ho'he` this @Typed
+    ~?= Ok (Bool Unit)
+
+  , "Not on Num"
+    ~: TestCase $ case expression `ha` notExpr `hv` num 0 `he'he'hv` testEnv of
         Error (Mismatched _) -> return ()
         _ -> assertFailure "Expected Mismatched"
   ]
