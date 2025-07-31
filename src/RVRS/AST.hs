@@ -82,4 +82,4 @@ pattern Or x = That x
 type Operation e = (e `P` Unary) `S` (e `P` e `P` Dyadic)
 
 pattern Unary x = This x :: Operation e
-pattern Binary x = That x :: Operation e
+pattern Dyadic x = That x :: Operation e

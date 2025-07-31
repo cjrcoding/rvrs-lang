@@ -2,7 +2,7 @@
 
 module RVRS.Checker where
 
-import Ya hiding (Binary)
+import Ya
 import Ya.Conversion
 import Ya.Instances ()
 
@@ -31,7 +31,7 @@ expression x = case unwrap x of
  Variable x -> intro @Checker `hv` Unit
   `yuk____` Lease `hv__` State `ha` Event `hv` get @Context `yo` find x
   `yok____` Check `ha__` Error `ha` Unknown `la` Ok
- Operator (Binary (These (These x y) operation)) -> intro @Checker `hv` Unit
+ Operator (Dyadic (These (These x y) operation)) -> intro @Checker `hv` Unit
   `yuk____` Apply `hv__` expression x `lu'yp'yo'q` Apply `hv` expression y
   `yok____` Check `ha__` Error `ha` Mismatched `la` Ok
   `yok____` Check `ha__` Error `ha` Unexpected `la` Ok

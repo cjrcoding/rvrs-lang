@@ -36,7 +36,7 @@ genExpr :: Recursive Expression -> String
 genExpr expr = case unwrap expr of
   Variable x -> x
   Literal x -> is `ho` show @String `la` is `ho` show @Double `la` is `ho` bool "false" "true"  `li` x
-  Operator (Binary (These (These x y) (Comparison (Equals _)))) -> genExpr x ++ " == " ++ genExpr y
+  Operator (Dyadic (These (These x y) (Comparison (Equals _)))) -> genExpr x ++ " == " ++ genExpr y
 
 -- | Render a function argument
 renderArg :: Argument -> String

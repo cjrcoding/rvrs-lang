@@ -40,7 +40,7 @@ operatorTable =
   ]
 
 binop f x y = x `lu` y `lu` f Unit
- `yi` Recursive `ha` Operator `ha` Binary
+ `yi` Recursive `ha` Operator `ha` Dyadic
 
 -- Terms in the expression grammar
 term :: Parser (Recursive Expression)

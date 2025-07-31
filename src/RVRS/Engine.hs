@@ -12,7 +12,7 @@ import Data.Map (Map, insert, union)
 import Text.Show (Show (..))
 import qualified Data.Map as Map (lookup)
 
-import Ya hiding (Binary, Not, True, False, Left, Right)
+import Ya hiding (True, False, Left, Right)
 import Ya.Conversion
 import Ya.World
 
@@ -83,7 +83,7 @@ expression x = case unwrap x of
  Variable var -> intro @Engine `hv` Unit
   `yuk____` Lease `hv__` State `ha` Event `hv` get @Bindings `yo` find var
   `yok____` Check `ha__` Error `ha` Runtime `ha` Unbound `la` Ok
- Operator (Binary (These (These x y) (Comparison operation))) -> intro @Engine `hv` Unit
+ Operator (Dyadic (These (These x y) (Comparison operation))) -> intro @Engine `hv` Unit
   `yuk____` Apply `hv` expression x
      `lu'yp` Apply `hv` expression y
   `yok____` Check `ha` tap `ha` on @Double `ha` this
@@ -92,7 +92,7 @@ expression x = case unwrap x of
        `la` Equals `hu` (is `ho'hd` (==) `ho` Bool)
        `la` Less `hu` (is `ho'hd` (<) `ho` Bool)
        `li` is @Comparison operation
- Operator (Binary (These (These x y) (Arithmetic operation))) -> intro @Engine `hv` Unit
+ Operator (Dyadic (These (These x y) (Arithmetic operation))) -> intro @Engine `hv` Unit
   `yuk____` Apply `hv` expression x
      `lu'yp` Apply `hv` expression y
   `yok____` Check `ha` tap `ha` on @Double `ha` this
@@ -102,7 +102,7 @@ expression x = case unwrap x of
        `la` Mul `hu` (is `ho'hd` (*) `ho` Double)
        `la` Div `hu` (is `ho'hd` (/) `ho` Double)
        `li` is @Arithmetic operation
- Operator (Binary (These (These x y) (Combinated operation))) -> intro @Engine `hv` Unit
+ Operator (Dyadic (These (These x y) (Combinated operation))) -> intro @Engine `hv` Unit
   `yuk____` Apply `hv` expression x
      `lu'yp` Apply `hv` expression y
   `yok____` Check `ha` tap `ha` on @Bool `ha` this

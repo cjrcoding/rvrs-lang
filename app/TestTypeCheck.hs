@@ -32,10 +32,10 @@ var :: String -> Recursive Expression
 var = Variable `ho` Recursive
 
 add :: Recursive Expression -> Recursive Expression -> Recursive Expression
-add x y = x `lu` y `lu` Arithmetic `ha` Add `hv` Unit `yi` Binary `ho` Operator `ho` Recursive
+add x y = x `lu` y `lu` Arithmetic `ha` Add `hv` Unit `yi` Dyadic `ho` Operator `ho` Recursive
 
 equals :: Recursive Expression -> Recursive Expression -> Recursive Expression
-equals x y = x `lu` y `lu` Comparison `ha` Equals `hv` Unit `yi` Binary `ho` Operator `ho` Recursive
+equals x y = x `lu` y `lu` Comparison `ha` Equals `hv` Unit `yi` Dyadic `ho` Operator `ho` Recursive
 
 notExpr :: Recursive Expression -> Recursive Expression
 notExpr = (`lu` Complement Unit) `ho` Unary `ho` Operator `ho` Recursive
