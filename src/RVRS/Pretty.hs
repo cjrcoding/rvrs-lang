@@ -11,14 +11,15 @@ import RVRS.AST
 prettyExpr :: Recursive Expression -> String
 prettyExpr expr = case expr of
   Recursive (Variable name) -> name
-  Recursive (Operator (Binary (These (These x y) op))) -> "(" ++ prettyExpr x ++ bin op ++ prettyExpr y ++ ")"
-  Recursive (Operator (Unary (Not e))) -> "(not " ++ prettyExpr e ++ ")"
-  Recursive (Operator (Unary (Neg e))) -> "(-" ++ prettyExpr e ++ ")"
+  Recursive (Operator (Binary (These (These x y) op))) -> "(" ++ prettyExpr x ++ dyadic op ++ prettyExpr y ++ ")"
+  Recursive (Operator (Unary (These e op))) -> "(" ++ unary op ++ prettyExpr e ++ ")"
   Recursive (Calling name args) -> "call " ++ name ++ "(" ++ unwords (prettyExpr <$> toList args) ++ ")"
   Recursive (Literal x) -> is `ho` show @String `la` is `ho` show @Double `la` is `ho` bool "false" "true" `li` x
 
-bin :: Dyadic `AR` String
-bin = Add `hu` " + " `la` Sub `hu` " - " `la` Mul `hu` " * " `la` Div `hu` " / "
+dyadic :: Dyadic `AR` String
+dyadic = Add `hu` " + " `la` Sub `hu` " - " `la` Mul `hu` " * " `la` Div `hu` " / "
  `la__` Greater `hu` " > " `la` Equals `hu` " == " `la` Less `hu` " < "
  `la__` And `hu` " and " `la` Or `hu` " or "
 
+unary :: Unary `AR` String
+unary = Negation `hu` "not " `la` Complement `hu` "-"

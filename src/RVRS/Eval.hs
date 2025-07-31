@@ -137,15 +137,15 @@ evalExpr expr = case unwrap expr of
       -- (Double n1, Double n2) -> return . Double $ n1 / n2
       -- _                  -> throwError $ RuntimeError "Type error in division"
 
-  Operator (Unary (Neg e)) ->
-    evalExpr e >>= \case
-      Double n -> return $ Double (-n)
-      _      -> throwError $ RuntimeError "Negation requires number"
+  -- Operator (Unary (Neg e)) ->
+    -- evalExpr e >>= \case
+      -- Double n -> return $ Double (-n)
+      -- _      -> throwError $ RuntimeError "Negation requires number"
 
-  Operator (Unary (Not e)) ->
-    evalExpr e >>= \case
-      Bool b -> return . Bool $ not b
-      _       -> throwError $ RuntimeError "Expected boolean in 'not'"
+  -- Operator (Unary (Not e)) ->
+    -- evalExpr e >>= \case
+      -- Bool b -> return . Bool $ not b
+      -- _       -> throwError $ RuntimeError "Expected boolean in 'not'"
 
   -- Operator (Binary (Equals a b)) ->
   --   Bool . bool (by False) (by True) <$> ((==) <$> evalExpr a <*> evalExpr b)

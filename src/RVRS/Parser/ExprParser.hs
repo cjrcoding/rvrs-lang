@@ -49,8 +49,8 @@ term = do try $ funcCallExpr
    <|> do try $ Recursive (Literal . Bool $ False) <$ symbol "void"
    <|> do try $ Recursive . Literal . String <$> stringLiteral
    <|> do try $ parseNumber
-   <|> do try $ Recursive . Operator . Unary . Not <$> (symbol "not" *> term)
-   <|> do try $ Recursive . Operator . Unary . Neg <$> (symbol "-" *> term)
+   <|> do try $ Recursive . Operator . Unary . (`lu` Complement Unit) <$> (symbol "not" *> term)
+   <|> do try $ Recursive . Operator . Unary . (`lu` Negation Unit) <$> (symbol "-" *> term)
    <|> do try $ parens exprParser
    <|> Recursive . Variable <$> identifier
 

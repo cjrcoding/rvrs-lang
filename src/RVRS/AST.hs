@@ -47,10 +47,10 @@ type Value = Primitive String Double Bool
 
 type Typed = Primitive Unit Unit Unit
 
-data Unary e
-  = Neg e
-  | Not e
-  deriving (Show, Eq)
+type Unary = Unit `S` Unit
+
+pattern Negation x = This x
+pattern Complement x = That x
 
 type Dyadic = Arithmetic `S` Comparison `S` Combinated
 
@@ -79,7 +79,7 @@ pattern And, Or :: Unit `AR` Combinated
 pattern And x = This x
 pattern Or x = That x
 
-type Operation e = Unary e `S` (e `P` e `P` Dyadic)
+type Operation e = (e `P` Unary) `S` (e `P` e `P` Dyadic)
 
 pattern Unary x = This x :: Operation e
 pattern Binary x = That x :: Operation e

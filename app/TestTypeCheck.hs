@@ -38,7 +38,7 @@ equals :: Recursive Expression -> Recursive Expression -> Recursive Expression
 equals x y = x `lu` y `lu` Comparison `ha` Equals `hv` Unit `yi` Binary `ho` Operator `ho` Recursive
 
 notExpr :: Recursive Expression -> Recursive Expression
-notExpr = Not `ho` Unary `ho` Operator `ho` Recursive
+notExpr = (`lu` Complement Unit) `ho` Unary `ho` Operator `ho` Recursive
 
 -- Define the actual tests
 tests :: Test

@@ -47,8 +47,8 @@ expression env expr = case unwrap expr of
  Operator (Binary (These (These x y) (Arithmetic _))) -> match env x y `yok` Try `ha_` expect `hv` by Double
  Operator (Binary (These (These x y) (Comparison _))) -> match env x y `yok` Try `ha_` expect `hv` by Double `ho'yu` by Bool
  Operator (Binary (These (These x y) (Combinated _))) -> match env x y `yok` Try `ha_` expect `hv` by Bool
- Operator (Unary (Not x)) -> expression env x `yok` Try `ha_` expect `hv` by Bool
- Operator (Unary (Neg x)) -> expression env x `yok` Try `ha_` expect `hv` by Double
+ Operator (Unary (These x (Complement _))) -> expression env x `yok` Try `ha_` expect `hv` by Bool
+ Operator (Unary (These x (Negation _))) -> expression env x `yok` Try `ha_` expect `hv` by Double
  x -> Error `ha` Unsupported `hv` show x
 
 match env left right =
