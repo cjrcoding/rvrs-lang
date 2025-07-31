@@ -45,23 +45,3 @@ expression x = case unwrap x of
   `ha_____` Negation `hu` (`lu'q` Double Unit)
        `la` Complement `hu` (`lu'q` Bool Unit)
        `li` operation
-
--- expression :: Map String Typed -> Recursive Expression -> Error Types Typed
--- expression env expr = case unwrap expr of
- -- Literal x -> Ok `hv` valueToType x
- -- Variable x -> lookup x env `yi_` None `hu_` Error `hv` Unknown x `la` Ok `ha_` to @Optional
- -- Operator (Binary (These (These x y) (Arithmetic _))) -> match env x y `yok` Try `ha_` expect `hv` by Double
- -- Operator (Binary (These (These x y) (Comparison _))) -> match env x y `yok` Try `ha_` expect `hv` by Double `ho'yu` by Bool
- -- Operator (Binary (These (These x y) (Combinated _))) -> match env x y `yok` Try `ha_` expect `hv` by Bool
- -- Operator (Unary (These x (Complement _))) -> expression env x `yok` Try `ha_` expect `hv` by Bool
- -- Operator (Unary (These x (Negation _))) -> expression env x `yok` Try `ha_` expect `hv` by Double
- -- x -> Error `ha` Unsupported `hv` show x
--- 
--- match env left right =
- -- intro @(Error Types) Unit
- -- `yuk____` Try `hv` expression env left
- -- `lu'yp'yo'q` Try `hv` expression env right
- -- `yok____` Try `ha__` Error `ha` Mismatched `la` Ok
--- 
--- expect sample typed =
- -- sample `lu'q` typed `yi_` Error `ha` Unexpected `la` Ok
