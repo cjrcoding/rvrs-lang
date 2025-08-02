@@ -42,7 +42,10 @@ type Engine = Given Flowings `JNT` State Bindings `JNT` Stops Reason `JNT` World
 
 statement :: Recursive Statement `AR__` Engine Value
 statement x = case unwrap x of
- Return e -> expression e
+ Return expr -> intro @Engine `hv` Unit
+  `yuk____` Apply `hv` expression expr
+  `yok____` Apply `ha` State `ha` Event `ha` save @String @Value "_return"
+  `yok____` Check `ha` Break `ha` Returns `ha` that
  Echo expr -> intro @Engine `hv` Unit
   `yuk____` Apply `hv` expression expr
   `yok____` World `ha` display "echo: "
