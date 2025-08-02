@@ -42,7 +42,9 @@ type Engine = Given Flowings `JNT` State Bindings `JNT` Stops Reason `JNT` World
 
 statement :: Recursive Statement `AR__` Engine Value
 statement x = case unwrap x of
- Return e -> expression e
+ Return expr -> intro @Engine `hv` Unit
+  `yuk____` Apply `hv` expression expr
+  `yok____` Check `ha` Break `ha` Returns
  Echo expr -> intro @Engine `hv` Unit
   `yuk____` Apply `hv` expression expr
   `yok____` World `ha` display "echo: "
@@ -68,14 +70,12 @@ statement x = case unwrap x of
   `yok____` Apply `ha` calls `ha'ho` bool if_block else_block
  Delta name _ expr -> intro @Engine `hv` Unit
   `yuk____` Apply `hv` expression expr
-  `yok____` Apply `ha` State `ha` Event `ha` save @String @Value name
-  `yok____` Check `ha` Break `ha` Returns `ha` that @Value
+  `yok____` Apply `ha` State `ha` Event `ha` save @String @Value name `ho'yo` that @Value
  Source name _ expr -> intro @Engine `hv` Unit
   `yuk____` Lease `hv___` State `ha` Event `hv` get @Bindings `yo` find name
   `yok____` Check `ha___` Error `hu_` Ok `hv` Unit `la_` Some `hu_` Error `ha` Runtime `ha` Defined `hv` name
   `yuk____` Apply `hv` expression expr
-  `yok____` Apply `ha` State `ha` Event `ha` save @String @Value name
-  `yok____` Check `ha` Break `ha` Returns `ha` that @Value
+  `yok____` Apply `ha` State `ha` Event `ha` save @String @Value name `ho'yo` that @Value
 
 expression :: Recursive Expression `AR__` Engine Value
 expression x = case unwrap x of
