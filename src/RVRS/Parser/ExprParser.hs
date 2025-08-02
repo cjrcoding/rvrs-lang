@@ -42,7 +42,7 @@ operatorTable =
     ]
   ]
 
-binop f x y = Operation `hv` Both (x `lu` y) `hv` f Unit
+binop f x y = Operation `hv` f Unit `hv` Both (x `lu` y)
  `yi` Recursive `ha` Operator `ha` Dyadic
 
 -- Terms in the expression grammar
@@ -52,8 +52,8 @@ term = do try $ Recursive (Operand `ha` Literal `ha` Bool $ True) <$ symbol "tru
    <|> do try $ Recursive (Operand `ha` Literal `ha` Bool $ False) <$ symbol "void"
    <|> do try $ Recursive `ha` Operand `ha` Literal `ha` String <$> stringLiteral
    <|> do try $ parseNumber
-   <|> do try $ Recursive . Operator . Unary . (\x -> Operation `hv` Only x `hv` by Complement) <$> (symbol "not" *> term)
-   <|> do try $ Recursive . Operator . Unary . (\x -> Operation `hv` Only x `hv` by Negation) <$> (symbol "-" *> term)
+   <|> do try $ Recursive . Operator . Unary . Operation (by Complement) . Only <$> (symbol "not" *> term)
+   <|> do try $ Recursive . Operator . Unary . Operation (by Negation) . Only <$> (symbol "-" *> term)
    <|> do try $ parens exprParser
    <|> Recursive . Operand . Variable <$> identifier
 

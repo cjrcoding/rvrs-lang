@@ -38,7 +38,7 @@ var = Variable `ho` Operand `ho` Recursive
 -- equals x y = Operation `hv` Both (x `lu` y) `hv` (Arithmetic `hv` Equals Unit) `yi` Dyadic `ho` Operator `ho` Recursive
 
 notExpr :: Recursive Expression -> Recursive Expression
-notExpr x = Operation `hv` Only x `hv` Complement Unit `yi` Unary `ho` Operator `ho` Recursive
+notExpr x = Operation `hv` Complement Unit `hv` Only x `yi` Unary `ho` Operator `ho` Recursive
 
 -- type Operator = Operation Only Unary `S'T'I'TT'I` Operation Twice Dyadic
 

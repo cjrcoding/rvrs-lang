@@ -42,14 +42,14 @@ pattern Variable x = T'TT'I'TTT'I (That (T'I' x)) :: Operand e
 
 -- type Calling = Instead String `P'T'I'TT'I` Nonempty List
 
-type Operator = Operation Only Unary `S'T'I'TT'I` Operation Twice Dyadic
+type Operator = Operation Unary Only `S'T'I'TT'I` Operation Dyadic Twice
 
 pattern Unary x = T'TT'I'TTT'I (This x) :: Operator e
 pattern Dyadic x = T'TT'I'TTT'I (That x) :: Operator e
 
-type Operation quantity kind = quantity `P'T'I'TT'I` Instead kind
+type Operation kind quantity = Instead kind `P'T'I'TT'I` quantity
 
-pattern Operation args op = T'TT'I'TTT'I (These args (Instead op)) :: Operation quantity kind e
+pattern Operation op args = T'TT'I'TTT'I (These (Instead op) args) :: Operation kind quantity e
 
 type Unary = Unit `S` Unit
 

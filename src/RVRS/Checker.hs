@@ -37,14 +37,14 @@ variable x = intro @Checker `hv` Unit
  `yuk____` Lease `hv__` State `ha` Event `hv` get @Context `yo` find x
  `yok____` Check `ha__` Error `ha` Unknown `la` Ok
 
-unary (These (Only x) operation) = intro @Checker `hv` Unit
+unary (These operation (Only x)) = intro @Checker `hv` Unit
  `yuk____` Apply `hv__` expression `hv` is @(Recursive Expression) x
  `yok____` Check `ha__` Error `ha` Unexpected `la` Ok
  `ha_____` is @Unary `hv` unwrap operation
      `yi_` Negation `hu` (`lu'q` by Double)
       `la` Complement `hu` (`lu'q` by Bool)
 
-dyadic ((These (Both (These x y)) operation)) = intro @Checker `hv` Unit
+dyadic (These operation (Both (These x y))) = intro @Checker `hv` Unit
  `yuk____` Apply `ha` expression `hv` x
  `lu'yp'yo'q` Apply `ha` expression `hv` y
  `yok____` Check `ha__` Error `ha` Mismatched `la` Ok
