@@ -1,6 +1,6 @@
 module RVRS.AST where
 
-import Ya (Tagged (Tag), type (#), type T, type AR, P, S, Object (This, That), Recursive (..), type Unit, type Nonempty, type List)
+import Ya (T'TT'I'TTT'I (..), type P'T'I'TT'I, type S'T'I'TT'I, Tagged (Tag), type (#), type Twice, type Instead, type T'I' (..), type T, type AR, P, S, Object (..), Recursive (..), type Only, type Both, type Unit, type Nonempty, type List, pattern Instead)
 
 import Ya.Instances ()
 import Ya.Literal ()
@@ -27,25 +27,29 @@ data Statement e
   | Return (Recursive Expression)
   | Call String (Nonempty List `T` Recursive Expression)
   | Assert (Recursive Expression)
-  deriving (Show, Eq)
+  -- deriving (Show, Eq)
 
-data Expression e
-  = Variable String
-  | Operator (Operation e)
-  | Calling String (Nonempty List e)
-  | Literal Value
-  deriving (Show, Eq)
+type Expression = Operand `S'T'I'TT'I` Operator -- `S'T'I'TT'I` Calling
 
-type Primitive string double bool
- = string `S` double `S` bool
+pattern Operand x = T'TT'I'TTT'I (This x) :: Expression e
+pattern Operator x = T'TT'I'TTT'I (That x) :: Expression e
+-- pattern Calling x = T'TT'I'TTT'I (That x) :: Expression e
 
-pattern String x = This (This x) :: Primitive string double bool
-pattern Double x = This (That x) :: Primitive string double bool
-pattern Bool x = That x :: Primitive string double bool
+type Operand = Instead Value `S'T'I'TT'I` Instead String
 
-type Value = Primitive String Double Bool
+pattern Literal x = T'TT'I'TTT'I (This (T'I' x)) :: Operand e
+pattern Variable x = T'TT'I'TTT'I (That (T'I' x)) :: Operand e
 
-type Typed = Primitive Unit Unit Unit
+-- type Calling = Instead String `P'T'I'TT'I` Nonempty List
+
+type Operator = Operation Only Unary `S'T'I'TT'I` Operation Twice Dyadic
+
+pattern Unary x = T'TT'I'TTT'I (This x) :: Operator e
+pattern Dyadic x = T'TT'I'TTT'I (That x) :: Operator e
+
+type Operation quantity kind = quantity `P'T'I'TT'I` Instead kind
+
+pattern Operation args op = T'TT'I'TTT'I (These args (Instead op)) :: Operation quantity kind e
 
 type Unary = Unit `S` Unit
 
@@ -79,7 +83,13 @@ pattern And, Or :: Unit `AR` Combinated
 pattern And x = This x
 pattern Or x = That x
 
-type Operation e = (e `P` Unary) `S` (e `P` e `P` Dyadic)
+type Primitive string double bool
+ = string `S` double `S` bool
 
-pattern Unary x = This x :: Operation e
-pattern Dyadic x = That x :: Operation e
+pattern String x = This (This x) :: Primitive string double bool
+pattern Double x = This (That x) :: Primitive string double bool
+pattern Bool x = That x :: Primitive string double bool
+
+type Value = Primitive String Double Bool
+
+type Typed = Primitive Unit Unit Unit

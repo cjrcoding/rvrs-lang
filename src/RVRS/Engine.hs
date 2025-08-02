@@ -79,11 +79,11 @@ statement x = case unwrap x of
 
 expression :: Recursive Expression `AR__` Engine Value
 expression x = case unwrap x of
- Literal val -> intro @Engine `hv` val
- Variable var -> intro @Engine `hv` Unit
+ Operand (Literal val) -> intro @Engine `hv` val
+ Operand (Variable var) -> intro @Engine `hv` Unit
   `yuk____` Lease `hv__` State `ha` Event `hv` get @Bindings `yo` find var
   `yok____` Check `ha__` Error `ha` Runtime `ha` Unbound `la` Ok
- Operator (Dyadic (These (These x y) (Comparison operation))) -> intro @Engine `hv` Unit
+ Operator (Dyadic (Operation (Both (These x y)) (Comparison operation))) -> intro @Engine `hv` Unit
   `yuk____` Apply `hv` expression x
      `lu'yp` Apply `hv` expression y
   `yok____` Check `ha` tap `ha` on @Double `ha` this
@@ -92,7 +92,7 @@ expression x = case unwrap x of
        `la` Equals `hu` (is `ho'hd` (==) `ho` Bool)
        `la` Less `hu` (is `ho'hd` (<) `ho` Bool)
        `li` is @Comparison operation
- Operator (Dyadic (These (These x y) (Arithmetic operation))) -> intro @Engine `hv` Unit
+ Operator (Dyadic (Operation (Both (These x y)) (Arithmetic operation))) -> intro @Engine `hv` Unit
   `yuk____` Apply `hv` expression x
      `lu'yp` Apply `hv` expression y
   `yok____` Check `ha` tap `ha` on @Double `ha` this
@@ -102,7 +102,7 @@ expression x = case unwrap x of
        `la` Mul `hu` (is `ho'hd` (*) `ho` Double)
        `la` Div `hu` (is `ho'hd` (/) `ho` Double)
        `li` is @Arithmetic operation
- Operator (Dyadic (These (These x y) (Combinated operation))) -> intro @Engine `hv` Unit
+ Operator (Dyadic (Operation (Both (These x y)) (Combinated operation))) -> intro @Engine `hv` Unit
   `yuk____` Apply `hv` expression x
      `lu'yp` Apply `hv` expression y
   `yok____` Check `ha` tap `ha` on @Bool `ha` this
@@ -110,11 +110,11 @@ expression x = case unwrap x of
   `ho___'yo` And `hu` (is `ho'hd` (&&) `ho` Bool)
        `la` Or `hu` (is `ho'hd` (||) `ho` Bool)
        `li` is @Combinated operation
- Calling name args -> intro @Engine `hv` Unit
-  `yuk____` Apply `hv` params args `lu'yp` Apply `hv` setup name
-  `yok____` Check `ha__` unwrap @AR `ho_'yoikl` Apply `ha` Check `ha` match
-  `yok____` Apply `ha__` calls
-  `yuk____` Apply `hv__` intro @Engine `hv` Bool True
+ -- Calling name args -> intro @Engine `hv` Unit
+  -- `yuk____` Apply `hv` params args `lu'yp` Apply `hv` setup name
+  -- `yok____` Check `ha__` unwrap @AR `ho_'yoikl` Apply `ha` Check `ha` match
+  -- `yok____` Apply `ha__` calls
+  -- `yuk____` Apply `hv__` intro @Engine `hv` Bool True
 
 setup name = intro @Engine @(AR) `hv` Unit
  `yuk____` Apply `hv__` Given `hv` is @Flowings `yo` find name

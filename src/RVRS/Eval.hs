@@ -121,9 +121,9 @@ binOp op a b = (,) <$> evalExpr a <*> evalExpr b >>= \case
 
 evalExpr :: Recursive Expression -> EvalIR Value
 evalExpr expr = case unwrap expr of
-  Literal x -> return x
+  Operand (Literal x) -> return x
 
-  Variable name ->
+  Operand (Variable name) ->
     Map.lookup name <$> T.get
       >>= maybe (throwError `ha` RuntimeError $ "Unbound variable: " ++ name) pure
 
@@ -170,17 +170,17 @@ evalExpr expr = case unwrap expr of
       -- (Bool b1, Bool b2) -> return . Bool $ b1 `lu'ys'la` Try b2
       -- _ -> throwError $ RuntimeError "or requires booleans"
 
-  Calling name args -> do
-    fsenv <- ask
-    case Map.lookup name fsenv of
-      Nothing -> throwError $ RuntimeError ("Unknown function: " ++ name)
-      Just (These params body) -> do
-        argVals <- for (toList args) evalExpr
-        if length (toList params) /= length argVals
-          then throwError $ RuntimeError ("Arity mismatch calling: " ++ name)
+  -- Calling name args -> do
+    -- fsenv <- ask
+    -- case Map.lookup name fsenv of
+      -- Nothing -> throwError $ RuntimeError ("Unknown function: " ++ name)
+      -- Just (These params body) -> do
+        -- argVals <- for (toList args) evalExpr
+        -- if length (toList params) /= length argVals
+          -- then throwError $ RuntimeError ("Arity mismatch calling: " ++ name)
           -- TODO: here you have to extract a `Value` from `Maybe Value` because you accept
           -- list instead of nonempty list. I'll plumb it with primitive `error` for now, but -- once we replace `List` with `Nonempty List` it's going to be resolved by itself
-          else fromJust `ha` fst <$> do callBody (toList body) `ha` fromList $ zip (toList $ params `yo` argName) argVals
+          -- else fromJust `ha` fst <$> do callBody (toList body) `ha` fromList $ zip (toList $ params `yo` argName) argVals
 
 callBody :: [Recursive Statement] -> ValueEnv -> EvalIR (Maybe Value, ValueEnv)
 callBody body callEnv = runReaderT (evalBody body) <$> ask >>= lift `ha` lift `ha` flip runStateT callEnv

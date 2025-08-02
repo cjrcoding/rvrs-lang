@@ -26,7 +26,8 @@ parseRVRS input =
     Left err -> trace "❌ PARSE FAILED" (Left err)
     Right flows ->
       if debug
-        then trace ("✅ Parsed flows:\n" ++ show flows) (Right flows)
+        -- then trace ("✅ Parsed flows:\n" ++ show flows) (Right flows)
+        then trace ("✅ Parsed flows:\n") (Right flows)
         else Right flows
 
 flowParser :: Parser (Flow `P` String)
