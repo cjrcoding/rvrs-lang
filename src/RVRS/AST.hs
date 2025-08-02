@@ -2,8 +2,11 @@ module RVRS.AST where
 
 import Ya (T'TT'I'TTT'I (..), type P'T'I'TT'I, type S'T'I'TT'I, Tagged (Tag), type (#), type Twice, type Instead, type T'I' (..), type T, type AR, P, S, Object (..), Recursive (..), type Only, type Both, type Unit, type Nonempty, type List, pattern Instead)
 
-import Ya.Instances ()
-import Ya.Literal ()
+import Ya.ASCII
+import Ya.Literal
+import Ya.Instances
+
+type Name = Nonempty List ASCII
 
 -- | Represents a flow of ritual logic
 type Flow = Nonempty List Argument `P` Nonempty List (Recursive Statement)
@@ -37,8 +40,8 @@ pattern Operator x = T'TT'I'TTT'I (That x) :: Expression e
 
 type Operand = Instead Value `S'T'I'TT'I` Instead String
 
-pattern Literal x = T'TT'I'TTT'I (This (T'I' x)) :: Operand e
-pattern Variable x = T'TT'I'TTT'I (That (T'I' x)) :: Operand e
+pattern Literal x = T'TT'I'TTT'I (This (Instead x)) :: Operand e
+pattern Variable x = T'TT'I'TTT'I (That (Instead x)) :: Operand e
 
 -- type Calling = Instead String `P'T'I'TT'I` Nonempty List
 
