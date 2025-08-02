@@ -24,28 +24,6 @@ pattern Unknown x = That x :: Types
 
 type Checker = State Context `JNT` Stops Types
 
--- expression :: Recursive Expression `AR___` Checker Typed
--- expression x = case unwrap x of
- -- Literal x -> intro @Checker
-  -- `hv_____` be `hv'he` String `la` be `hv'he` Double `la` be `hv'he` Bool `li` x
- -- Variable x -> intro @Checker `hv` Unit
-  -- `yuk____` Lease `hv__` State `ha` Event `hv` get @Context `yo` find x
-  -- `yok____` Check `ha__` Error `ha` Unknown `la` Ok
- -- Operator (Dyadic (These (These x y) operation)) -> intro @Checker `hv` Unit
-  -- `yuk____` Apply `hv__` expression x `lu'yp'yo'q` Apply `hv` expression y
-  -- `yok____` Check `ha__` Error `ha` Mismatched `la` Ok
-  -- `yok____` Check `ha__` Error `ha` Unexpected `la` Ok
-  -- `ha_____` is @Dyadic operation
-      -- `yi_` Arithmetic `hu` (`lu'q` by Double)
-       -- `la` Comparison `hu` (`lu'q` by Double) `ho'ho'ho` (be `hv'he` Bool)
-       -- `la` Combinated `hu` (`lu'q` by Bool)
- -- Operator (Unary (These x operation)) -> intro @Checker `hv` Unit
-  -- `yuk____` Apply `hv__` expression x
-  -- `yok____` Check `ha__` Error `ha` Unexpected `la` Ok
-  -- `ha_____` is @Unary operation
-      -- `yi_` Negation `hu` (`lu'q` by Double)
-       -- `la` Complement `hu` (`lu'q` by Bool)
-
 expression = is @(Recursive Expression `AR_` Checker Typed)
  `li__` literal `ha'he` is `la` variable `ha'he` is
   `la_` unary `ha'he` is `la` dyadic `ha'he` is
