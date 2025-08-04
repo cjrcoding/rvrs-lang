@@ -1,4 +1,4 @@
-flow main {
+ flow main {
   delta x = 5
   delta y = 3
   echo x
