@@ -135,3 +135,13 @@ executable testtypechecknegative
     , RVRS.Value
     , Ya.Conversion
     , Ya.Instances
+
+executable TestTypeCheckStmt
+  import: app-settings, hunit-deps
+  main-is: TestTypeCheckStmt.hs
+  other-modules:
+      RVRS.AST
+    , RVRS.Typecheck.Stmt
+    , Ya.Instances
+    , RVRS.Checker
+    , RVRS.Value
