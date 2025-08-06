@@ -38,7 +38,8 @@ pattern Valency e = This (This (That e))
 pattern Neglect e = This (That e)
 pattern Defined e = That e
 
-type Engine = Given Flowings `JNT` State Bindings `JNT` Stops Reason `JNT` World
+-- type Engine = Given Flowings `JNT` State Bindings `JNT` Stops Reason `JNT` World
+type Engine = World `JNT` Stops Reason `JNT` State Bindings `JNT` Given Flowings
 
 statement :: Recursive Statement `AR__` Engine Value
 statement x = case unwrap x of

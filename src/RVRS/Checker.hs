@@ -22,7 +22,7 @@ pattern Unexpected x = This (This (That x)) :: Types
 pattern Unsupported x = This (That x) :: Types
 pattern Unknown x = That x :: Types
 
-type Checker = State Context `JNT` Stops Types
+type Checker = Stops Types `JNT` State Context
 
 expression = is @(Recursive Expression `AR_` Checker Typed)
  `li__` literal `ha'he` is `la` variable `ha'he` is
