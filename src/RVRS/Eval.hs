@@ -34,8 +34,8 @@ import RVRS.Env
 import RVRS.Value
 import RVRS.Parser
 
-type Env     = Map String Value
-type FlowEnv = Map String Flow
+type Env     = Map Name Value
+type FlowEnv = Map Name Flow
 
 type EvalIR a = ReaderT FlowEnv (StateT ValueEnv (ExceptT EvalError IO)) a
 
@@ -45,24 +45,24 @@ data EvalError
   deriving (Show, Eq)
 
 -- Load stdlib and merge
-loadAndMergeStdlib :: World `T'I` Map String Flow
+loadAndMergeStdlib :: World (Map Name Flow)
 loadAndMergeStdlib = readFile "stdlib/stdlib.rvrs" `yo` parseRVRS `yok` \case
   Left err -> World `ha` error $ "Stdlib parse error:\n" ++ show err
   Right flows -> World `ha` return `ha` fromList $ (\(These flow name) -> (name, flow)) <$> flows
 
 -- Runner
-runEvalIR :: Map String Flow -> Map String Value -> EvalIR a -> IO (Either EvalError (a, Map String Value))
+runEvalIR :: Map Name Flow -> Map Name Value -> EvalIR a -> IO (Either EvalError (a, Map Name Value))
 runEvalIR flows env action = runExceptT `ha` flip runStateT env `hv` runReaderT action flows
 
 -- Flow evaluation
-evalIRFlow :: Map String Flow -> String -> [Value] -> IO (Either EvalError (Maybe Value))
+evalIRFlow :: Map Name Flow -> Name -> [Value] -> IO (Either EvalError (Maybe Value))
 evalIRFlow userFlows entryName args = do
   fullFlowMap <- loadAndMergeStdlib `yo` union userFlows
   case Map.lookup entryName fullFlowMap of
     Just (These params body) -> do
       let initialEnv = fromList $ zip (toList $ params `yo` argName) args
       (fmap . fmap) fst $ do runEvalIR fullFlowMap initialEnv $ catchError (evalBody $ toList body) handleReturn
-    Nothing -> return `ha` Left `ha` RuntimeError $ "No flow named '" ++ entryName ++ "' found."
+    Nothing -> return `ha` Left `ha` RuntimeError $ "No flow named '" ++ show entryName ++ "' found."
 
 handleReturn :: EvalError -> EvalIR (Maybe Value)
 handleReturn (ReturnValue v) = return `hv` Just v
@@ -84,12 +84,12 @@ evalStmt stmt = case unwrap stmt of
   Mouth expr -> Nothing <$ do evalExpr expr >>= display "mouth: "
 
   -- ✅ Correct: discard subflow return value
-  Call name args -> do
-    flowMap <- ask
-    case Map.lookup name flowMap of
-      Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
-      Just (These params body) -> do
-        Nothing <$ do for (toList args) evalExpr >>= lift `ha` lift `ha` runStateT (runReaderT (evalBody (toList body)) flowMap) `ha` fromList `ha` zip (toList $ params `yo` argName)
+  -- Call name args -> do
+  --   flowMap <- ask
+  --   case Map.lookup name flowMap of
+  --     Nothing -> throwError $ RuntimeError ("Unknown flow: " ++ name)
+  --     Just (These params body) -> do
+  --       Nothing <$ do for (toList args) evalExpr >>= lift `ha` lift `ha` runStateT (runReaderT (evalBody (toList body)) flowMap) `ha` fromList `ha` zip (toList $ params `yo` argName)
 
   Return expr ->
     Just <$> evalExpr expr
@@ -106,13 +106,13 @@ evalStmt stmt = case unwrap stmt of
       Bool False -> isolate (evalBody $ toList eBlock)
       _           -> throwError $ RuntimeError "Condition must be boolean"
 
-  Delta name _mType expr ->
-    Nothing <$ do evalExpr expr >>= modify `ha` insert name
+  -- Delta name expr ->
+  --   Nothing <$ do evalExpr expr >>= modify `ha` insert name
 
-  Source name _mType expr -> do
-    Map.lookup name <$> T.get >>= \case
-      Nothing -> Nothing <$ do evalExpr expr >>= modify `ha` insert name
-      Just _  -> throwError $ RuntimeError ("Variable '" ++ name ++ "' already defined")
+  -- Source name expr -> do
+  --   Map.lookup name <$> T.get >>= \case
+  --     Nothing -> Nothing <$ do evalExpr expr >>= modify `ha` insert name
+  --     Just _  -> throwError $ RuntimeError ("Variable '" ++ name ++ "' already defined")
 
 binOp :: (Double -> Double -> Double) -> Recursive Expression -> Recursive Expression -> EvalIR Value
 binOp op a b = (,) <$> evalExpr a <*> evalExpr b >>= \case
@@ -123,9 +123,9 @@ evalExpr :: Recursive Expression -> EvalIR Value
 evalExpr expr = case unwrap expr of
   Operand (Literal x) -> return x
 
-  Operand (Variable name) ->
-    Map.lookup name <$> T.get
-      >>= maybe (throwError `ha` RuntimeError $ "Unbound variable: " ++ name) pure
+  -- Operand (Variable name) ->
+  --   Map.lookup name <$> T.get
+  --     >>= maybe (throwError `ha` RuntimeError $ "Unbound variable: " ++ name) pure
 
   -- Operator (Binary (Add a b)) -> binOp (+) a b
   -- Operator (Binary (Sub a b)) -> binOp (-) a b

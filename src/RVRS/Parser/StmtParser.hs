@@ -12,12 +12,13 @@ import Data.Char (isAlphaNum)
 import Ya (Recursive (..), ho'ho, ho'ho'ho)
 
 import RVRS.AST
-import RVRS.Parser.ExprParser (exprParser)
-import RVRS.Parser.Type (typeParser)
+import RVRS.Parser.ExprParser (exprParser, identifier)
+-- import RVRS.Parser.Type (typeParser)
 
 type Parser = Parsec Void String
 
-statementParser = choice
+statementParser :: Parser (Recursive Statement)
+statementParser = choice (
   [ try pillarParser
   , try mouthParser
   , try whisperParser     
@@ -30,7 +31,7 @@ statementParser = choice
   , try returnParser
   , try callStmt           
   , try bareCallStmt
-  ]
+  ] :: [Parser (Recursive Statement)])
 
 -- Individual statement parsers
 
@@ -50,10 +51,10 @@ speaksParser :: Parser (Recursive Statement)
 speaksParser = symbol "speaks" *> do Recursive <$> Echo <$> exprParser
 
 sourceParser :: Parser (Recursive Statement)
-sourceParser = Source `ho'ho'ho` Recursive
+sourceParser = Source `ho'ho` Recursive
   <$> do symbol "source" *> identifier
   -- TODO: there is actually a better way to describe it
-  <*> do try (symbol ":" *> (Just <$> typeParser)) <|> pure Nothing
+  -- <*> do try (symbol ":" *> (Just <$> typeParser)) <|> pure Nothing
   <*> do symbol "=" *> exprParser
 
 bareCallStmt :: Parser (Recursive Statement)
@@ -63,15 +64,15 @@ bareCallStmt = Call `ho'ho` Recursive
 
 -- Delta parser supporting both typed and untyped declarations
 deltaParser :: Parser (Recursive Statement)
-deltaParser = Delta `ho'ho'ho` Recursive
+deltaParser = Delta `ho'ho` Recursive
   <$> do symbol "delta" *> identifier
-  <*> do try (symbol ":" *> do Just <$> typeParser) <|> pure Nothing
+  -- <*> do try (symbol ":" *> do Just <$> typeParser) <|> pure Nothing
   <*> do symbol "=" *> exprParser
 
 pillarParser :: Parser (Recursive Statement)
 pillarParser = Pillar `ho'ho` Recursive
-  <$> do symbol "pillar" *> identifier
-  <*> do symbol "=" *> exprParser
+  <$> do symbol ("pillar" :: String) *> identifier
+  <*> do symbol ("=" :: String) *> exprParser
 
 returnParser :: Parser (Recursive Statement)
 returnParser = Recursive <$> Return <$> do symbol "return" *> exprParser
@@ -101,8 +102,8 @@ symbol = L.symbol sc
 parens :: Parser a -> Parser a
 parens = between (symbol "(") (symbol ")")
 
-identifier :: Parser String
-identifier = lexeme $ (:) <$> letterChar <*> many (alphaNumChar <|> char '_')
+-- identifier :: Parser String
+-- identifier = lexeme $ (:) <$> letterChar <*> many (alphaNumChar <|> char '_')
 
 sc :: Parser ()
 sc = L.space space1 lineCmnt blockCmnt

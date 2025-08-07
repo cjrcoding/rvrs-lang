@@ -1,12 +1,13 @@
 -- src/RVRS/Parser/Expression.hs
 
-module RVRS.Parser.ExprParser (exprParser) where
+module RVRS.Parser.ExprParser (exprParser, identifier) where
 
 import Prelude
 import GHC.IsList (fromList)
 import Control.Monad (void)
 import Control.Monad.Combinators.Expr
 import Data.Void
+import Data.String
 import Text.Megaparsec
 import Text.Megaparsec.Char
 
@@ -76,8 +77,8 @@ symbol = M.symbol sc
 parens :: Parser a -> Parser a
 parens = between (symbol "(") (symbol ")")
 
-identifier :: Parser String
-identifier = lexeme $ (:) <$> letterChar <*> many (alphaNumChar <|> char '_')
+identifier :: Parser Name
+identifier = fromString <$> do lexeme $ (:) <$> lowerChar <*> many letterChar
 
 stringLiteral :: Parser String
 stringLiteral = char '"' *> manyTill M.charLiteral (char '"')

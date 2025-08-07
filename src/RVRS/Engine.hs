@@ -5,7 +5,6 @@ import GHC.IsList (fromList, toList)
 import Prelude (Double, (+), (-), (*), (/), (<), (==), (>), readFile, putStrLn, error)
 import Data.List ((++), zip)
 import Data.Bool (Bool (..), bool, (&&), (||))
-import Data.String (String)
 import Data.Either (Either (..))
 import Data.Functor ((<$>))
 import Data.Map (Map, insert, union)
@@ -20,16 +19,16 @@ import RVRS.AST
 import RVRS.Parser
 import RVRS.Value
 
-type Bindings = Map String Value
+type Bindings = Map Name Value
 
-type Flowings = Map String Flow
+type Flowings = Map Name Flow
 
 type Reason = Runtime `S` Value
 
 pattern Runtime e = This e :: Reason
 pattern Returns e = That e :: Reason
 
-type Runtime = Unit `S` String `S` String `S` (Value `S` String) `S` Recursive Expression `S` String
+type Runtime = Unit `S` Name `S` Name `S` (Value `S` Name) `S` Recursive Expression `S` Name
 
 pattern Require e = This (This (This (This (This e))))
 pattern Unknown e = This (This (This (This (That e))))
@@ -67,15 +66,15 @@ statement x = case unwrap x of
   `yok____` Ok `hu_` Lease `ha` State `ha` Event `hv` get @Bindings
      `lo'yp` Lease `ha` intro @(State Bindings) @(AR)
   `yok____` Apply `ha` calls `ha'ho` bool if_block else_block
- Delta name _ expr -> intro @Engine `hv` Unit
+ Delta name expr -> intro @Engine `hv` Unit
   `yuk____` Apply `hv` expression expr
-  `yok____` Apply `ha` State `ha` Event `ha` save @String @Value name
+  `yok____` Apply `ha` State `ha` Event `ha` save @Name @Value name
   `yok____` Check `ha` Break `ha` Returns `ha` that @Value
- Source name _ expr -> intro @Engine `hv` Unit
+ Source name expr -> intro @Engine `hv` Unit
   `yuk____` Lease `hv___` State `ha` Event `hv` get @Bindings `yo` find name
   `yok____` Check `ha___` Error `hu_` Ok `hv` Unit `la_` Some `hu_` Error `ha` Runtime `ha` Defined `hv` name
   `yuk____` Apply `hv` expression expr
-  `yok____` Apply `ha` State `ha` Event `ha` save @String @Value name
+  `yok____` Apply `ha` State `ha` Event `ha` save @Name @Value name
   `yok____` Check `ha` Break `ha` Returns `ha` that @Value
 
 expression :: Recursive Expression `AR__` Engine Value
@@ -128,7 +127,7 @@ params args = is @(Nonempty List `T` Recursive Expression)
 match :: Nonempty List Value `P` Nonempty List Argument `AR` Stops Reason Bindings
 match (These values names) = values `lu'yr` Align `hv` (names `yo` argName)
  `yokl` Apply `ho` Forth `ha__` Error `ha` Runtime `ha` Valency `la` Ok `ha` Equip
- `yo__` to `ha` wrap @(AR) @(Nonempty List `T'TT'I` Equipped String `T'I_` Value)
+ `yo__` to `ha` wrap @(AR) @(Nonempty List `T'TT'I` Equipped Name `T'I_` Value)
 
 tap :: forall target . Value `M` target `S` target `AR___` Error Reason target
 tap = Some `hu_` Error `ha` Runtime `ha` Require `hv` Unit `la` Valid @target
@@ -145,8 +144,8 @@ block (These bindings body) flows = body
  `yi__` execute flows bindings
  `yo__` Error `la` Ok `la` Ok `hu` (Ok `hv` Bool True)
 
-execute :: Flowings -> Map String Value -> Engine e
- -> World (Stops Reason `T'I` Equipped `T` Map String Value `T` e)
+execute :: Flowings -> Bindings -> Engine e
+ -> World (Stops Reason `T'I` Equipped `T` Bindings `T` e)
 execute flows bindings action = is `hv_'he` action `he'he'hv` flows `he'he'hv` bindings
 
 display label x = putStrLn (label ++ ": " ++ show x) `yu` x
@@ -158,7 +157,7 @@ loadAndMergeStdlib = readFile "stdlib/stdlib.rvrs" `yo` parseRVRS `yok` \case
   `hv` ((\(These flow name) -> (name, flow)) <$> flows)
 
 -- TODO: I think it should be `[Recursive Expression]` instead of `[Value]`
-flowing :: Flowings -> String -> [Value] -> World (Stops Reason Value)
+flowing :: Flowings -> Name -> [Value] -> World (Stops Reason Value)
 flowing userFlows entryName args = do
  fullFlowMap <- loadAndMergeStdlib `yo` union userFlows
  case find entryName fullFlowMap of

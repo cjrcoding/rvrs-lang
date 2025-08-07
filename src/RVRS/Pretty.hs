@@ -10,7 +10,7 @@ import RVRS.AST
 
 prettyExpr :: Recursive Expression -> String
 prettyExpr expr = case expr of
-  Recursive (Operand (Variable name)) -> name
+  -- Recursive (Operand (Variable name)) -> name
   Recursive (Operand (Literal x)) -> is `ho` show @String `la` is `ho` show @Double `la` is `ho` bool "false" "true" `li` x
   -- Recursive (Operator (Dyadic (These (These x y) op))) -> "(" ++ prettyExpr x ++ dyadic op ++ prettyExpr y ++ ")"
   -- Recursive (Operator (Unary (These e op))) -> "(" ++ unary op ++ prettyExpr e ++ ")"

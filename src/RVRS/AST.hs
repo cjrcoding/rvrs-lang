@@ -6,7 +6,7 @@ import Ya.ASCII
 import Ya.Literal
 import Ya.Instances
 
-type Name = Nonempty List ASCII
+type Name = Nonempty List Letter
 
 -- | Represents a flow of ritual logic
 type Flow = Nonempty List Argument `P` Nonempty List (Recursive Statement)
@@ -14,21 +14,21 @@ type Flow = Nonempty List Argument `P` Nonempty List (Recursive Statement)
 -- TODO: is `argType` really necessary here?
 -- | A named argument to a flow, e.g., `x: Number`
 data Argument = Argument
-  { argName :: String            -- ^ The argument name
+  { argName :: Name            -- ^ The argument name
   , argType :: String            -- ^ Placeholder for the type (optional for now)
   } deriving (Show, Eq)
 
 -- | Statements inside a flow block
 data Statement e
-  = Source String (Maybe Typed) (Recursive Expression)                 -- source x = ...
-  | Delta String (Maybe Typed) (Recursive Expression)
+  = Source Name (Recursive Expression)                 -- source x = ...
+  | Delta Name (Recursive Expression)
   | Branch (Recursive Expression) (Nonempty List e) (Nonempty List e) -- branch cond { ... } else { ... }
   | Mouth (Recursive Expression)                          -- mouth "..."
   | Whisper (Recursive Expression)
   | Echo (Recursive Expression)                           -- echo x
-  | Pillar String (Recursive Expression)  -- pillar NAME = ...
+  | Pillar Name (Recursive Expression)  -- pillar NAME = ...
   | Return (Recursive Expression)
-  | Call String (Nonempty List `T` Recursive Expression)
+  | Call Name (Nonempty List `T` Recursive Expression)
   | Assert (Recursive Expression)
   -- deriving (Show, Eq)
 
@@ -38,7 +38,7 @@ pattern Operand x = T'TT'I'TTT'I (This x) :: Expression e
 pattern Operator x = T'TT'I'TTT'I (That x) :: Expression e
 -- pattern Calling x = T'TT'I'TTT'I (That x) :: Expression e
 
-type Operand = Instead Value `S'T'I'TT'I` Instead String
+type Operand = Instead Value `S'T'I'TT'I` Instead Name
 
 pattern Literal x = T'TT'I'TTT'I (This (Instead x)) :: Operand e
 pattern Variable x = T'TT'I'TTT'I (That (Instead x)) :: Operand e

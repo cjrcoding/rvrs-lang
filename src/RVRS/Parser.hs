@@ -11,6 +11,7 @@ import Data.Void
 import Debug.Trace (trace)
 
 import RVRS.AST
+import RVRS.Parser.ExprParser (exprParser, identifier)
 import RVRS.Parser.StmtParser (statementParser)
 
 type Parser = Parsec Void String
@@ -20,7 +21,7 @@ debug :: Bool
 debug = False  -- Set to True if you want parser debug output
 
 -- Top-level parse function
-parseRVRS :: String -> Either (ParseErrorBundle String Void) [Flow `P` String]
+parseRVRS :: String -> Either (ParseErrorBundle String Void) [Flow `P` Name]
 parseRVRS input =
   case parse (between sc eof (many flowParser)) "RVRS" input of
     Left err -> trace "❌ PARSE FAILED" (Left err)
@@ -30,7 +31,7 @@ parseRVRS input =
         then trace ("✅ Parsed flows:\n") (Right flows)
         else Right flows
 
-flowParser :: Parser (Flow `P` String)
+flowParser :: Parser (Flow `P` Name)
 flowParser = (\name params body -> params `lu` body `lu` name)
   <$> ((symbol "flow" <|> symbol "ceremony") *> identifier)
   <*> (fromList <$> argListParser)
@@ -55,6 +56,3 @@ lexeme = L.lexeme sc
 
 symbol :: String -> Parser String
 symbol = L.symbol sc
-
-identifier :: Parser String
-identifier = lexeme $ (:) <$> letterChar <*> many (alphaNumChar <|> char '_')

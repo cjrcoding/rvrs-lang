@@ -13,9 +13,9 @@ import Text.Show
 import RVRS.AST
 import RVRS.Value
 
-type Context = Map String Typed
+type Context = Map Name Typed
 
-type Types = (Typed `P` Typed) `S` (Typed `P` Typed) `S` String `S` String
+type Types = (Typed `P` Typed) `S` (Typed `P` Typed) `S` String `S` Name
 
 pattern Mismatched x = This (This (This x)) :: Types
 pattern Unexpected x = This (This (That x)) :: Types
