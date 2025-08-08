@@ -43,14 +43,14 @@ runTests files silent = go files 0 0 0 silent
       putStrLn stdout
       let combinedOutput = map toLower (stdout ++ stderr)
           failed = any (`isInfixOf` combinedOutput)
-            [ "parse failed"
+            ([ "parse failed"
             , "unexpected"
             , "runtime error"
             , "assertion failed"
             , "assertion error"
             , "error:"
             , "could not evaluate"
-            ]
+            ] :: [String])
           isSilent = not ("echo:" `isInfixOf` combinedOutput ||
                           "returned:" `isInfixOf` combinedOutput ||
                           "whisper:" `isInfixOf` combinedOutput ||

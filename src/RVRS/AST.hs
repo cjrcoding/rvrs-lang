@@ -1,9 +1,12 @@
 module RVRS.AST where
 
-import Ya (Tagged (Tag), type (#), type T, type AR, P, S, Object (This, That), Recursive (..), type Unit, type Nonempty, type List)
+import Ya (T'TT'I'TTT'I (..), type P'T'I'TT'I, type S'T'I'TT'I, Tagged (Tag), type (#), type Twice, type Instead, type T'I' (..), type T, type AR, P, S, Object (..), Recursive (..), type Only, type Both, type Unit, type Nonempty, type List, pattern Instead)
 
-import Ya.Instances ()
-import Ya.Literal ()
+import Ya.ASCII
+import Ya.Literal
+import Ya.Instances
+
+type Name = Nonempty List Letter
 
 -- | Represents a flow of ritual logic
 type Flow = Nonempty List Argument `P` Nonempty List (Recursive Statement)
@@ -11,46 +14,49 @@ type Flow = Nonempty List Argument `P` Nonempty List (Recursive Statement)
 -- TODO: is `argType` really necessary here?
 -- | A named argument to a flow, e.g., `x: Number`
 data Argument = Argument
-  { argName :: String            -- ^ The argument name
+  { argName :: Name            -- ^ The argument name
   , argType :: String            -- ^ Placeholder for the type (optional for now)
   } deriving (Show, Eq)
 
 -- | Statements inside a flow block
 data Statement e
-  = Source String (Maybe Typed) (Recursive Expression)                 -- source x = ...
-  | Delta String (Maybe Typed) (Recursive Expression)
+  = Source Name (Recursive Expression)                 -- source x = ...
+  | Delta Name (Recursive Expression)
   | Branch (Recursive Expression) (Nonempty List e) (Nonempty List e) -- branch cond { ... } else { ... }
   | Mouth (Recursive Expression)                          -- mouth "..."
   | Whisper (Recursive Expression)
   | Echo (Recursive Expression)                           -- echo x
-  | Pillar String (Recursive Expression)  -- pillar NAME = ...
+  | Pillar Name (Recursive Expression)  -- pillar NAME = ...
   | Return (Recursive Expression)
-  | Call String (Nonempty List `T` Recursive Expression)
   | Assert (Recursive Expression)
-  deriving (Show, Eq)
+  -- deriving (Show, Eq)
 
-data Expression e
-  = Variable String
-  | Operator (Operation e)
-  | Calling String (Nonempty List e)
-  | Literal Value
-  deriving (Show, Eq)
+type Expression = Operand `S'T'I'TT'I` Operator `S'T'I'TT'I` Calling
 
-type Primitive string double bool
- = string `S` double `S` bool
+pattern Operand x = T'TT'I'TTT'I (This (T'TT'I'TTT'I (This x))) :: Expression e
+pattern Operator x = T'TT'I'TTT'I (This (T'TT'I'TTT'I (That x))) :: Expression e
+pattern Calling x = T'TT'I'TTT'I (That (T'TT'I'TTT'I x)) :: Expression e
 
-pattern String x = This (This x) :: Primitive string double bool
-pattern Double x = This (That x) :: Primitive string double bool
-pattern Bool x = That x :: Primitive string double bool
+type Operand = Instead Value `S'T'I'TT'I` Instead Name
 
-type Value = Primitive String Double Bool
+pattern Literal x = T'TT'I'TTT'I (This (Instead x)) :: Operand e
+pattern Variable x = T'TT'I'TTT'I (That (Instead x)) :: Operand e
 
-type Typed = Primitive Unit Unit Unit
+type Operator = Operation Unary Only `S'T'I'TT'I` Operation Dyadic Twice
 
-data Unary e
-  = Neg e
-  | Not e
-  deriving (Show, Eq)
+pattern Unary x = T'TT'I'TTT'I (This x) :: Operator e
+pattern Dyadic x = T'TT'I'TTT'I (That x) :: Operator e
+
+type Calling = Instead Name `P'T'I'TT'I` Nonempty List
+
+type Operation kind quantity = Instead kind `P'T'I'TT'I` quantity
+
+pattern Operation op args = T'TT'I'TTT'I (These (Instead op) args) :: Operation kind quantity e
+
+type Unary = Unit `S` Unit
+
+pattern Negation x = This x
+pattern Complement x = That x
 
 type Dyadic = Arithmetic `S` Comparison `S` Combinated
 
@@ -79,7 +85,13 @@ pattern And, Or :: Unit `AR` Combinated
 pattern And x = This x
 pattern Or x = That x
 
-type Operation e = Unary e `S` (e `P` e `P` Dyadic)
+type Primitive string double bool
+ = string `S` double `S` bool
 
-pattern Unary x = This x :: Operation e
-pattern Binary x = That x :: Operation e
+pattern String x = This (This x) :: Primitive string double bool
+pattern Double x = This (That x) :: Primitive string double bool
+pattern Bool x = That x :: Primitive string double bool
+
+type Value = Primitive String Double Bool
+
+type Typed = Primitive Unit Unit Unit

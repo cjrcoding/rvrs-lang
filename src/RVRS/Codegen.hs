@@ -4,7 +4,7 @@ import Prelude
 import Data.Bool (bool)
 import GHC.IsList (fromList, toList)
 
-import Ya (Object (..), Recursive (..), type AR__, type P, is, unwrap, yo, ho, ho'he, hu, la, li)
+import Ya (Object (..), Recursive (..), type T'I' (..), type AR__, type P, pattern Both, is, unwrap, yo, ho, ho'he, hu, la, li)
 import Ya.Literal ()
 
 import RVRS.AST
@@ -13,15 +13,16 @@ import RVRS.AST
 generateAiken :: Flow `P` String `AR__` String
 generateAiken (These (These args body) name) =
   unlines $
-    ["fn " ++ name ++ "(" ++ commaSep (toList $ args `yo` renderArg) ++ ") -> String {"] ++
+    ["fn " ++ name ++ "(" ++ "..." ++ ") -> String {"] ++
+    -- ["fn " ++ name ++ "(" ++ commaSep (toList $ args `yo` renderArg) ++ ") -> String {"] ++
     map ("  " ++) (concatMap genStmt (toList body)) ++
     ["}"]
 
 -- | Convert a statement into one or more Aiken lines
 genStmt :: Recursive Statement -> [String]
 genStmt stmt = case unwrap stmt of
-  Source var _ expr -> ["let " ++ var ++ " = " ++ genExpr expr]
-  Delta var _ expr -> ["let " ++ var ++ " = " ++ genExpr expr]
+  -- Source var _ expr -> ["let " ++ var ++ " = " ++ genExpr expr]
+  -- Delta var _ expr -> ["let " ++ var ++ " = " ++ genExpr expr]
   Mouth expr -> ["trace " ++ show (genExpr expr)]
   Echo expr -> ["return " ++ genExpr expr]
   Branch cond tBranch fBranch ->
@@ -34,13 +35,13 @@ genStmt stmt = case unwrap stmt of
 -- | Convert an expression into Aiken-compatible syntax
 genExpr :: Recursive Expression -> String
 genExpr expr = case unwrap expr of
-  Variable x -> x
-  Literal x -> is `ho` show @String `la` is `ho` show @Double `la` is `ho` bool "false" "true"  `li` x
-  Operator (Binary (These (These x y) (Comparison (Equals _)))) -> genExpr x ++ " == " ++ genExpr y
+  -- Operand (Variable x) -> x
+  Operand (Literal x) -> is `ho` show @String `la` is `ho` show @Double `la` is `ho` bool "false" "true" `li` x
+  -- Operator (Dyadic (These (Both (These x y)) (T'I' (Comparison (Equals _))))) -> genExpr x ++ " == " ++ genExpr y
 
 -- | Render a function argument
-renderArg :: Argument -> String
-renderArg (Argument name typ) = name ++ ": " ++ typ
+-- renderArg :: Argument -> String
+-- renderArg (Argument name typ) = name ++ ": " ++ typ
 
 -- | Helpers
 commaSep :: [String] -> String
@@ -52,8 +53,8 @@ indent :: [String] -> [String]
 indent = map ("  " ++)
 
 -- | Pretty-print the Flow structure (used for debugging)
-prettyPrintFlow :: Flow `P` String `AR__` String
+prettyPrintFlow :: Flow `P` Name `AR__` String
 prettyPrintFlow (These (These body args) name) =
-  "Flow\n  name: " ++ name ++
-  "\n  args: " ++ show args ++
-  "\n  body:\n    " ++ unlines (toList $ body `yo` show)
+  "Flow\n  name: " ++ -- ++ name ++
+  "\n  args: " ++ -- show args ++
+  "\n  body:\n    " -- ++ unlines (toList $ body `yo` show)
