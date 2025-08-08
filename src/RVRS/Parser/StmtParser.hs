@@ -29,8 +29,6 @@ statementParser = choice (
   , try deltaParser
   , try branchParser
   , try returnParser
-  , try callStmt           
-  , try bareCallStmt
   ] :: [Parser (Recursive Statement)])
 
 -- Individual statement parsers
@@ -57,11 +55,6 @@ sourceParser = Source `ho'ho` Recursive
   -- <*> do try (symbol ":" *> (Just <$> typeParser)) <|> pure Nothing
   <*> do symbol "=" *> exprParser
 
-bareCallStmt :: Parser (Recursive Statement)
-bareCallStmt = Call `ho'ho` Recursive
-  <$> identifier
-  <*> do fromList <$> do between (symbol "(") (symbol ")") (exprParser `sepBy` symbol ",")
-
 -- Delta parser supporting both typed and untyped declarations
 deltaParser :: Parser (Recursive Statement)
 deltaParser = Delta `ho'ho` Recursive
@@ -86,13 +79,6 @@ branchParser = Branch `ho'ho'ho` Recursive
 blockParser :: Parser [Recursive Statement]
 blockParser = between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc))
 
-callStmt :: Parser (Recursive Statement)
-callStmt = Call `ho'ho` Recursive
-  <$> do symbol "call" *> identifier
-  <*> do fromList <$> do option [] . parens $ exprParser `sepBy` symbol ","
-
--- Shared utilities
-
 lexeme :: Parser a -> Parser a
 lexeme = L.lexeme sc
 
@@ -101,9 +87,6 @@ symbol = L.symbol sc
 
 parens :: Parser a -> Parser a
 parens = between (symbol "(") (symbol ")")
-
--- identifier :: Parser String
--- identifier = lexeme $ (:) <$> letterChar <*> many (alphaNumChar <|> char '_')
 
 sc :: Parser ()
 sc = L.space space1 lineCmnt blockCmnt

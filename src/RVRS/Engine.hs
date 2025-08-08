@@ -54,10 +54,6 @@ statement x = case unwrap x of
  Whisper expr -> intro @Engine `hv` Unit
   `yuk____` Apply `hv` expression expr
   `yok____` World `ha` display "whisper: "
- -- Call name args -> intro @Engine `hv` Unit
-  -- `yuk____` Apply `hv` params args `lu'yp` Apply `hv` setup name
-  -- `yok____` Check `ha__` unwrap @(AR) `ho_'yoikl` Apply `ha` Check `ha` match
-  -- `yok____` Apply `ha__` calls
  Assert expr -> intro @Engine `hv` Unit
   `yuk____` Apply `hv` expression expr
   `yok____` Check `ha` tap `ha` on @Bool

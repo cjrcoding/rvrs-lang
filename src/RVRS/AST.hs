@@ -28,7 +28,6 @@ data Statement e
   | Echo (Recursive Expression)                           -- echo x
   | Pillar Name (Recursive Expression)  -- pillar NAME = ...
   | Return (Recursive Expression)
-  | Call Name (Nonempty List `T` Recursive Expression)
   | Assert (Recursive Expression)
   -- deriving (Show, Eq)
 

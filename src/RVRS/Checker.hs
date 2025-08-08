@@ -57,4 +57,4 @@ dyadic (These operation (Both (These x y))) = intro @Checker `hv` Unit
 
 -- TODO: implement typechecking of this type of expressions
 calling (These name args) = intro @Checker @(AR) `ha` Bool `hv` Unit
- -- `yuk____` Apply `ha` expression `hv` x
+ -- `yuk____` Lease `hv__` State `ha` Event `hv` get @Context `yo` find name
