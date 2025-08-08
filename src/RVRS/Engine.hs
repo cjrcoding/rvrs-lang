@@ -15,7 +15,7 @@ import Ya hiding (True, False, Left, Right)
 import Ya.Conversion
 import Ya.World
 
-import RVRS.AST
+import RVRS.Syntax
 import RVRS.Parser
 import RVRS.Value
 

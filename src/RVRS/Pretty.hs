@@ -6,7 +6,7 @@ import GHC.IsList (toList)
 
 import Ya (type AR, Recursive (..), Object (These), is, ho, hu, li, la, la__)
 
-import RVRS.AST
+import RVRS.Syntax
 
 prettyExpr :: Recursive Expression -> String
 prettyExpr expr = case expr of

@@ -29,7 +29,7 @@ import Ya (Object (..), type T'I, type P, type Recursive (..), pattern Unit, pat
 import Ya.World (World, pattern World)
 import Ya.Literal ()
 
-import RVRS.AST
+import RVRS.Syntax
 import RVRS.Value
 import RVRS.Parser
 

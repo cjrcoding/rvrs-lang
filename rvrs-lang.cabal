@@ -51,7 +51,7 @@ common hunit-deps
 library
   import: lib-settings
   exposed-modules:
-      RVRS.AST
+      RVRS.Syntax
   other-modules:
       RVRS.Codegen
     , RVRS.Parser
@@ -72,7 +72,7 @@ executable rvrs
   import: app-settings
   main-is: Main.hs
   other-modules:
-      RVRS.AST
+      RVRS.Syntax
     , RVRS.Codegen
     , RVRS.Parser
     , RVRS.Checker
@@ -90,7 +90,7 @@ executable RunAll
   import: app-settings, extra-deps
   main-is: RunAll.hs
   other-modules:
-      RVRS.AST
+      RVRS.Syntax
     , RVRS.Codegen
     , RVRS.Parser
     , RVRS.Checker
@@ -108,7 +108,7 @@ executable RunEngine
   import: app-settings, extra-deps
   main-is: RunEngine.hs
   other-modules:
-      RVRS.AST
+      RVRS.Syntax
     , RVRS.Engine
     , RVRS.Parser
     , RVRS.Value
@@ -117,7 +117,7 @@ executable RunEngine
 --   import: app-settings, hunit-deps
 --   main-is: TestTypeCheck.hs
 --   other-modules:
---       RVRS.AST
+--       RVRS.Syntax
 --     , RVRS.Parser.Type
 --     , RVRS.Checker
 --     , RVRS.Value
@@ -128,7 +128,7 @@ executable RunEngine
 --   import: app-settings, hunit-deps
 --   main-is: TestTypeCheckNegative.hs
 --   other-modules:
---       RVRS.AST
+--       RVRS.Syntax
 --     , RVRS.Checker
 --     , RVRS.Parser.Type
 --     , RVRS.Value

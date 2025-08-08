@@ -1,5 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-module RVRS.AST where
+module RVRS.Syntax where
 
 import Ya
 import Ya.ASCII

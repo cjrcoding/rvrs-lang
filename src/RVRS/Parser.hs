@@ -10,7 +10,7 @@ import Data.Char (isAlphaNum)
 import Data.Void
 import Debug.Trace (trace)
 
-import RVRS.AST
+import RVRS.Syntax
 import RVRS.Parser.ExprParser (exprParser, identifier)
 import RVRS.Parser.StmtParser (statementParser)
 

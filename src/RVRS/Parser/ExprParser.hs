@@ -15,7 +15,7 @@ import qualified Control.Monad.Combinators.Expr as M
 
 import Ya (Recursive (..), Object (..), type AR, type AR_, type AR__, type Unit, pattern Both, pattern Only, pattern Unit, by, yi, ho, ho'ho, ha, hv, lu, wrap)
 
-import RVRS.AST
+import RVRS.Syntax
 
 type Parser = Parsec Void String
 
