@@ -27,6 +27,7 @@ import GHC.IsList (fromList, toList)
 import System.IO (readFile)
 import Ya (Object (..), type T'I, type P, type Recursive (..), pattern Unit, pattern Try, is, at, by, this, unwrap, ha, ho, ho___'yok, hu, hv, hv__, la, li, lu'yp, lu'ys'la, yo, yok, yu)
 import Ya.World (World, pattern World)
+import Ya.Instances ()
 import Ya.Literal ()
 
 import RVRS.Syntax
