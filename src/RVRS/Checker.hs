@@ -27,6 +27,7 @@ type Checker = Stops Types `JNT` State Context
 expression = is @(Recursive Expression `AR_` Checker Typed)
  `li__` literal `ha'he` is `la` variable `ha'he` is
   `la_` unary `ha'he` is `la` dyadic `ha'he` is
+  `la_` calling `ha'he` is
 
 literal = intro @Checker
  `ha__` be `hv'he` String
@@ -53,3 +54,7 @@ dyadic (These operation (Both (These x y))) = intro @Checker `hv` Unit
      `yi_` Arithmetic `hu` (`lu'q` by Double)
       `la` Comparison `hu` (`lu'q` by Double) `ho'ho'ho` (be `hv'he` Bool)
       `la` Combinated `hu` (`lu'q` by Bool)
+
+-- TODO: implement typechecking of this type of expressions
+calling (These name args) = intro @Checker @(AR) `ha` Bool `hv` Unit
+ -- `yuk____` Apply `ha` expression `hv` x

@@ -32,23 +32,23 @@ data Statement e
   | Assert (Recursive Expression)
   -- deriving (Show, Eq)
 
-type Expression = Operand `S'T'I'TT'I` Operator -- `S'T'I'TT'I` Calling
+type Expression = Operand `S'T'I'TT'I` Operator `S'T'I'TT'I` Calling
 
-pattern Operand x = T'TT'I'TTT'I (This x) :: Expression e
-pattern Operator x = T'TT'I'TTT'I (That x) :: Expression e
--- pattern Calling x = T'TT'I'TTT'I (That x) :: Expression e
+pattern Operand x = T'TT'I'TTT'I (This (T'TT'I'TTT'I (This x))) :: Expression e
+pattern Operator x = T'TT'I'TTT'I (This (T'TT'I'TTT'I (That x))) :: Expression e
+pattern Calling x = T'TT'I'TTT'I (That (T'TT'I'TTT'I x)) :: Expression e
 
 type Operand = Instead Value `S'T'I'TT'I` Instead Name
 
 pattern Literal x = T'TT'I'TTT'I (This (Instead x)) :: Operand e
 pattern Variable x = T'TT'I'TTT'I (That (Instead x)) :: Operand e
 
--- type Calling = Instead String `P'T'I'TT'I` Nonempty List
-
 type Operator = Operation Unary Only `S'T'I'TT'I` Operation Dyadic Twice
 
 pattern Unary x = T'TT'I'TTT'I (This x) :: Operator e
 pattern Dyadic x = T'TT'I'TTT'I (That x) :: Operator e
+
+type Calling = Instead Name `P'T'I'TT'I` Nonempty List
 
 type Operation kind quantity = Instead kind `P'T'I'TT'I` quantity
 

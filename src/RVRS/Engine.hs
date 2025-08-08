@@ -1,10 +1,12 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE ViewPatterns #-}
 module RVRS.Engine where
 
 import GHC.IsList (fromList, toList)
 import Prelude (Double, (+), (-), (*), (/), (<), (==), (>), readFile, putStrLn, error)
 import Data.List ((++), zip)
 import Data.Bool (Bool (..), bool, (&&), (||))
+import Data.String (String)
 import Data.Either (Either (..))
 import Data.Functor ((<$>))
 import Data.Map (Map, insert, union)
@@ -52,10 +54,10 @@ statement x = case unwrap x of
  Whisper expr -> intro @Engine `hv` Unit
   `yuk____` Apply `hv` expression expr
   `yok____` World `ha` display "whisper: "
- Call name args -> intro @Engine `hv` Unit
-  `yuk____` Apply `hv` params args `lu'yp` Apply `hv` setup name
-  `yok____` Check `ha__` unwrap @(AR) `ho_'yoikl` Apply `ha` Check `ha` match
-  `yok____` Apply `ha__` calls
+ -- Call name args -> intro @Engine `hv` Unit
+  -- `yuk____` Apply `hv` params args `lu'yp` Apply `hv` setup name
+  -- `yok____` Check `ha__` unwrap @(AR) `ho_'yoikl` Apply `ha` Check `ha` match
+  -- `yok____` Apply `ha__` calls
  Assert expr -> intro @Engine `hv` Unit
   `yuk____` Apply `hv` expression expr
   `yok____` Check `ha` tap `ha` on @Bool
@@ -111,11 +113,12 @@ expression x = case unwrap x of
        `la` Or `hu` (is `ho'hd` (||) `ho` Bool)
        `li` is @Combinated operation
 
- -- Calling name args -> intro @Engine `hv` Unit
-  -- `yuk____` Apply `hv` params args `lu'yp` Apply `hv` setup name
-  -- `yok____` Check `ha__` unwrap @AR `ho_'yoikl` Apply `ha` Check `ha` match
-  -- `yok____` Apply `ha__` calls
-  -- `yuk____` Apply `hv__` intro @Engine `hv` Bool True
+ Calling (These name args) -> intro @Engine `hv` Unit
+  `yuk____` Apply `hv` params args
+    `lu'yp` Apply `ha` setup `hv` unwrap name
+  `yok____` Check `ha__` unwrap @AR `ho_'yoikl` Apply `ha` Check `ha` match
+  `yok____` Apply `ha__` calls
+  `yuk____` Apply `hv__` intro @Engine `hv` Bool True
 
 setup name = intro @Engine @(AR) `hv` Unit
  `yuk____` Apply `hv__` Given `hv` is @Flowings `yo` find name
