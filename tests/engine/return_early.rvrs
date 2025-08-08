@@ -1,0 +1,4 @@
+flow main {
+  return 42
+  echo "you should not see this"
+}
