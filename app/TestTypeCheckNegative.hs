@@ -7,7 +7,7 @@ import qualified Data.Map as Map
 import Ya (Recursive(..), pattern Unit, pattern Error, pattern Valid, yi, ho, ha, hv, lu)
 import Ya.Instances ()
 
-import RVRS.AST
+import RVRS.Syntax
 import RVRS.Checker
 
 -- Simple type environment

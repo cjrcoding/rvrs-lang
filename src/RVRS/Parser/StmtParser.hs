@@ -11,7 +11,7 @@ import Data.Char (isAlphaNum)
 
 import Ya (Recursive (..), ho'ho, ho'ho'ho)
 
-import RVRS.AST
+import RVRS.Syntax
 import RVRS.Parser.ExprParser (exprParser, identifier)
 -- import RVRS.Parser.Type (typeParser)
 

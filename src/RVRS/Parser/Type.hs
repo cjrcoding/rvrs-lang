@@ -8,7 +8,7 @@ import qualified Text.Megaparsec.Char.Lexer as L
 
 import Ya (pattern Unit)
 
-import RVRS.AST (type Typed, pattern Double, pattern String, pattern Bool)
+import RVRS.Syntax (type Typed, pattern Double, pattern String, pattern Bool)
 
 -- Parser for these types (used in annotations)
 -- typeParser :: Parsec Void String Typed

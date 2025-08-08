@@ -5,7 +5,7 @@ import Data.Bool (bool)
 
 import Ya (is, ho, hu, he'hu, la, li, pattern Unit, unwrap)
 
-import RVRS.AST (type Value, type Typed, pattern String, pattern Double, pattern Bool)
+import RVRS.Syntax (type Value, type Typed, pattern String, pattern Double, pattern Bool)
 
 -- | Variable bindings (mutable or immutable)
 data Binding

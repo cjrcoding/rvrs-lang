@@ -1,5 +1,4 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE ViewPatterns #-}
 module RVRS.Engine where
 
 import GHC.IsList (fromList, toList)
@@ -16,7 +15,7 @@ import Ya hiding (True, False, Left, Right)
 import Ya.Conversion
 import Ya.World
 
-import RVRS.AST
+import RVRS.Syntax
 import RVRS.Parser
 import RVRS.Value
 
@@ -119,13 +118,13 @@ setup name = intro @Engine @(AR) `hv` Unit
  `yuk____` Apply `hv__` Given `hv` is @Flowings `yo` find name
  `yok____` Check `ha__` Error `ha` Runtime `ha` Unknown `la` Ok @Flow
 
-params args = is @(Nonempty List `T` Recursive Expression)
+params args = is @(List `T` Recursive Expression)
  args `yokl` Forth `ha` Apply `ha` expression
 
-match :: Nonempty List Value `P` Nonempty List Name `AR` Stops Reason Bindings
+match :: List Value `P` List Name `AR` Stops Reason Bindings
 match (These values names) = values `lu'yr` Align `hv` names
  `yokl` Apply `ho` Forth `ha__` Error `ha` Runtime `ha` Valency `la` Ok `ha` Equip
- `yo__` to `ha` wrap @(AR) @(Nonempty List `T'TT'I` Equipped Name `T'I_` Value)
+ `yo__` to `ha` wrap @(AR) @(List `T'TT'I` Equipped Name `T'I_` Value)
 
 tap :: forall target . Value `M` target `S` target `AR___` Error Reason target
 tap = Some `hu_` Error `ha` Runtime `ha` Require `hv` Unit `la` Valid @target

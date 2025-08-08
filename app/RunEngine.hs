@@ -3,7 +3,7 @@ module Main where
 
 import RVRS.Parser (parseRVRS)
 import RVRS.Engine (flowing)
-import RVRS.AST (Flow)
+import RVRS.Syntax (Flow)
 import Ya (Object(..))  
 import qualified Data.Text.IO as T
 import qualified Data.Text as Text

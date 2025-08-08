@@ -1,5 +1,3 @@
--- src/RVRS/Parser/Expression.hs
-
 module RVRS.Parser.ExprParser (exprParser, identifier) where
 
 import Prelude
@@ -15,9 +13,9 @@ import qualified Text.Megaparsec.Char.Lexer as M
 import qualified Text.Megaparsec as M
 import qualified Control.Monad.Combinators.Expr as M
 
-import Ya (Recursive (..), type AR, type AR_, type AR__, type Unit, pattern Both, pattern Only, pattern Unit, by, yi, ho'ho, ha, hv, lu)
+import Ya (Recursive (..), Object (..), type AR, type AR_, type AR__, type Unit, pattern Both, pattern Only, pattern Unit, by, yi, ho, ho'ho, ha, hv, lu, wrap)
 
-import RVRS.AST
+import RVRS.Syntax
 
 type Parser = Parsec Void String
 
@@ -48,8 +46,8 @@ binop f x y = Operation `hv` f Unit `hv` Both (x `lu` y)
 
 -- Terms in the expression grammar
 term :: Parser (Recursive Expression)
--- term = do try $ funcCallExpr
-term = do try $ Recursive (Operand `ha` Literal `ha` Bool $ True) <$ symbol "truth"
+term = do try $ funcCallExpr
+   <|> do try $ Recursive (Operand `ha` Literal `ha` Bool $ True) <$ symbol "truth"
    <|> do try $ Recursive (Operand `ha` Literal `ha` Bool $ False) <$ symbol "void"
    <|> do try $ Recursive `ha` Operand `ha` Literal `ha` String <$> stringLiteral
    <|> do try $ parseNumber
@@ -63,9 +61,9 @@ parseNumber :: Parser (Recursive Expression)
 parseNumber = Recursive . Operand . Literal <$> Double <$> do lexeme $ try M.float <|> fromInteger <$> M.decimal
 
 -- Function call expressions (e.g., fuse(2, 3))
--- funcCallExpr :: Parser (Recursive Expression)
--- funcCallExpr = Calling `ho'ho` Recursive <$> identifier
- -- <*> (fromList <$> parens (exprParser `sepBy` symbol ","))
+funcCallExpr :: Parser (Recursive Expression)
+funcCallExpr = Calling `ho` Recursive
+ <$> (These <$> (wrap <$> identifier) <*> (fromList <$> parens (exprParser `sepBy` symbol ",")))
 
 -- Utility parsers
 lexeme :: Parser a -> Parser a

@@ -10,7 +10,7 @@ import Data.Map
 import Data.String
 import Text.Show
 
-import RVRS.AST
+import RVRS.Syntax
 import RVRS.Value
 
 type Context = Map Name Typed

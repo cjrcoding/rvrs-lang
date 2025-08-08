@@ -6,7 +6,7 @@ import Ya (Object (..), at, this, ho)
 import Ya.Literal
 
 -- Internal modules
-import RVRS.AST (Flow, Name)
+import RVRS.Syntax (Flow, Name)
 import RVRS.Parser (parseRVRS)
 import RVRS.Eval (evalIRFlow, EvalError)
 import RVRS.Codegen (prettyPrintFlow)
