@@ -6,7 +6,6 @@ import GHC.IsList (fromList, toList)
 import Prelude (Double, (+), (-), (*), (/), (<), (==), (>), readFile, putStrLn, error)
 import Data.List ((++), zip)
 import Data.Bool (Bool (..), bool, (&&), (||))
-import Data.String (String)
 import Data.Either (Either (..))
 import Data.Functor ((<$>))
 import Data.Map (Map, insert, union)
@@ -68,12 +67,12 @@ statement x = case unwrap x of
   `yok____` Apply `ha` calls `ha'ho` bool if_block else_block
  Delta name expr -> intro @Engine `hv` Unit
   `yuk____` Apply `hv` expression expr
-  `yok____` Apply `ha` State `ha` Event `ha` save @String @Value name `ho'yo` that @Value
- Source name _ expr -> intro @Engine `hv` Unit
+  `yok____` Apply `ha` State `ha` Event `ha` save @Name @Value name `ho'yo` that @Value
+ Source name expr -> intro @Engine `hv` Unit
   `yuk____` Lease `hv___` State `ha` Event `hv` get @Bindings `yo` find name
   `yok____` Check `ha___` Error `hu_` Ok `hv` Unit `la_` Some `hu_` Error `ha` Runtime `ha` Defined `hv` name
   `yuk____` Apply `hv` expression expr
-  `yok____` Apply `ha` State `ha` Event `ha` save @String @Value name `ho'yo` that @Value
+  `yok____` Apply `ha` State `ha` Event `ha` save @Name @Value name `ho'yo` that @Value
 
 expression :: Recursive Expression `AR__` Engine Value
 expression x = case unwrap x of
@@ -123,8 +122,8 @@ setup name = intro @Engine @(AR) `hv` Unit
 params args = is @(Nonempty List `T` Recursive Expression)
  args `yokl` Forth `ha` Apply `ha` expression
 
-match :: Nonempty List Value `P` Nonempty List Argument `AR` Stops Reason Bindings
-match (These values names) = values `lu'yr` Align `hv` (names `yo` argName)
+match :: Nonempty List Value `P` Nonempty List Name `AR` Stops Reason Bindings
+match (These values names) = values `lu'yr` Align `hv` names
  `yokl` Apply `ho` Forth `ha__` Error `ha` Runtime `ha` Valency `la` Ok `ha` Equip
  `yo__` to `ha` wrap @(AR) @(Nonempty List `T'TT'I` Equipped Name `T'I_` Value)
 
@@ -161,6 +160,6 @@ flowing userFlows entryName args = do
  fullFlowMap <- loadAndMergeStdlib `yo` union userFlows
  case find entryName fullFlowMap of
   Valid (These params body) ->
-   let bindings = fromList `hv` zip (params `yo` argName `yi` toList) args in
+   let bindings = fromList `hv` zip (toList params) args in
    is `hv_'he` calls (bindings `lu` body) `he'he'hv` fullFlowMap `he'he'hv` bindings `yo'yo` is `ho'he` this @Value
   Error name -> intro @World `ha` Error `ha` Runtime `hv` Unknown name

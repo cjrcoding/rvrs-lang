@@ -32,4 +32,4 @@ runTestFile path = do
     Right flows -> do
       let flowMap = fromList [(name, flow) | These flow name <- flows]
       result <- flowing flowMap "main" []
-      putStrLn $ "Result: " ++ show result
+      putStrLn $ "Result: " -- ++ show result

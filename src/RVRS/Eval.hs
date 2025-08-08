@@ -60,7 +60,7 @@ evalIRFlow userFlows entryName args = do
   fullFlowMap <- loadAndMergeStdlib `yo` union userFlows
   case Map.lookup entryName fullFlowMap of
     Just (These params body) -> do
-      let initialEnv = fromList $ zip (toList $ params `yo` argName) args
+      let initialEnv = fromList $ zip (toList params) args
       (fmap . fmap) fst $ do runEvalIR fullFlowMap initialEnv $ catchError (evalBody $ toList body) handleReturn
     Nothing -> return `ha` Left `ha` RuntimeError $ "No flow named '" ++ show entryName ++ "' found."
 

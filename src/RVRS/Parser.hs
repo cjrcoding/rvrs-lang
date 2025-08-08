@@ -38,11 +38,8 @@ flowParser = (\name params body -> params `lu` body `lu` name)
   <*> (fromList <$> between (symbol "{") (symbol "}") (many (sc *> statementParser <* sc)))
 
 -- Optional argument list
-argListParser :: Parser [Argument]
-argListParser =
-  option [] $ between (symbol "(") (symbol ")") (nameArg `sepBy` symbol ",")
-  where
-    nameArg = Argument <$> identifier <*> pure "Unknown"
+argListParser :: Parser [Name]
+argListParser = option [] $ between (symbol "(") (symbol ")") (identifier `sepBy` symbol ",")
 
 -- Shared utilities
 sc :: Parser ()
