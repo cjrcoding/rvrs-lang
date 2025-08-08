@@ -14,6 +14,7 @@ import qualified Text.Megaparsec as M
 import qualified Control.Monad.Combinators.Expr as M
 
 import Ya (Recursive (..), Object (..), type AR, type AR_, type AR__, type Unit, pattern Both, pattern Only, pattern Unit, by, yi, ho, ho'ho, ha, hv, lu, wrap)
+import Ya.Literal
 
 import RVRS.Syntax
 
