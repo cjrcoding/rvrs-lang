@@ -1,5 +1,3 @@
--- src/RVRS/Parser/Expression.hs
-
 module RVRS.Parser.ExprParser (exprParser, identifier) where
 
 import Prelude

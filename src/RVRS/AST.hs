@@ -1,18 +1,18 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 module RVRS.AST where
 
-import Ya (T'TT'I'TTT'I (..), type P'T'I'TT'I, type S'T'I'TT'I, Tagged (Tag), type (#), type Twice, type Instead, type T'I' (..), type T, type AR, P, S, Object (..), Recursive (..), type Only, type Both, type Unit, type Nonempty, type List, pattern Instead)
-
+import Ya
 import Ya.ASCII
 import Ya.Literal
 import Ya.Instances
 
+import Prelude (Bool, Double, String)
+
 type Name = Nonempty List Letter
 
 -- TODO: add optional type annotation (or not optional?)
--- | Represents a flow of ritual logic
 type Flow = List Name `P` Nonempty List (Recursive Statement)
 
--- | Statements inside a flow block
 data Statement e
   = Source Name (Recursive Expression)                 -- source x = ...
   | Delta Name (Recursive Expression)
@@ -23,7 +23,6 @@ data Statement e
   | Pillar Name (Recursive Expression)  -- pillar NAME = ...
   | Return (Recursive Expression)
   | Assert (Recursive Expression)
-  -- deriving (Show, Eq)
 
 type Expression = Operand `S'T'I'TT'I` Operator `S'T'I'TT'I` Calling
 
