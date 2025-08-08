@@ -63,7 +63,6 @@ library
     , RVRS.Eval
     , RVRS.Pretty
     , RVRS.Value
-    , RVRS.Env
     , Ya.Conversion
     , Ya.Instances
 
@@ -84,7 +83,6 @@ executable rvrs
     , RVRS.Eval
     , RVRS.Pretty
     , RVRS.Value
-    , RVRS.Env
     , Ya.Conversion
     , Ya.Instances
 
@@ -103,7 +101,6 @@ executable RunAll
     , RVRS.Eval
     , RVRS.Pretty
     , RVRS.Value
-    , RVRS.Env
     , Ya.Conversion
     , Ya.Instances
 
@@ -114,7 +111,6 @@ executable RunEngine
       RVRS.AST
     , RVRS.Engine
     , RVRS.Parser
-    , RVRS.Env
     , RVRS.Value
 
 -- executable TestTypeCheck

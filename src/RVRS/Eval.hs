@@ -30,14 +30,13 @@ import Ya.World (World, pattern World)
 import Ya.Literal ()
 
 import RVRS.AST
-import RVRS.Env
 import RVRS.Value
 import RVRS.Parser
 
 type Env     = Map Name Value
 type FlowEnv = Map Name Flow
 
-type EvalIR a = ReaderT FlowEnv (StateT ValueEnv (ExceptT EvalError IO)) a
+type EvalIR a = ReaderT FlowEnv (StateT Env (ExceptT EvalError IO)) a
 
 data EvalError
   = RuntimeError String
@@ -182,7 +181,7 @@ evalExpr expr = case unwrap expr of
           -- list instead of nonempty list. I'll plumb it with primitive `error` for now, but -- once we replace `List` with `Nonempty List` it's going to be resolved by itself
           -- else fromJust `ha` fst <$> do callBody (toList body) `ha` fromList $ zip (toList $ params `yo` argName) argVals
 
-callBody :: [Recursive Statement] -> ValueEnv -> EvalIR (Maybe Value, ValueEnv)
+callBody :: [Recursive Statement] -> Env -> EvalIR (Maybe Value, Env)
 callBody body callEnv = runReaderT (evalBody body) <$> ask >>= lift `ha` lift `ha` flip runStateT callEnv
 
 -- Flow body evaluator used in both Calling and CallStmt
