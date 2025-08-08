@@ -10,7 +10,7 @@ type Name = Nonempty List Letter
 
 -- TODO: add optional type annotation (or not optional?)
 -- | Represents a flow of ritual logic
-type Flow = Nonempty List Name `P` Nonempty List (Recursive Statement)
+type Flow = List Name `P` Nonempty List (Recursive Statement)
 
 -- | Statements inside a flow block
 data Statement e
@@ -41,7 +41,7 @@ type Operator = Operation Unary Only `S'T'I'TT'I` Operation Dyadic Twice
 pattern Unary x = T'TT'I'TTT'I (This x) :: Operator e
 pattern Dyadic x = T'TT'I'TTT'I (That x) :: Operator e
 
-type Calling = Instead Name `P'T'I'TT'I` Nonempty List
+type Calling = Instead Name `P'T'I'TT'I` List
 
 type Operation kind quantity = Instead kind `P'T'I'TT'I` quantity
 
