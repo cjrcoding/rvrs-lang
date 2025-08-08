@@ -8,15 +8,9 @@ import Ya.Instances
 
 type Name = Nonempty List Letter
 
+-- TODO: add optional type annotation (or not optional?)
 -- | Represents a flow of ritual logic
-type Flow = Nonempty List Argument `P` Nonempty List (Recursive Statement)
-
--- TODO: is `argType` really necessary here?
--- | A named argument to a flow, e.g., `x: Number`
-data Argument = Argument
-  { argName :: Name            -- ^ The argument name
-  , argType :: String            -- ^ Placeholder for the type (optional for now)
-  } deriving (Show, Eq)
+type Flow = Nonempty List Name `P` Nonempty List (Recursive Statement)
 
 -- | Statements inside a flow block
 data Statement e
