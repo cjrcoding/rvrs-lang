@@ -1,5 +1,4 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE ViewPatterns #-}
 module RVRS.Engine where
 
 import GHC.IsList (fromList, toList)
