@@ -5,7 +5,6 @@ import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
 
 import Ya (type P, Optional, pattern Ok, pattern Error, to, by, ho, hu, la, lu)
-import Ya.Instances
 
 find k m = case Map.lookup k m of
  Maybe.Nothing -> Error k
