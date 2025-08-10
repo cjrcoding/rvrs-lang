@@ -13,7 +13,13 @@ import Text.Show
 import RVRS.Syntax
 import RVRS.Value
 
-type Context = Map Name Typed
+type Block e = List e `P` e
+
+type Terms = Map Name `T` Typed
+
+type Flows = Map Name `T` Block Typed
+
+type Context = Terms `P` Flows
 
 type Types = (Typed `P` Typed) `S` (Typed `P` Typed) `S` String `S` Name
 
@@ -29,14 +35,11 @@ expression = is @(Recursive Expression `AR_` Checker Typed)
   `la_` unary `ha'he` is `la` dyadic `ha'he` is
   `la_` calling `ha'he` is
 
-literal = intro @Checker
- `ha__` be `hv'he` String
-   `la` be `hv'he` Double
-   `la` be `hv'he` Bool
+literal = intro @Checker `ha__` be `hv'he` String `la` be `hv'he` Double `la` be `hv'he` Bool
 
 variable x = intro @Checker `hv` Unit
- `yuk____` Lease `hv__` State `ha` Event `hv` get @Context `yo` find x
- `yok____` Check `ha__` Error `ha` Unknown `la` Ok
+ `yuk____` Lease `ha__` State `hv___` Event `hv` get `ha__` Scope `hv` at @Terms `ho_` Scope `hv` key x
+ `yok____` Check `ha__` Break @Types `ha` Unknown `la` Ok @Typed
 
 unary (These operation (Only x)) = intro @Checker `hv` Unit
  `yuk____` Apply `hv__` expression `hv` is @(Recursive Expression) x
