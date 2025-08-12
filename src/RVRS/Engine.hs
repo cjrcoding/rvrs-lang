@@ -12,12 +12,13 @@ import Text.Show (Show (..))
 import qualified Data.Map as Map (lookup)
 
 import Ya hiding (True, False, Left, Right)
-import Ya.Conversion
 import Ya.World
 
 import RVRS.Syntax
 import RVRS.Parser
 import RVRS.Value
+import Ya.Conversion
+import Ya.Instances
 
 type Bindings = Map Name Value
 

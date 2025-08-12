@@ -13,33 +13,41 @@ import Text.Show
 import RVRS.Syntax
 import RVRS.Value
 
-type Context = Map Name Typed
+type Terms = Map Name `T` Typed
 
-type Types = (Typed `P` Typed) `S` (Typed `P` Typed) `S` String `S` Name
+type Flows = Map Name `T` List Typed
 
-pattern Mismatched x = This (This (This x)) :: Types
-pattern Unexpected x = This (This (That x)) :: Types
-pattern Unsupported x = This (That x) :: Types
-pattern Unknown x = That x :: Types
+type Context = Terms `P` Flows
 
-type Checker = Stops Types `JNT` State Context
+type Mistyped = (Typed `P` Typed) `S` (Typed `P` Typed) `S` (List Typed `P` List Typed) `S` Name
+
+pattern Mismatched x = This (This (This x)) :: Mistyped
+pattern Unexpected x = This (This (That x)) :: Mistyped
+pattern Misaligned x = This (That x) :: Mistyped
+pattern Unknown x = That x :: Mistyped
+
+type Checker = Stops Mistyped `JNT` State Context
 
 expression = is @(Recursive Expression `AR_` Checker Typed)
  `li__` literal `ha'he` is `la` variable `ha'he` is
   `la_` unary `ha'he` is `la` dyadic `ha'he` is
   `la_` calling `ha'he` is
 
-literal = intro @Checker
- `ha__` be `hv'he` String
-   `la` be `hv'he` Double
-   `la` be `hv'he` Bool
+literal = intro @Checker `ha__` be `hv'he` String `la` be `hv'he` Double `la` be `hv'he` Bool
 
-variable x = intro @Checker `hv` Unit
- `yuk____` Lease `hv__` State `ha` Event `hv` get @Context `yo` find x
- `yok____` Check `ha__` Error `ha` Unknown `la` Ok
+variable var = intro @Checker `hv` Unit
+ `yuk____` Lease `ha__` State `hv___` Event `hv` get `ha__` Scope `hv` at @Terms `ho_` Scope `hv` key var
+ `yok____` Check `ha__` Error @Mistyped `ha` Unknown `la` Ok @Typed
+
+calling (These name args) = intro @Checker `hv` Unit
+ `yuk______` Lease `ha__` State `hv___` Event `hv` get `ha__` Scope `hv` at @Flows `ho_` Scope `ha` key `hv'he` name
+ `yok______` Apply `ha__` Exist `hu` args `ho_'yokl` Forth `ha` Apply `ha` expression
+ `lo__'yp'yo'q` Check `ha__` Error `ha` Unknown `la` Ok @(List Typed)
+ `yok______` Check `ha__` Error `ha` Misaligned `la` Ok @(List Typed)
+ `ho_____'yu` Bool Unit
 
 unary (These operation (Only x)) = intro @Checker `hv` Unit
- `yuk____` Apply `hv__` expression `hv` is @(Recursive Expression) x
+ `yuk____` Apply `hv__` expression `hv` x
  `yok____` Check `ha__` Error `ha` Unexpected `la` Ok
  `ha_____` is @Unary `hv` unwrap operation
      `yi_` Negation `hu` (`lu'q` by Double)
@@ -54,7 +62,3 @@ dyadic (These operation (Both (These x y))) = intro @Checker `hv` Unit
      `yi_` Arithmetic `hu` (`lu'q` by Double)
       `la` Comparison `hu` (`lu'q` by Double) `ho'ho'ho` (be `hv'he` Bool)
       `la` Combinated `hu` (`lu'q` by Bool)
-
--- TODO: implement typechecking of this type of expressions
-calling (These name args) = intro @Checker @(AR) `ha` Bool `hv` Unit
- -- `yuk____` Lease `hv__` State `ha` Event `hv` get @Context `yo` find name
