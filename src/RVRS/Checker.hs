@@ -13,11 +13,9 @@ import Text.Show
 import RVRS.Syntax
 import RVRS.Value
 
-type Block e = List e `P` e
-
 type Terms = Map Name `T` Typed
 
-type Flows = Map Name `T` Block Typed
+type Flows = Map Name `T` List Typed
 
 type Context = Terms `P` Flows
 
@@ -40,6 +38,15 @@ literal = intro @Checker `ha__` be `hv'he` String `la` be `hv'he` Double `la` be
 variable x = intro @Checker `hv` Unit
  `yuk____` Lease `ha__` State `hv___` Event `hv` get `ha__` Scope `hv` at @Terms `ho_` Scope `hv` key x
  `yok____` Check `ha__` Break @Types `ha` Unknown `la` Ok @Typed
+
+calling :: Instead Name (Recursive Expression) `P` List (Recursive Expression) `AR__` Checker Typed
+calling (These name args) = intro @Checker `hv` Unit
+ `yuk______` Lease `ha__` State `hv___` Event `hv` get `ha__` Scope `hv` at @Flows `ho_` Scope `ha` key `hv'he` name
+ `yok______` Apply `ha__` (\_ -> args `yokl` Forth `ha` Apply `ha` expression)
+ `lo__'yp'yo'q` Check `ha__` Break @Types `ha` Unknown `la` Ok @(List Typed)
+ -- `yok______` Check `ha__` Error `ha` Mismatched `la` Ok
+ -- TODO: Stops Name (List Typed) -> Checker `L` Checker `T` Void `T` (List Typed `P` List Typed `S` List Typed))
+ `ho___'yu` Bool Unit
 
 unary (These operation (Only x)) = intro @Checker `hv` Unit
  `yuk____` Apply `hv__` expression `hv` is @(Recursive Expression) x
